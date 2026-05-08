@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地点管理 — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">🗺️ {{ world.name }}</h1><p class="subtitle">地点管理</p></header>
+<nav class="nav">
+    <a href="/worlds/{{ world.id }}" class="nav-link">← 返回世界详情</a>
+    <a href="/worlds/{{ world.id }}/locations/new" class="btn-primary btn-sm">+ 创建地点</a>
+</nav>
+<main class="main">
+{% if locations %}
+<div class="world-grid">
+{% for loc in locations %}
+<div class="world-card">
+    <div class="world-card-header">
+        <h3><a href="/worlds/{{ world.id }}/locations/{{ loc.id }}">{{ loc.name }}</a></h3>
+        <span class="badge">{{ loc.location_type or '未分类' }}</span>
+    </div>
+    <div class="world-card-body">
+        <p class="world-desc">{% if loc.description %}{{ loc.description[:80] }}{% else %}<span class="muted">暂无描述</span>{% endif %}</p>
+        <div class="world-meta">
+            <span>📍 {{ loc.region or '未知区域' }}</span>
+            <span>🏛️ {{ loc.controlling_faction.name if loc.controlling_faction else '无控制势力' }}</span>
+        </div>
+    </div>
+    <div class="world-card-footer">
+        <span class="time">{{ loc.created_at.strftime('%Y-%m-%d') }}</span>
+        <div class="actions">
+            <a href="/worlds/{{ world.id }}/locations/{{ loc.id }}" class="btn-sm">详情</a>
+            <a href="/worlds/{{ world.id }}/locations/{{ loc.id }}/edit" class="btn-sm btn-edit">编辑</a>
+            <form action="/worlds/{{ world.id }}/locations/{{ loc.id }}/delete" method="post" class="inline-form" onsubmit="return confirm('确定删除地点「{{ loc.name }}」吗？')">
+                <button type="submit" class="btn-sm btn-danger">删除</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<section class="empty-state"><div class="empty-icon">🗺️</div><h2>还没有地点</h2><p>创建第一个地点。</p><a href="/worlds/{{ world.id }}/locations/new" class="btn-primary">创建地点</a></section>
+{% endif %}
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

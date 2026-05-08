@@ -11,6 +11,10 @@ from app.config import settings
 from app.database import init_db
 from app.routes.pages import router as pages_router
 from app.routes.worlds import router as worlds_router
+from app.routes.characters import router as characters_router
+from app.routes.factions import router as factions_router
+from app.routes.locations import router as locations_router
+from app.routes.rules import router as rules_router
 
 
 @asynccontextmanager
@@ -36,6 +40,10 @@ app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 # Include routers
 app.include_router(pages_router)
 app.include_router(worlds_router)
+app.include_router(characters_router)
+app.include_router(factions_router)
+app.include_router(locations_router)
+app.include_router(rules_router)
 
 
 @app.get("/health")

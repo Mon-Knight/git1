@@ -215,7 +215,7 @@ def test_update_world_empty_name_fails(client):
 
 
 def test_world_detail_shows_module_placeholders(client):
-    """Test that world detail shows module navigation placeholders."""
+    """Test that world detail shows module navigation entries."""
     client.post("/worlds", data={
         "name": "模块测试",
         "world_type": "奇幻",
@@ -230,4 +230,5 @@ def test_world_detail_shows_module_placeholders(client):
     assert "规则管理" in response.text
     assert "时间线" in response.text
     assert "AI 推演" in response.text
+    # Time and AI still show "即将推出"
     assert "即将推出" in response.text

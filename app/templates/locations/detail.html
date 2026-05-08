@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ location.name }} — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">📍 {{ location.name }}</h1><p class="subtitle">{{ location.location_type or '未分类' }}</p></header>
+<nav class="nav">
+    <a href="/worlds/{{ world.id }}/locations" class="nav-link">← 返回地点列表</a>
+    <a href="/worlds/{{ world.id }}/locations/{{ location.id }}/edit" class="btn-sm btn-edit">编辑地点</a>
+</nav>
+<main class="main">
+<section class="world-info">
+    <div class="info-grid">
+        <div class="info-item"><span class="info-label">名称</span><span class="info-value">{{ location.name }}</span></div>
+        <div class="info-item"><span class="info-label">类型</span><span class="info-value">{{ location.location_type or '未设定' }}</span></div>
+        <div class="info-item"><span class="info-label">所属区域</span><span class="info-value">{{ location.region or '未设定' }}</span></div>
+        <div class="info-item"><span class="info-label">控制势力</span><span class="info-value">{{ location.controlling_faction.name if location.controlling_faction else '无' }}</span></div>
+        <div class="info-item"><span class="info-label">所属世界</span><span class="info-value">{{ world.name }}</span></div>
+        <div class="info-item"><span class="info-label">创建时间</span><span class="info-value">{{ location.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
+    </div>
+    {% if location.description %}<div class="info-card"><h3>📖 描述</h3><p>{{ location.description }}</p></div>{% endif %}
+    {% if location.important_events %}<div class="info-card"><h3>📜 重要事件</h3><p>{{ location.important_events }}</p></div>{% endif %}
+</section>
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

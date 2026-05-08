@@ -103,6 +103,7 @@ class Location(Base):
     region = Column(String(200), default="")
     description = Column(Text, default="")
     controlling_faction_id = Column(Integer, ForeignKey("factions.id"), nullable=True)
+    important_events = Column(Text, default="")
     created_at = Column(DateTime, default=_utcnow)
     updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
 

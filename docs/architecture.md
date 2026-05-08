@@ -13,51 +13,43 @@ AI World Engine 是一个 AI 小说世界观推演系统，帮助作者构建小
 - **测试**: pytest
 - **AI**: OpenAI-compatible API + Mock 模式
 
-## 目录结构（v0.2.0 实际）
+## 目录结构（v0.3.0 实际）
 
 ```
 f:\git\
 ├── app/
 │   ├── __init__.py
-│   ├── main.py              # FastAPI 应用入口（lifespan 事件）
-│   ├── config.py            # 配置管理（读取 .env）
-│   ├── database.py          # 数据库连接与初始化
-│   ├── models.py            # SQLAlchemy 数据模型（8张表）
+│   ├── main.py              # FastAPI 入口（6个路由注册）
+│   ├── config.py            # 配置管理
+│   ├── database.py          # 数据库连接
+│   ├── models.py            # 8张表（Location新增important_events）
 │   ├── routes/
-│   │   ├── __init__.py
-│   │   ├── pages.py         # 页面路由（首页）
-│   │   └── worlds.py        # 世界管理路由（CRUD）
+│   │   ├── pages.py         # 首页
+│   │   ├── worlds.py        # 世界 CRUD
+│   │   ├── characters.py    # 角色 CRUD
+│   │   ├── factions.py      # 势力 CRUD
+│   │   ├── locations.py     # 地点 CRUD
+│   │   └── rules.py         # 规则 CRUD
 │   ├── services/
-│   │   ├── __init__.py
-│   │   ├── ai_service.py    # AI 调用服务（Mock + 真实API）
-│   │   └── world_service.py # 世界业务逻辑
+│   │   ├── ai_service.py
+│   │   ├── world_service.py
+│   │   ├── character_service.py
+│   │   ├── faction_service.py
+│   │   ├── location_service.py
+│   │   └── rule_service.py
 │   ├── templates/
-│   │   ├── index.html       # 首页模板
-│   │   └── worlds/          # 世界管理模板
-│   │       ├── list.html    # 世界列表
-│   │       ├── new.html     # 创建世界
-│   │       ├── detail.html  # 世界详情
-│   │       ├── edit.html    # 编辑世界
-│   │       └── 404.html     # 世界不存在
+│   │   ├── index.html
+│   │   ├── worlds/ (5)
+│   │   ├── characters/ (5)
+│   │   ├── factions/ (5)
+│   │   ├── locations/ (5)
+│   │   └── rules/ (5)
 │   └── static/
-│       ├── css/
-│       │   └── style.css
-│       └── js/
-│           └── main.js
-├── tests/
-│   ├── __init__.py
-│   ├── conftest.py          # 测试配置（内存数据库）
-│   ├── test_main.py         # 应用与首页测试 (6)
-│   ├── test_database.py     # 数据库表结构测试 (5)
-│   ├── test_ai_service.py   # AI 服务测试 (7)
-│   └── test_worlds.py       # 世界管理测试 (18)
+├── tests/ (9个测试文件)
 ├── docs/
-├── .project_backups/        # 本地备份（不入Git）
-├── .env.example
-├── .gitignore
+├── .project_backups/
 ├── requirements.txt
-├── README.md
-└── CHANGELOG.md
+└── ...
 ```
 
 ## 数据库设计

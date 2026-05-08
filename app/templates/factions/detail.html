@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ faction.name }} — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">🏛️ {{ faction.name }}</h1><p class="subtitle">{{ faction.faction_type or '未分类' }}</p></header>
+<nav class="nav">
+    <a href="/worlds/{{ world.id }}/factions" class="nav-link">← 返回势力列表</a>
+    <a href="/worlds/{{ world.id }}/factions/{{ faction.id }}/edit" class="btn-sm btn-edit">编辑势力</a>
+</nav>
+<main class="main">
+<section class="world-info">
+    <div class="info-grid">
+        <div class="info-item"><span class="info-label">名称</span><span class="info-value">{{ faction.name }}</span></div>
+        <div class="info-item"><span class="info-label">类型</span><span class="info-value">{{ faction.faction_type or '未设定' }}</span></div>
+        <div class="info-item"><span class="info-label">领袖</span><span class="info-value">{{ faction.leader.name if faction.leader else '无' }}</span></div>
+        <div class="info-item"><span class="info-label">所属世界</span><span class="info-value">{{ world.name }}</span></div>
+        <div class="info-item"><span class="info-label">创建时间</span><span class="info-value">{{ faction.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
+    </div>
+    {% if faction.goal %}<div class="info-card"><h3>🎯 目标</h3><p>{{ faction.goal }}</p></div>{% endif %}
+    {% if faction.resources %}<div class="info-card"><h3>💰 资源</h3><p>{{ faction.resources }}</p></div>{% endif %}
+    {% if faction.enemies and faction.enemies != '[]' %}<div class="info-card"><h3>⚔️ 敌对势力</h3><p>{{ faction.enemies }}</p></div>{% endif %}
+    {% if faction.allies and faction.allies != '[]' %}<div class="info-card"><h3>🤝 盟友</h3><p>{{ faction.allies }}</p></div>{% endif %}
+    {% if faction.members %}
+    <div class="info-card"><h3>👥 成员 ({{ faction.members|length }})</h3>
+    {% if faction.members %}<ul style="padding-left:1.5rem;color:var(--color-text-muted)">{% for m in faction.members %}<li>{{ m.name }} — {{ m.role or '未知身份' }}</li>{% endfor %}</ul>{% else %}<p class="muted">暂无成员</p>{% endif %}
+    </div>{% endif %}
+    {% if faction.notes %}<div class="info-card"><h3>📝 备注</h3><p>{{ faction.notes }}</p></div>{% endif %}
+</section>
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

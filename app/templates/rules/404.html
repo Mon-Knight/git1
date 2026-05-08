@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>规则不存在 — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">{{ world.name }}</h1></header>
+<main class="main"><section class="empty-state"><div class="empty-icon">🔍</div>
+<h2>规则不存在</h2><p>规则 #{{ resource_id }} 未找到。</p>
+<a href="/worlds/{{ world.id }}/rules" class="btn-primary">返回规则列表</a></section></main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

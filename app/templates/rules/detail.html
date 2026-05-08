@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ rule.name }} — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">📜 {{ rule.name }}</h1><p class="subtitle">{{ rule.rule_type or '未分类' }}</p></header>
+<nav class="nav">
+    <a href="/worlds/{{ world.id }}/rules" class="nav-link">← 返回规则列表</a>
+    <a href="/worlds/{{ world.id }}/rules/{{ rule.id }}/edit" class="btn-sm btn-edit">编辑规则</a>
+</nav>
+<main class="main">
+<section class="world-info">
+    <div class="info-grid">
+        <div class="info-item"><span class="info-label">规则名称</span><span class="info-value">{{ rule.name }}</span></div>
+        <div class="info-item"><span class="info-label">规则类型</span><span class="info-value">{{ rule.rule_type or '未设定' }}</span></div>
+        <div class="info-item"><span class="info-label">影响范围</span><span class="info-value">{{ rule.scope or '未指定' }}</span></div>
+        <div class="info-item"><span class="info-label">所属世界</span><span class="info-value">{{ world.name }}</span></div>
+        <div class="info-item"><span class="info-label">创建时间</span><span class="info-value">{{ rule.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
+    </div>
+    {% if rule.content %}<div class="info-card"><h3>📖 规则内容</h3><p style="white-space:pre-wrap">{{ rule.content }}</p></div>{% endif %}
+    {% if rule.constraints %}<div class="info-card"><h3>⚠️ 限制条件</h3><p>{{ rule.constraints }}</p></div>{% endif %}
+</section>
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

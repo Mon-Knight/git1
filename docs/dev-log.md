@@ -1,5 +1,74 @@
 # Development Log — AI World Engine
 
+## 2026-05-09 — v0.3.0: 角色、势力、地点、世界规则管理 CRUD
+
+### 完成内容
+- 角色管理：service + routes + 5个模板（list/new/detail/edit/404）
+- 势力管理：service + routes + 5个模板
+- 地点管理：service + routes + 5个模板
+- 世界规则管理：service + routes + 5个模板
+- Location 模型新增 `important_events` 字段
+- 世界详情页：角色/势力/地点/规则入口已激活
+- 跨世界数据隔离（每个模块的列表仅显示当前世界数据）
+- 表单校验（名称必填、长度限制）
+- 44个新测试
+
+### 修改文件
+- `app/models.py` — Location 新增 important_events
+- `app/main.py` — 注册 4 个新路由
+- `app/services/character_service.py` — 新建
+- `app/services/faction_service.py` — 新建
+- `app/services/location_service.py` — 新建
+- `app/services/rule_service.py` — 新建
+- `app/routes/characters.py` — 新建
+- `app/routes/factions.py` — 新建
+- `app/routes/locations.py` — 新建
+- `app/routes/rules.py` — 新建
+- `app/templates/characters/` — 5个模板
+- `app/templates/factions/` — 5个模板
+- `app/templates/locations/` — 5个模板
+- `app/templates/rules/` — 5个模板
+- `app/templates/worlds/detail.html` — 激活模块入口
+- `tests/test_characters.py` — 新建（11个测试）
+- `tests/test_factions.py` — 新建（11个测试）
+- `tests/test_locations.py` — 新建（11个测试）
+- `tests/test_rules.py` — 新建（11个测试）
+- `tests/test_worlds.py` — 更新占位测试
+- `README.md` — 更新
+- `CHANGELOG.md` — 更新
+- `docs/dev-log.md` — 更新
+- `docs/architecture.md` — 更新
+- `docs/todo.md` — 更新
+
+### 测试命令
+```bash
+pytest tests/ -v
+```
+
+### 测试结果
+- 80 passed, 0 failed (v0.2.0: 36 + v0.3.0: 44)
+
+### 备份路径
+- `.project_backups/v0.3.0-20260509-0000.zip`
+
+### commit 信息
+- `feat: complete v0.3.0 core setting management`
+
+### tag 信息
+- `v0.3.0` — Version v0.3.0: character faction location rule CRUD
+
+### push 结果
+- main 分支推送成功
+- v0.3.0 tag 推送成功
+
+### 已知问题
+- 无
+
+### 下一步计划
+- v0.4.0: 历史事件和时间线管理
+
+---
+
 ## 2026-05-09 — v0.2.0: 世界项目管理 CRUD
 
 ### 完成内容

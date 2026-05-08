@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编辑规则 — {{ rule.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">📜 {{ world.name }}</h1><p class="subtitle">编辑规则：{{ rule.name }}</p></header>
+<nav class="nav"><a href="/worlds/{{ world.id }}/rules/{{ rule.id }}" class="nav-link">← 返回规则详情</a></nav>
+<main class="main">
+<form action="/worlds/{{ world.id }}/rules/{{ rule.id }}/edit" method="post" class="world-form">
+    <div class="form-group {% if errors.name %}has-error{% endif %}">
+        <label for="name">规则名称 <span class="required">*</span></label>
+        <input type="text" id="name" name="name" value="{{ rule.name }}" maxlength="100" required>
+        {% if errors.name %}<span class="error-msg">{{ errors.name }}</span>{% endif %}
+    </div>
+    <div class="form-group">
+        <label for="rule_type">规则类型</label>
+        <select id="rule_type" name="rule_type">
+            <option value="">-- 请选择 --</option>
+            {% set types = ['物理法则', '魔法体系', '社会结构', '经济规则', '生物特性', '历史规律', '其他'] %}
+            {% for t in types %}<option value="{{ t }}" {% if rule.rule_type == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="form-group"><label for="content">规则内容</label><textarea id="content" name="content" rows="4">{{ rule.content }}</textarea></div>
+    <div class="form-group"><label for="constraints">限制条件</label><textarea id="constraints" name="constraints" rows="2">{{ rule.constraints }}</textarea></div>
+    <div class="form-group"><label for="scope">影响范围</label><input type="text" id="scope" name="scope" value="{{ rule.scope }}"></div>
+    <div class="form-actions"><button type="submit" class="btn-primary">保存修改</button><a href="/worlds/{{ world.id }}/rules/{{ rule.id }}" class="btn-secondary">取消</a></div>
+</form>
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

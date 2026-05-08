@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>势力管理 — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">🏛️ {{ world.name }}</h1><p class="subtitle">势力管理</p></header>
+<nav class="nav">
+    <a href="/worlds/{{ world.id }}" class="nav-link">← 返回世界详情</a>
+    <a href="/worlds/{{ world.id }}/factions/new" class="btn-primary btn-sm">+ 创建势力</a>
+</nav>
+<main class="main">
+{% if factions %}
+<div class="world-grid">
+{% for f in factions %}
+<div class="world-card">
+    <div class="world-card-header">
+        <h3><a href="/worlds/{{ world.id }}/factions/{{ f.id }}">{{ f.name }}</a></h3>
+        <span class="badge">{{ f.faction_type or '未分类' }}</span>
+    </div>
+    <div class="world-card-body">
+        <p class="world-desc">{% if f.goal %}{{ f.goal[:80] }}{% else %}<span class="muted">暂无目标</span>{% endif %}</p>
+        <div class="world-meta">
+            <span>👤 {{ f.leader.name if f.leader else '无领袖' }}</span>
+        </div>
+    </div>
+    <div class="world-card-footer">
+        <span class="time">{{ f.created_at.strftime('%Y-%m-%d') }}</span>
+        <div class="actions">
+            <a href="/worlds/{{ world.id }}/factions/{{ f.id }}" class="btn-sm">详情</a>
+            <a href="/worlds/{{ world.id }}/factions/{{ f.id }}/edit" class="btn-sm btn-edit">编辑</a>
+            <form action="/worlds/{{ world.id }}/factions/{{ f.id }}/delete" method="post" class="inline-form" onsubmit="return confirm('确定删除势力「{{ f.name }}」吗？')">
+                <button type="submit" class="btn-sm btn-danger">删除</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<section class="empty-state"><div class="empty-icon">🏛️</div><h2>还没有势力</h2><p>创建第一个势力。</p><a href="/worlds/{{ world.id }}/factions/new" class="btn-primary">创建势力</a></section>
+{% endif %}
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

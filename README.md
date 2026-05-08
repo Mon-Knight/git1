@@ -340,6 +340,13 @@ AI 生成结果必须先保存到 simulation_records，不允许直接写入 his
 
 ## 开发进度
 
+### v0.3.0 ✅ 已完成
+- 角色管理 CRUD（列表/创建/详情/编辑/删除）
+- 势力管理 CRUD（列表/创建/详情/编辑/删除）
+- 地点管理 CRUD（列表/创建/详情/编辑/删除）
+- 世界规则管理 CRUD（列表/创建/详情/编辑/删除）
+- 跨世界数据隔离
+
 ### v0.2.0 ✅ 已完成
 - 世界管理 CRUD（创建/查看/编辑/删除）
 - 世界列表页、详情页、创建/编辑表单
@@ -351,7 +358,7 @@ AI 生成结果必须先保存到 simulation_records，不允许直接写入 his
 - SQLite 数据库初始化（8张表）
 - 首页模板
 - Mock AI 服务模块
-- 基础测试（36个测试全部通过）
+- 基础测试（80个测试全部通过）
 
 ### 运行方式
 
@@ -375,9 +382,22 @@ pytest tests/ -v
 | `/worlds/new` | 创建世界 |
 | `/worlds/{id}` | 世界详情 |
 | `/worlds/{id}/edit` | 编辑世界 |
+| `/worlds/{id}/characters` | 角色列表 |
+| `/worlds/{id}/characters/new` | 创建角色 |
+| `/worlds/{id}/characters/{cid}` | 角色详情 |
+| `/worlds/{id}/factions` | 势力列表 |
+| `/worlds/{id}/factions/new` | 创建势力 |
+| `/worlds/{id}/factions/{fid}` | 势力详情 |
+| `/worlds/{id}/locations` | 地点列表 |
+| `/worlds/{id}/locations/new` | 创建地点 |
+| `/worlds/{id}/locations/{lid}` | 地点详情 |
+| `/worlds/{id}/rules` | 规则列表 |
+| `/worlds/{id}/rules/new` | 创建规则 |
+| `/worlds/{id}/rules/{rid}` | 规则详情 |
 | `/health` | 健康检查 |
 
-### 项目目录结构
+### 下一阶段 v0.4.0
+- 历史事件和时间线管理
 
 ```
 app/

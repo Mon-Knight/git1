@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ character.name }} — {{ world.name }} — AI World Engine</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">👤 {{ character.name }}</h1><p class="subtitle">{{ character.role or '未知身份' }}</p></header>
+<nav class="nav">
+    <a href="/worlds/{{ world.id }}/characters" class="nav-link">← 返回角色列表</a>
+    <a href="/worlds/{{ world.id }}/characters/{{ character.id }}/edit" class="btn-sm btn-edit">编辑角色</a>
+</nav>
+<main class="main">
+<section class="world-info">
+    <div class="info-grid">
+        <div class="info-item"><span class="info-label">姓名</span><span class="info-value">{{ character.name }}</span></div>
+        <div class="info-item"><span class="info-label">身份</span><span class="info-value">{{ character.role or '未设定' }}</span></div>
+        <div class="info-item"><span class="info-label">所属势力</span><span class="info-value">{{ character.faction.name if character.faction else '未加入势力' }}</span></div>
+        <div class="info-item"><span class="info-label">当前状态</span><span class="info-value">{{ character.current_status }}</span></div>
+        <div class="info-item"><span class="info-label">所属世界</span><span class="info-value">{{ world.name }}</span></div>
+        <div class="info-item"><span class="info-label">创建时间</span><span class="info-value">{{ character.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
+    </div>
+    {% if character.personality %}
+    <div class="info-card"><h3>🎭 性格</h3><p>{{ character.personality }}</p></div>
+    {% endif %}
+    {% if character.goal %}
+    <div class="info-card"><h3>🎯 目标</h3><p>{{ character.goal }}</p></div>
+    {% endif %}
+    {% if character.abilities %}
+    <div class="info-card"><h3>⚡ 能力</h3><p>{{ character.abilities }}</p></div>
+    {% endif %}
+    {% if character.notes %}
+    <div class="info-card"><h3>📝 备注</h3><p>{{ character.notes }}</p></div>
+    {% endif %}
+</section>
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div>
+</body>
+</html>
