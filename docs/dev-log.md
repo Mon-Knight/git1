@@ -1,5 +1,53 @@
 # Development Log — AI World Engine
 
+## 2026-05-09 — v1.0.0: 稳定展示版
+
+### 完成内容
+- README 最终整理（功能总览、页面路径、安装说明、演示流程、AI配置、数据库说明、目录结构、已知限制、后续规划）
+- 架构文档最终整理
+- 安全审查最终总结
+- TODO 更新后续计划
+
+### 修改文件
+- `README.md` — 最终整理
+- `CHANGELOG.md` — 更新
+- `docs/dev-log.md` — 更新
+- `docs/architecture.md` — 更新
+- `docs/todo.md` — 更新
+- `docs/security-review.md` — 更新
+
+### 测试命令
+```bash
+pytest tests/ -v
+```
+
+### 测试结果
+- 210 passed, 0 failed
+
+### 备份路径
+- `.project_backups/v1.0.0-20260509-0000.zip`
+
+### commit 信息
+- `release: complete v1.0.0 stable demo`
+
+### tag 信息
+- `v1.0.0` — Version v1.0.0: stable demo release
+
+### push 结果
+- main 分支推送成功
+- v1.0.0 tag 推送成功
+
+### 已知问题
+- 无
+
+### 项目总结
+- 从零到完整系统，8个版本迭代
+- 210个测试，覆盖所有核心功能
+- 15个功能模块，17个页面路径
+- 代码结构清晰，易于后续扩展
+
+---
+
 ## 2026-05-09 — v0.8.0: 页面优化、错误处理和测试完善
 
 ### 完成内容
