@@ -231,5 +231,6 @@ def test_world_detail_shows_module_placeholders(client):
     assert "历史事件" in response.text
     assert "时间线" in response.text
     assert "AI 推演" in response.text
-    # Only AI推演 still shows "即将推出"
-    assert "即将推出" in response.text
+    assert "推演记录" in response.text
+    # All modules now active, no "即将推出" remaining
+    assert "即将推出" not in response.text

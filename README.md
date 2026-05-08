@@ -368,28 +368,32 @@ python -m uvicorn app.main:app --reload
 pytest tests/ -v
 ```
 
+### v0.5.0 ✅ 已完成
+- AI 推演页面（提交问题、查看结果）
+- 推演记录列表和详情
+- 世界上下文聚合（角色/势力/地点/规则/正史事件）
+- Mock AI 模式（无 API Key 时自动启用）
+- **AI 推演结果不直接写入正史**
+
 ### 页面路径
 
 | 路径 | 说明 |
 |------|------|
 | `/` | 首页 |
 | `/worlds` | 世界列表 |
-| `/worlds/{id}` | 世界详情 |
-| `/worlds/{id}/characters` | 角色管理 |
-| `/worlds/{id}/factions` | 势力管理 |
-| `/worlds/{id}/locations` | 地点管理 |
-| `/worlds/{id}/rules` | 规则管理 |
-| `/worlds/{id}/events` | 历史事件 |
+| `/worlds/{id}` | 世界详情（8个模块入口） |
+| `/worlds/{id}/simulation` | AI 推演 |
+| `/worlds/{id}/records` | 推演记录 |
 | `/worlds/{id}/timeline` | 时间线 |
 | `/health` | 健康检查 |
 
-### 时间线排序规则
-- 按 event_time 文本排序（支持 YYYY-MM-DD 或自定义文本如"帝国历三年"）
-- event_time 为空的事件排到最后
-- 支持 `?view=canon` / `?view=all` / `?view=non_canon` 筛选
+### AI 模式说明
+- 未配置 `AI_API_KEY` 时自动使用 Mock AI 模式
+- 配置 `AI_API_KEY` 后可接入 OpenAI-compatible API
+- Mock AI 生成基于规则的推演结果，用于本地测试
 
-### 下一阶段 v0.5.0
-- AI 推演和推演记录
+### 下一阶段 v0.6.0
+- 采纳为正史、分支记录
 
 ```
 app/

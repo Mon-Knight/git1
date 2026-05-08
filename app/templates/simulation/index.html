@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 推演 — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<style>
+.sim-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:768px){.sim-layout{grid-template-columns:1fr}}
+.sim-panel{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem}
+.sim-panel h3{font-size:1rem;margin-bottom:0.75rem}
+.context-text{font-size:0.8rem;color:var(--color-text-muted);white-space:pre-wrap;max-height:400px;overflow-y:auto;line-height:1.5}
+.result-text{font-size:0.9rem;color:var(--color-text);white-space:pre-wrap;line-height:1.7;max-height:500px;overflow-y:auto}
+.result-meta{display:flex;gap:1rem;margin-top:1rem;font-size:0.8rem;color:var(--color-text-muted)}
+.alert-info{background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:var(--color-primary)}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">🤖 {{ world.name }}</h1><p class="subtitle">AI 推演</p></header>
+<nav class="nav">
+    <a href="/worlds/{{ world.id }}" class="nav-link">← 返回世界详情</a>
+    <a href="/worlds/{{ world.id }}/records" class="btn-sm">查看推演记录</a>
+</nav>
+<main class="main">
+
+<div class="alert-info">⚠️ AI 推演结果不会自动写入正史。推演记录保存后，你可以在后续版本中选择采纳为正史或保留为分支。</div>
+
+{% if errors.submit %}<div class="alert-info" style="background:rgba(231,76,60,0.1);border-color:rgba(231,76,60,0.3);color:#e74c3c">{{ errors.submit }}</div>{% endif %}
+
+{% if result %}
+<div class="sim-layout">
+    <div class="sim-panel">
+        <h3>📋 推演问题</h3>
+        <p style="color:var(--color-text)">{{ result.question }}</p>
+        {% if result.simulation_type %}<p style="color:var(--color-text-muted);font-size:0.85rem">类型: {{ result.simulation_type }}</p>{% endif %}
+        <div class="result-meta">
+            <span>状态: {{ result.status }}</span>
+            <span>模式: {{ 'Mock AI' if result.is_mock else 'Live AI' }}</span>
+            <span>{{ result.created_at }}</span>
+        </div>
+        <p style="margin-top:0.75rem"><a href="/worlds/{{ world.id }}/records/{{ result.id }}" class="btn-sm">查看完整记录 →</a></p>
+    </div>
+    <div class="sim-panel">
+        <h3>🤖 AI 推演结果</h3>
+        <div class="result-text">{{ result.ai_response }}</div>
+    </div>
+</div>
+{% else %}
+<form action="/worlds/{{ world.id }}/simulation" method="post" class="world-form">
+    <div class="form-group {% if errors.question %}has-error{% endif %}">
+        <label for="question">推演问题 <span class="required">*</span></label>
+        <textarea id="question" name="question" rows="3" placeholder="输入你想推演的问题，例如：如果龙族发动全面战争会怎样？" maxlength="1000" required>{{ form_data.question if form_data else '' }}</textarea>
+        {% if errors.question %}<span class="error-msg">{{ errors.question }}</span>{% endif %}
+    </div>
+    <div class="form-group">
+        <label for="simulation_type">推演类型</label>
+        <select id="simulation_type" name="simulation_type">
+            <option value="">-- 请选择 --</option>
+            {% set types = ['剧情发展', '角色行动', '势力冲突', '世界规则影响', '历史事件后果'] %}
+            {% for t in types %}<option value="{{ t }}" {% if form_data and form_data.simulation_type == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="form-actions"><button type="submit" class="btn-primary">🤖 开始推演</button></div>
+</form>
+
+<div class="sim-panel" style="margin-top:1.5rem">
+    <h3>📊 当前世界设定摘要</h3>
+    <div class="context-text">{{ context_snapshot or '暂无设定数据' }}</div>
+</div>
+{% endif %}
+
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

@@ -166,11 +166,14 @@ class SimulationRecord(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     world_id = Column(Integer, ForeignKey("worlds.id"), nullable=False)
     question = Column(Text, default="")
+    simulation_type = Column(String(50), default="")
+    context_snapshot = Column(Text, default="")
     ai_response = Column(Text, default="")
     status = Column(String(50), default="pending")  # pending / adopted / branched / discarded
     ai_model = Column(String(100), default="")
     is_mock = Column(Boolean, default=False)
     created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
 
     world = relationship("World", back_populates="simulations")
 

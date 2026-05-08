@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>推演记录 — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<style>.status-pending{color:#ffc107}.status-adopted{color:var(--color-accent)}.status-branched{color:var(--color-primary)}.status-discarded{color:#888}</style>
+</head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">📋 {{ world.name }}</h1><p class="subtitle">推演记录</p></header>
+<nav class="nav">
+    <a href="/worlds/{{ world.id }}" class="nav-link">← 返回世界详情</a>
+    <a href="/worlds/{{ world.id }}/simulation" class="btn-primary btn-sm">🤖 新推演</a>
+</nav>
+<main class="main">
+{% if records %}
+<div class="world-grid">
+{% for r in records %}
+<div class="world-card">
+    <div class="world-card-header">
+        <h3><a href="/worlds/{{ world.id }}/records/{{ r.id }}">{{ r.question[:60] }}{% if r.question|length > 60 %}…{% endif %}</a></h3>
+        <span class="badge">{{ r.simulation_type or '未分类' }}</span>
+    </div>
+    <div class="world-card-body">
+        <p class="world-desc">{% if r.ai_response %}{{ r.ai_response[:100] }}{% else %}<span class="muted">暂无结果</span>{% endif %}</p>
+        <div class="world-meta">
+            <span class="status-{{ r.status }}">📌 {{ r.status }}</span>
+            <span>{{ 'Mock' if r.is_mock else 'Live' }}</span>
+        </div>
+    </div>
+    <div class="world-card-footer">
+        <span class="time">{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+        <div class="actions"><a href="/worlds/{{ world.id }}/records/{{ r.id }}" class="btn-sm">详情</a></div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<section class="empty-state"><div class="empty-icon">📋</div><h2>还没有推演记录</h2><p>提交一个 AI 推演问题来开始。</p><a href="/worlds/{{ world.id }}/simulation" class="btn-primary">开始推演</a></section>
+{% endif %}
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

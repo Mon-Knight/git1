@@ -1,5 +1,65 @@
 # Development Log — AI World Engine
 
+## 2026-05-09 — v0.5.0: AI 推演和推演记录
+
+### 完成内容
+- AI 推演页面：问题输入、类型选择、世界设定预览、结果展示
+- 世界上下文聚合服务：聚合角色/势力/地点/规则/正史事件
+- 推演记录：列表 + 详情页
+- SimulationRecord 模型新增 simulation_type、context_snapshot、updated_at
+- 核心规则：AI 推演结果不直接写入 historical_events
+- 17个新测试（含跨世界隔离、不污染正史验证）
+
+### 修改文件
+- `app/models.py` — SimulationRecord 新增3个字段
+- `app/services/world_context_service.py` — 新建
+- `app/services/simulation_service.py` — 新建
+- `app/routes/simulation.py` — 新建
+- `app/routes/records.py` — 新建
+- `app/templates/simulation/index.html` — 新建
+- `app/templates/records/list.html` — 新建
+- `app/templates/records/detail.html` — 新建
+- `app/templates/records/404.html` — 新建
+- `app/templates/worlds/detail.html` — 激活AI推演+推演记录入口
+- `app/main.py` — 注册2个新路由
+- `tests/test_simulation.py` — 新建（17个测试）
+- `tests/test_worlds.py` — 更新占位测试
+- `README.md` — 更新
+- `CHANGELOG.md` — 更新
+- `docs/dev-log.md` — 更新
+- `docs/architecture.md` — 更新
+- `docs/todo.md` — 更新
+- `docs/security-review.md` — 更新
+
+### 测试命令
+```bash
+pytest tests/ -v
+```
+
+### 测试结果
+- 116 passed, 0 failed (v0.4.0: 99 + v0.5.0: 17)
+
+### 备份路径
+- `.project_backups/v0.5.0-20260509-0000.zip`
+
+### commit 信息
+- `feat: complete v0.5.0 AI simulation records`
+
+### tag 信息
+- `v0.5.0` — Version v0.5.0: AI simulation and records
+
+### push 结果
+- main 分支推送成功
+- v0.5.0 tag 推送成功
+
+### 已知问题
+- 无
+
+### 下一步计划
+- v0.6.0: 采纳为正史、分支记录
+
+---
+
 ## 2026-05-09 — v0.4.0: 历史事件和时间线管理
 
 ### 完成内容

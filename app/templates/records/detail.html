@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>推演记录 #{{ record.id }} — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<style>.status-pending{color:#ffc107}.status-adopted{color:var(--color-accent)}.status-branched{color:var(--color-primary)}</style>
+</head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">📋 推演记录 #{{ record.id }}</h1><p class="subtitle"><span class="status-{{ record.status }}">{{ record.status }}</span> · {{ 'Mock AI' if record.is_mock else 'Live AI' }}</p></header>
+<nav class="nav"><a href="/worlds/{{ world.id }}/records" class="nav-link">← 返回记录列表</a></nav>
+<main class="main">
+<section class="world-info">
+    <div class="info-grid">
+        <div class="info-item"><span class="info-label">所属世界</span><span class="info-value">{{ world.name }}</span></div>
+        <div class="info-item"><span class="info-label">推演类型</span><span class="info-value">{{ record.simulation_type or '未分类' }}</span></div>
+        <div class="info-item"><span class="info-label">状态</span><span class="info-value status-{{ record.status }}">{{ record.status }}</span></div>
+        <div class="info-item"><span class="info-label">AI 模式</span><span class="info-value">{{ 'Mock' if record.is_mock else record.ai_model }}</span></div>
+        <div class="info-item"><span class="info-label">创建时间</span><span class="info-value">{{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
+    </div>
+
+    <div class="info-card"><h3>❓ 推演问题</h3><p>{{ record.question }}</p></div>
+
+    <div class="info-card"><h3>🤖 AI 推演结果</h3><div style="white-space:pre-wrap;line-height:1.7;color:var(--color-text)">{{ record.ai_response }}</div></div>
+
+    {% if record.context_snapshot %}
+    <details class="info-card" style="cursor:pointer"><summary style="font-weight:600;font-size:1rem">📊 推演时世界设定快照</summary>
+    <pre style="font-size:0.8rem;color:var(--color-text-muted);white-space:pre-wrap;margin-top:0.75rem;line-height:1.5">{{ record.context_snapshot }}</pre>
+    </details>
+    {% endif %}
+
+    <div class="info-card" style="background:rgba(108,99,255,0.05);border-color:rgba(108,99,255,0.2)">
+        <h3>📌 后续操作</h3>
+        <p style="color:var(--color-text-muted)">采纳为正史和保存为分支功能将在 v0.6.0 中实现。届时你可以将此推演结果采纳为世界正史事件，或保留为独立分支。</p>
+    </div>
+</section>
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

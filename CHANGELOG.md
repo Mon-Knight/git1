@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.5.0] — 2026-05-09
+
+### Added
+- AI 推演页面（提交问题、查看结果）
+- 世界上下文聚合服务（角色/势力/地点/规则/正史事件）
+- 推演记录列表和详情页
+- SimulationRecord 新增 simulation_type、context_snapshot、updated_at 字段
+- 推演结果不直接写入正史（核心规则）
+- 17个新测试（模拟10 + 记录7）
+
 ## [v0.4.0] — 2026-05-09
 
 ### Added
