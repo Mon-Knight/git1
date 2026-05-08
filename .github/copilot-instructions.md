@@ -82,14 +82,22 @@ git push origin v0.1.0
 ---
 
 # GitHub Rules
+本项目已经完成 Git 初始化，并已连接到 GitHub 远程仓库 `git1`。
 
-必须为项目单独创建仓库。
+Copilot Agent 必须遵守：
 
-默认：
+1. 不要重新创建 GitHub 仓库。
+2. 不要执行 `gh repo create`。
+3. 不要修改已有 remote。
+4. 不要推送到其他仓库。
+5. 不要删除 `.git` 目录。
+6. 不要重新执行 `git init`，除非确认当前目录不是 Git 仓库。
+7. 每次开发前必须先检查：
 
 ```bash
-gh repo create <repo-name> --private --source=. --remote=origin --push
-```
+git status
+git remote -v
+git branch
 
 禁止推送到错误仓库。
 
@@ -210,3 +218,216 @@ flutter test
 - 提交 node_modules
 - 提交 venv
 - 提交备份压缩包
+
+
+
+【版本备份机制】
+每一个可运行版本都必须完成以下动作：
+
+1. 本地备份：
+   - 创建 .project_backups/ 目录。
+   - 每个版本创建一个备份压缩包。
+   - 命名格式：
+     .project_backups/v0.1.0-YYYYMMDD-HHMM.zip
+   - 备份时排除：
+     .git/
+     node_modules/
+     venv/
+     .venv/
+     __pycache__/
+     dist/
+     build/
+     .env
+     .project_backups/
+
+2. Git 提交：
+   - 每完成一个稳定版本，执行：
+     git status
+     git add .
+     git commit -m "feat: complete v0.1.0 <简短说明>"
+
+3. Git Tag：
+   - 每个稳定版本必须创建 tag：
+     git tag -a v0.1.0 -m "Version v0.1.0: <说明>"
+
+4. 推送 GitHub：
+   - 推送主分支：
+     git push -u origin main
+   - 推送 tag：
+     git push origin v0.1.0
+
+5. 版本记录：
+   - 更新 CHANGELOG.md。
+   - 更新 docs/dev-log.md。
+   - 在 docs/dev-log.md 中记录：
+     - 当前版本号
+     - 完成功能
+     - 修改文件
+     - 测试命令
+     - 测试结果
+     - 已知问题
+     - 下一步计划
+
+【版本号规则】
+请使用语义化版本：
+- v0.1.0：项目骨架完成，可启动。
+- v0.2.0：核心功能初版完成。
+- v0.3.0：界面或交互完善。
+- v0.4.0：错误处理、边界情况、数据校验完善。
+- v0.5.0：测试、文档、安全检查完善。
+- v1.0.0：完整稳定版。
+
+不要把不可运行的状态标记为稳定版本。不可运行的中间状态只能使用普通 commit，不能打正式 tag。
+
+【开发流程】
+请严格按照下面流程执行：
+
+阶段 1：需求分析
+- 根据项目目标写出功能清单。
+- 区分核心功能、增强功能、暂不实现功能。
+- 写入 docs/decision-log.md。
+
+阶段 2：架构设计
+- 设计目录结构。
+- 说明前端、后端、数据存储、配置文件、测试文件的职责。
+- 写入 README.md 和 docs/decision-log.md。
+
+阶段 3：最小可运行版本
+- 先完成最小可运行版本，不要一开始堆复杂功能。
+- 运行启动命令。
+- 发现错误必须修复。
+- 启动成功后提交为 v0.1.0。
+
+阶段 4：核心功能开发
+- 每次只实现一个功能模块。
+- 每个功能完成后运行测试。
+- 测试通过后提交。
+- 达到稳定阶段后打 tag 并推送。
+
+阶段 5：异常处理与安全检查
+- 检查输入校验。
+- 检查路径穿越风险。
+- 检查命令注入风险。
+- 检查 XSS、SQL 注入、敏感信息泄露风险。
+- 检查依赖漏洞。
+- 检查 .gitignore 是否生效。
+- 结果写入 docs/security-review.md。
+
+阶段 6：最终整理
+- 完善 README.md。
+- 完善 CHANGELOG.md。
+- 完善运行说明。
+- 补充常见问题。
+- 清理无用代码。
+- 执行最终测试。
+- 提交并打 v1.0.0 tag。
+- 推送到 GitHub。
+
+【测试要求】
+根据项目技术栈自动选择测试方式：
+
+如果是 Python 项目：
+- 创建 requirements.txt
+- 推荐使用 pytest
+- 至少执行：
+  python -m compileall .
+  pytest
+
+如果是 Node.js / 前端项目：
+- 创建 package.json
+- 至少执行：
+  npm install
+  npm run build
+  npm test
+  npm run lint
+
+如果是 Flutter 项目：
+- 至少执行：
+  flutter pub get
+  flutter analyze
+  flutter test
+  flutter build apk 或适合当前平台的构建命令
+
+如果是 Web 项目：
+- 检查页面是否能启动
+- 检查路由是否正常
+- 检查控制台是否有明显错误
+- 检查表单输入是否合法
+
+如果没有测试框架，也必须创建最基本的 smoke test，并说明如何验证程序可运行。
+
+【安全要求】
+必须避免以下问题：
+1. 硬编码密钥。
+2. 把 .env 提交到 GitHub。
+3. 使用 eval、exec 或危险 shell 拼接。
+4. 没有校验用户输入。
+5. 文件上传不限制类型和大小。
+6. 路径拼接导致路径穿越。
+7. 数据库查询直接拼接字符串。
+8. 前端直接渲染未经处理的 HTML。
+9. 日志输出密码、Token、Cookie。
+10. 把备份压缩包提交进 Git 仓库。
+
+【失败处理规则】
+如果某一步失败：
+1. 停止继续扩展新功能。
+2. 读取并总结错误。
+3. 判断是环境问题、依赖问题、代码问题还是权限问题。
+4. 优先做最小修改。
+5. 修改后重新运行测试。
+6. 如果连续两次失败，必须回退到上一个稳定 Git commit，并记录原因。
+7. 不要删除整个项目重来，除非我明确允许。
+
+【Git 分支策略】
+默认使用 main 分支。
+开发复杂功能时可以创建 feature 分支：
+git checkout -b feature/<功能名>
+
+功能完成并测试通过后合并回 main：
+git checkout main
+git merge feature/<功能名>
+
+合并前必须运行测试。
+合并后必须提交并推送。
+
+【提交信息规范】
+提交信息必须使用以下格式：
+- feat: 新功能
+- fix: 修复问题
+- docs: 文档修改
+- test: 测试相关
+- refactor: 重构
+- chore: 配置或杂项
+- security: 安全修复
+- backup: 版本备份说明
+
+示例：
+git commit -m "feat: add user login module"
+git commit -m "fix: handle empty input validation"
+git commit -m "docs: update installation guide"
+
+【最终交付要求】
+完成后请给我输出：
+1. 项目名称。
+2. GitHub 仓库地址。
+3. 当前最终版本号。
+4. 已完成功能列表。
+5. 项目目录结构。
+6. 本地运行命令。
+7. 测试命令和测试结果。
+8. 已创建的 Git tags。
+9. 已知问题。
+10. 后续可扩展方向。
+11. 安全检查结果摘要。
+
+【重要限制】
+- 不要伪造 GitHub 推送成功。
+- 不要伪造测试通过。
+- 不要在没有实际运行命令的情况下说“已验证”。
+- 不要把未完成版本标记为完成。
+- 不要为了省事跳过备份、提交、tag、推送。
+- 不要把备份压缩包提交到 GitHub，GitHub 上通过 commit、tag 和 release 记录版本即可。
+- 如果 GitHub CLI 没有登录，请明确告诉我需要先执行 gh auth login。
+- 如果缺少必要环境，请先说明缺少什么，并给出安装命令。
+- 如果存在多个解决方案，请选择最稳定、最容易运行、最适合初学者维护的方案。
