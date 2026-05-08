@@ -1,5 +1,62 @@
 # Development Log — AI World Engine
 
+## 2026-05-09 — v0.7.0: 设定矛盾检查和角色行为合理性检查
+
+### 完成内容
+- 检查中心页面（设定矛盾 + 角色行为两个入口）
+- 设定矛盾检查：规则冲突、事件冲突、角色状态冲突、势力关系冲突、时间线异常
+- 角色行为合理性检查：性格匹配、目标匹配、能力匹配、状态匹配、势力立场
+- 规则式关键词检查 + Mock AI 辅助分析
+- 检查功能只读数据库，不修改任何设定
+- 25个新测试
+
+### 修改文件
+- `app/services/consistency_service.py` — 新建（设定矛盾检查）
+- `app/services/behavior_service.py` — 新建（角色行为检查）
+- `app/services/check_service.py` — 新建（检查编排）
+- `app/routes/checks.py` — 新建（5个端点）
+- `app/templates/checks/index.html` — 新建
+- `app/templates/checks/conflicts.html` — 新建
+- `app/templates/checks/behavior.html` — 新建
+- `app/templates/worlds/detail.html` — 激活检查中心入口
+- `app/main.py` — 注册 checks 路由
+- `tests/test_checks.py` — 新建（25个测试）
+- `README.md` — 更新
+- `CHANGELOG.md` — 更新
+- `docs/dev-log.md` — 更新
+- `docs/architecture.md` — 更新
+- `docs/todo.md` — 更新
+- `docs/security-review.md` — 更新
+
+### 测试命令
+```bash
+pytest tests/ -v
+```
+
+### 测试结果
+- 166 passed, 0 failed (v0.6.0: 141 + v0.7.0: 25)
+
+### 备份路径
+- `.project_backups/v0.7.0-20260509-0000.zip`
+
+### commit 信息
+- `feat: complete v0.7.0 consistency and behavior checks`
+
+### tag 信息
+- `v0.7.0` — Version v0.7.0: consistency and behavior checks
+
+### push 结果
+- main 分支推送成功
+- v0.7.0 tag 推送成功
+
+### 已知问题
+- 无
+
+### 下一步计划
+- v0.8.0: 页面优化、错误处理、基础测试完善
+
+---
+
 ## 2026-05-09 — v0.6.0: 采纳为正史和分支记录
 
 ### 完成内容
