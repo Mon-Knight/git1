@@ -192,6 +192,7 @@ class Branch(Base):
     description = Column(Text, default="")
     events_json = Column(Text, default="[]")
     created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
 
     world = relationship("World", back_populates="branches")
     simulation = relationship("SimulationRecord", foreign_keys=[simulation_id])

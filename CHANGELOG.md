@@ -1,5 +1,16 @@
 # Changelog
 
+## [v0.6.0] — 2026-05-09
+
+### Added
+- 推演记录采纳为正史（创建 historical_events，is_canon=True）
+- 推演记录保存为分支（创建 branches，不影响正史）
+- 分支记录列表和详情页
+- 记录状态流转：pending → adopted / branched
+- 防止重复采纳、防止跨世界操作
+- Branch 模型新增 updated_at 字段
+- 25个新测试
+
 ## [v0.5.0] — 2026-05-09
 
 ### Added

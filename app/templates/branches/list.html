@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分支记录 — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">🔀 {{ world.name }}</h1><p class="subtitle">分支记录</p></header>
+<nav class="nav"><a href="/worlds/{{ world.id }}" class="nav-link">← 返回世界详情</a></nav>
+<main class="main">
+{% if branches %}
+<div class="world-grid">
+{% for b in branches %}
+<div class="world-card">
+    <div class="world-card-header">
+        <h3><a href="/worlds/{{ world.id }}/branches/{{ b.id }}">{{ b.branch_name }}</a></h3>
+    </div>
+    <div class="world-card-body">
+        <p class="world-desc">{% if b.simulation %}{{ b.simulation.question[:80] }}{% else %}<span class="muted">来源未知</span>{% endif %}</p>
+        <div class="world-meta"><span>📋 来源记录 #{{ b.simulation_id }}</span></div>
+    </div>
+    <div class="world-card-footer">
+        <span class="time">{{ b.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+        <div class="actions"><a href="/worlds/{{ world.id }}/branches/{{ b.id }}" class="btn-sm">详情</a></div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<section class="empty-state"><div class="empty-icon">🔀</div><h2>还没有分支记录</h2><p>将推演结果保存为分支后，分支会出现在这里。</p><a href="/worlds/{{ world.id }}/records" class="btn-primary">查看推演记录</a></section>
+{% endif %}
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

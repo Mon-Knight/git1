@@ -19,6 +19,7 @@ from app.routes.events import router as events_router
 from app.routes.timeline import router as timeline_router
 from app.routes.simulation import router as simulation_router
 from app.routes.records import router as records_router
+from app.routes.branches import router as branches_router
 
 
 @asynccontextmanager
@@ -52,6 +53,7 @@ app.include_router(events_router)
 app.include_router(timeline_router)
 app.include_router(simulation_router)
 app.include_router(records_router)
+app.include_router(branches_router)
 
 
 @app.get("/health")

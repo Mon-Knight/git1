@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ branch.branch_name }} — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">🔀 {{ branch.branch_name }}</h1><p class="subtitle">分支记录</p></header>
+<nav class="nav"><a href="/worlds/{{ world.id }}/branches" class="nav-link">← 返回分支列表</a></nav>
+<main class="main">
+<section class="world-info">
+    <div class="info-grid">
+        <div class="info-item"><span class="info-label">分支名称</span><span class="info-value">{{ branch.branch_name }}</span></div>
+        <div class="info-item"><span class="info-label">所属世界</span><span class="info-value">{{ world.name }}</span></div>
+        <div class="info-item"><span class="info-label">来源记录</span><span class="info-value">#{{ branch.simulation_id }}</span></div>
+        <div class="info-item"><span class="info-label">创建时间</span><span class="info-value">{{ branch.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
+    </div>
+
+    {% if branch.description %}<div class="info-card"><h3>📖 描述</h3><p>{{ branch.description }}</p></div>{% endif %}
+
+    {% if branch.simulation %}
+    <div class="info-card"><h3>❓ 原始推演问题</h3><p>{{ branch.simulation.question }}</p></div>
+    {% endif %}
+
+    <div class="info-card"><h3>📋 分支内容</h3>
+    <pre style="font-size:0.85rem;color:var(--color-text);white-space:pre-wrap;line-height:1.7">{{ branch.events_json }}</pre>
+    </div>
+
+    <div class="info-card" style="background:rgba(255,193,7,0.05);border-color:rgba(255,193,7,0.2)">
+        <h3>⚠️ 分支说明</h3>
+        <p style="color:var(--color-text-muted)">该分支未进入正史，不影响世界时间线。它记录了推演时的一种可能发展方向。</p>
+    </div>
+</section>
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

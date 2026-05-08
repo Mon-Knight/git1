@@ -385,6 +385,7 @@ pytest tests/ -v
 | `/worlds/{id}/simulation` | AI 推演 |
 | `/worlds/{id}/records` | 推演记录 |
 | `/worlds/{id}/timeline` | 时间线 |
+| `/worlds/{id}/branches` | 分支记录 |
 | `/health` | 健康检查 |
 
 ### AI 模式说明
@@ -392,8 +393,16 @@ pytest tests/ -v
 - 配置 `AI_API_KEY` 后可接入 OpenAI-compatible API
 - Mock AI 生成基于规则的推演结果，用于本地测试
 
-### 下一阶段 v0.6.0
-- 采纳为正史、分支记录
+### 推演记录状态说明
+| 状态 | 说明 | 可操作 |
+|------|------|--------|
+| pending | 待处理 | 采纳为正史 / 保存为分支 |
+| adopted | 已采纳为正史 | 无（已写入时间线） |
+| branched | 已保存为分支 | 无（已保存为独立分支） |
+| discarded | 已废弃 | 无（预留） |
+
+### 下一阶段 v0.7.0
+- 设定矛盾检查和角色行为合理性检查
 
 ```
 app/

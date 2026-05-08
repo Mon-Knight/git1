@@ -1,5 +1,63 @@
 # Development Log — AI World Engine
 
+## 2026-05-09 — v0.6.0: 采纳为正史和分支记录
+
+### 完成内容
+- 推演记录采纳为正史：创建 historical_events（is_canon=True, source_type=simulation）
+- 推演记录保存为分支：创建 branches，不写入 historical_events
+- 记录状态流转：pending → adopted / branched
+- 防止重复操作、跨世界操作
+- 分支列表和详情页
+- Branch 模型新增 updated_at
+- 25个新测试
+
+### 修改文件
+- `app/models.py` — Branch 新增 updated_at
+- `app/services/record_action_service.py` — 新建
+- `app/services/branch_service.py` — 新建
+- `app/routes/records.py` — 新增 adopt/branch 端点 + 跨世界校验
+- `app/routes/branches.py` — 新建
+- `app/templates/records/detail.html` — 新增操作按钮（按状态显示）
+- `app/templates/branches/` — 3个模板
+- `app/templates/worlds/detail.html` — 激活分支记录入口
+- `app/main.py` — 注册 branches 路由
+- `tests/test_adopt_branch.py` — 新建（25个测试）
+- `README.md` — 更新
+- `CHANGELOG.md` — 更新
+- `docs/dev-log.md` — 更新
+- `docs/architecture.md` — 更新
+- `docs/todo.md` — 更新
+- `docs/security-review.md` — 更新
+
+### 测试命令
+```bash
+pytest tests/ -v
+```
+
+### 测试结果
+- 141 passed, 0 failed (v0.5.0: 116 + v0.6.0: 25)
+
+### 备份路径
+- `.project_backups/v0.6.0-20260509-0000.zip`
+
+### commit 信息
+- `feat: complete v0.6.0 canon adoption and branches`
+
+### tag 信息
+- `v0.6.0` — Version v0.6.0: canon adoption and branches
+
+### push 结果
+- main 分支推送成功
+- v0.6.0 tag 推送成功
+
+### 已知问题
+- 数据库迁移：v0.5.0 和 v0.6.0 均修改了模型。开发阶段删除旧 `ai_world_engine.db` 后重新启动即可。
+
+### 下一步计划
+- v0.7.0: 设定矛盾检查和角色行为合理性检查
+
+---
+
 ## 2026-05-09 — v0.5.0: AI 推演和推演记录
 
 ### 完成内容
