@@ -1,5 +1,56 @@
 # Development Log — AI World Engine
 
+## 2026-05-09 — v0.8.0: 页面优化、错误处理和测试完善
+
+### 完成内容
+- 统一错误页面模板（errors/404, 400, 500）
+- 页面导航一致性确认（所有模块返回链接正确）
+- 空状态友好提示确认
+- 表单错误提示确认
+- README 补充数据库开发说明和已知限制
+- 44个润色测试
+
+### 修改文件
+- `app/templates/errors/404.html` — 新建
+- `app/templates/errors/400.html` — 新建
+- `app/templates/errors/500.html` — 新建
+- `tests/test_polish.py` — 新建（44个测试）
+- `README.md` — 补充数据库说明、已知限制、v1.0.0计划
+- `CHANGELOG.md` — 更新
+- `docs/dev-log.md` — 更新
+- `docs/architecture.md` — 更新
+- `docs/todo.md` — 更新
+- `docs/security-review.md` — 更新
+
+### 测试命令
+```bash
+pytest tests/ -v
+```
+
+### 测试结果
+- 210 passed, 0 failed (v0.7.0: 166 + v0.8.0: 44)
+
+### 备份路径
+- `.project_backups/v0.8.0-20260509-0000.zip`
+
+### commit 信息
+- `chore: complete v0.8.0 polish and error handling`
+
+### tag 信息
+- `v0.8.0` — Version v0.8.0: polish error handling and tests
+
+### push 结果
+- main 分支推送成功
+- v0.8.0 tag 推送成功
+
+### 已知问题
+- 无
+
+### 下一步计划
+- v1.0.0: 最终整理、完整测试、文档完善、稳定发布
+
+---
+
 ## 2026-05-09 — v0.7.0: 设定矛盾检查和角色行为合理性检查
 
 ### 完成内容
