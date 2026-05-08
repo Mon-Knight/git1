@@ -1,5 +1,62 @@
 # Development Log — AI World Engine
 
+## 2026-05-09 — v0.4.0: 历史事件和时间线管理
+
+### 完成内容
+- 历史事件 CRUD：service + routes + 5个模板
+- 时间线查看：3种视图（canon/all/non_canon），query参数筛选
+- 正史/非正史事件区分（is_canon 字段）
+- 时间线按 event_time 文本排序（空值排最后）
+- 世界详情页：历史事件和时间线入口已激活
+- 19个新测试
+
+### 修改文件
+- `app/services/event_service.py` — 新建
+- `app/services/timeline_service.py` — 新建
+- `app/routes/events.py` — 新建
+- `app/routes/timeline.py` — 新建
+- `app/templates/events/` — 5个模板
+- `app/templates/timeline/index.html` — 新建
+- `app/templates/worlds/detail.html` — 激活事件+时间线入口
+- `app/main.py` — 注册2个新路由
+- `tests/test_events.py` — 新建（12个测试）
+- `tests/test_timeline.py` — 新建（7个测试）
+- `tests/test_worlds.py` — 更新占位测试
+- `README.md` — 更新
+- `CHANGELOG.md` — 更新
+- `docs/dev-log.md` — 更新
+- `docs/architecture.md` — 更新
+- `docs/todo.md` — 更新
+
+### 测试命令
+```bash
+pytest tests/ -v
+```
+
+### 测试结果
+- 99 passed, 0 failed (v0.3.0: 80 + v0.4.0: 19)
+
+### 备份路径
+- `.project_backups/v0.4.0-20260509-0000.zip`
+
+### commit 信息
+- `feat: complete v0.4.0 event and timeline management`
+
+### tag 信息
+- `v0.4.0` — Version v0.4.0: event and timeline management
+
+### push 结果
+- main 分支推送成功
+- v0.4.0 tag 推送成功
+
+### 已知问题
+- 无
+
+### 下一步计划
+- v0.5.0: AI 推演和推演记录
+
+---
+
 ## 2026-05-09 — v0.3.0: 角色、势力、地点、世界规则管理 CRUD
 
 ### 完成内容

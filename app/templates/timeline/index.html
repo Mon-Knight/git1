@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>时间线 — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<style>
+.timeline-view-nav{display:flex;gap:0.5rem;margin-bottom:1.5rem}
+.timeline-view-nav a{padding:0.4rem 1rem;border-radius:6px;font-size:0.9rem;text-decoration:none;border:1px solid var(--color-border);color:var(--color-text-muted);transition:all 0.2s}
+.timeline-view-nav a.active{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
+.timeline-view-nav a:hover:not(.active){background:var(--color-surface-hover);color:var(--color-text)}
+.timeline-list{position:relative;padding-left:2rem}
+.timeline-list::before{content:'';position:absolute;left:0.5rem;top:0;bottom:0;width:2px;background:var(--color-border)}
+.timeline-item{position:relative;margin-bottom:1.5rem;padding:1rem 1.25rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius)}
+.timeline-item::before{content:'';position:absolute;left:-1.75rem;top:1.25rem;width:10px;height:10px;border-radius:50%;background:var(--color-primary);border:2px solid var(--color-bg)}
+.timeline-item.non-canon::before{background:#ffc107}
+.timeline-item .tl-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem}
+.timeline-item .tl-title{font-size:1.05rem;font-weight:600}
+.timeline-item .tl-title a{color:var(--color-text)}
+.timeline-item .tl-time{font-size:0.85rem;color:var(--color-text-muted)}
+.timeline-item .tl-content{color:var(--color-text-muted);font-size:0.9rem;line-height:1.6}
+.timeline-item .tl-meta{display:flex;gap:1rem;margin-top:0.5rem;font-size:0.8rem;color:var(--color-text-muted)}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">⏳ {{ world.name }}</h1><p class="subtitle">时间线</p></header>
+<nav class="nav"><a href="/worlds/{{ world.id }}" class="nav-link">← 返回世界详情</a></nav>
+<main class="main">
+<div class="timeline-view-nav">
+    <a href="?view=canon" class="{% if view == 'canon' %}active{% endif %}">📖 正史</a>
+    <a href="?view=all" class="{% if view == 'all' %}active{% endif %}">📋 全部</a>
+    <a href="?view=non_canon" class="{% if view == 'non_canon' %}active{% endif %}">🔀 非正史</a>
+</div>
+{% if events %}
+<div class="timeline-list">
+{% for e in events %}
+<div class="timeline-item {% if not e.is_canon %}non-canon{% endif %}">
+    <div class="tl-header">
+        <span class="tl-title"><a href="/worlds/{{ world.id }}/events/{{ e.id }}">{{ e.title }}</a></span>
+        <span class="badge {% if e.is_canon %}canon-badge{% else %}non-canon-badge{% endif %}">{{ '正史' if e.is_canon else '非正史' }}</span>
+    </div>
+    <div class="tl-time">🕐 {{ e.event_time or '时间未定' }}</div>
+    {% if e.content %}<div class="tl-content">{{ e.content[:200] }}{% if e.content|length > 200 %}…{% endif %}</div>{% endif %}
+    <div class="tl-meta">
+        <span>📍 {{ e.location.name if e.location else '未知地点' }}</span>
+        <span>📌 {{ e.source_type }}</span>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<section class="empty-state"><div class="empty-icon">⏳</div><h2>暂无事件</h2><p>当前视图下没有事件。</p><a href="/worlds/{{ world.id }}/events/new" class="btn-primary">创建事件</a></section>
+{% endif %}
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

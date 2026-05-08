@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ event.title }} — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<style>.canon-badge{background:rgba(0,212,170,0.15);color:var(--color-accent)}.non-canon-badge{background:rgba(255,193,7,0.15);color:#ffc107}</style>
+</head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">📜 {{ event.title }}</h1>
+<p class="subtitle"><span class="badge {% if event.is_canon %}canon-badge{% else %}non-canon-badge{% endif %}">{{ '正史' if event.is_canon else '非正史' }}</span> · {{ event.source_type }}</p></header>
+<nav class="nav">
+    <a href="/worlds/{{ world.id }}/events" class="nav-link">← 返回事件列表</a>
+    <a href="/worlds/{{ world.id }}/events/{{ event.id }}/edit" class="btn-sm btn-edit">编辑事件</a>
+</nav>
+<main class="main">
+<section class="world-info">
+    <div class="info-grid">
+        <div class="info-item"><span class="info-label">事件标题</span><span class="info-value">{{ event.title }}</span></div>
+        <div class="info-item"><span class="info-label">发生时间</span><span class="info-value">{{ event.event_time or '未设定' }}</span></div>
+        <div class="info-item"><span class="info-label">地点</span><span class="info-value">{{ event.location.name if event.location else '未指定' }}</span></div>
+        <div class="info-item"><span class="info-label">是否正史</span><span class="info-value">{{ '是' if event.is_canon else '否' }}</span></div>
+        <div class="info-item"><span class="info-label">来源类型</span><span class="info-value">{{ event.source_type }}</span></div>
+        <div class="info-item"><span class="info-label">创建时间</span><span class="info-value">{{ event.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
+    </div>
+    {% if event.involved_characters and event.involved_characters != '[]' %}<div class="info-card"><h3>👥 涉及角色</h3><p>{{ event.involved_characters }}</p></div>{% endif %}
+    {% if event.involved_factions and event.involved_factions != '[]' %}<div class="info-card"><h3>🏛️ 涉及势力</h3><p>{{ event.involved_factions }}</p></div>{% endif %}
+    {% if event.content %}<div class="info-card"><h3>📖 事件内容</h3><p style="white-space:pre-wrap">{{ event.content }}</p></div>{% endif %}
+    {% if event.consequences %}<div class="info-card"><h3>📊 影响结果</h3><p>{{ event.consequences }}</p></div>{% endif %}
+</section>
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

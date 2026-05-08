@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编辑事件 — {{ event.title }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">📜 {{ world.name }}</h1><p class="subtitle">编辑事件：{{ event.title }}</p></header>
+<nav class="nav"><a href="/worlds/{{ world.id }}/events/{{ event.id }}" class="nav-link">← 返回事件详情</a></nav>
+<main class="main">
+<form action="/worlds/{{ world.id }}/events/{{ event.id }}/edit" method="post" class="world-form">
+    <div class="form-group {% if errors.title %}has-error{% endif %}">
+        <label for="title">事件标题 <span class="required">*</span></label>
+        <input type="text" id="title" name="title" value="{{ event.title }}" maxlength="150" required>
+        {% if errors.title %}<span class="error-msg">{{ errors.title }}</span>{% endif %}
+    </div>
+    <div class="form-group"><label for="event_time">发生时间</label><input type="text" id="event_time" name="event_time" value="{{ event.event_time }}"></div>
+    <div class="form-group">
+        <label for="location_id">地点</label>
+        <select id="location_id" name="location_id">
+            <option value="">-- 无 --</option>
+            {% for loc in locations %}<option value="{{ loc.id }}" {% if event.location_id == loc.id %}selected{% endif %}>{{ loc.name }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="form-group"><label for="involved_characters">涉及角色</label><textarea id="involved_characters" name="involved_characters" rows="2">{{ event.involved_characters }}</textarea></div>
+    <div class="form-group"><label for="involved_factions">涉及势力</label><textarea id="involved_factions" name="involved_factions" rows="2">{{ event.involved_factions }}</textarea></div>
+    <div class="form-group"><label for="content">事件内容</label><textarea id="content" name="content" rows="4">{{ event.content }}</textarea></div>
+    <div class="form-group"><label for="consequences">影响结果</label><textarea id="consequences" name="consequences" rows="2">{{ event.consequences }}</textarea></div>
+    <div class="form-group">
+        <label for="is_canon">是否正史</label>
+        <select id="is_canon" name="is_canon">
+            <option value="true" {% if event.is_canon %}selected{% endif %}>是（正史）</option>
+            <option value="false" {% if not event.is_canon %}selected{% endif %}>否（非正史）</option>
+        </select>
+    </div>
+    <div class="form-actions"><button type="submit" class="btn-primary">保存修改</button><a href="/worlds/{{ world.id }}/events/{{ event.id }}" class="btn-secondary">取消</a></div>
+</form>
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

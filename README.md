@@ -340,6 +340,11 @@ AI 生成结果必须先保存到 simulation_records，不允许直接写入 his
 
 ## 开发进度
 
+### v0.4.0 ✅ 已完成
+- 历史事件管理 CRUD（列表/创建/详情/编辑/删除）
+- 时间线查看（正史/全部/非正史 三种视图）
+- 正史与非正史事件区分
+
 ### v0.3.0 ✅ 已完成
 - 角色管理 CRUD（列表/创建/详情/编辑/删除）
 - 势力管理 CRUD（列表/创建/详情/编辑/删除）
@@ -348,28 +353,18 @@ AI 生成结果必须先保存到 simulation_records，不允许直接写入 his
 - 跨世界数据隔离
 
 ### v0.2.0 ✅ 已完成
-- 世界管理 CRUD（创建/查看/编辑/删除）
-- 世界列表页、详情页、创建/编辑表单
-- 表单校验（名称必填、长度限制）
-- 详情页含后续模块占位入口
+- 世界管理 CRUD
+- 表单校验
 
 ### v0.1.0 ✅ 已完成
-- FastAPI 应用骨架
-- SQLite 数据库初始化（8张表）
-- 首页模板
-- Mock AI 服务模块
-- 基础测试（80个测试全部通过）
+- FastAPI 应用骨架、SQLite 数据库、首页、Mock AI
+- 基础测试（99个测试全部通过）
 
 ### 运行方式
 
 ```bash
-# 安装依赖
 pip install -r requirements.txt
-
-# 启动应用
 python -m uvicorn app.main:app --reload
-
-# 运行测试
 pytest tests/ -v
 ```
 
@@ -379,25 +374,22 @@ pytest tests/ -v
 |------|------|
 | `/` | 首页 |
 | `/worlds` | 世界列表 |
-| `/worlds/new` | 创建世界 |
 | `/worlds/{id}` | 世界详情 |
-| `/worlds/{id}/edit` | 编辑世界 |
-| `/worlds/{id}/characters` | 角色列表 |
-| `/worlds/{id}/characters/new` | 创建角色 |
-| `/worlds/{id}/characters/{cid}` | 角色详情 |
-| `/worlds/{id}/factions` | 势力列表 |
-| `/worlds/{id}/factions/new` | 创建势力 |
-| `/worlds/{id}/factions/{fid}` | 势力详情 |
-| `/worlds/{id}/locations` | 地点列表 |
-| `/worlds/{id}/locations/new` | 创建地点 |
-| `/worlds/{id}/locations/{lid}` | 地点详情 |
-| `/worlds/{id}/rules` | 规则列表 |
-| `/worlds/{id}/rules/new` | 创建规则 |
-| `/worlds/{id}/rules/{rid}` | 规则详情 |
+| `/worlds/{id}/characters` | 角色管理 |
+| `/worlds/{id}/factions` | 势力管理 |
+| `/worlds/{id}/locations` | 地点管理 |
+| `/worlds/{id}/rules` | 规则管理 |
+| `/worlds/{id}/events` | 历史事件 |
+| `/worlds/{id}/timeline` | 时间线 |
 | `/health` | 健康检查 |
 
-### 下一阶段 v0.4.0
-- 历史事件和时间线管理
+### 时间线排序规则
+- 按 event_time 文本排序（支持 YYYY-MM-DD 或自定义文本如"帝国历三年"）
+- event_time 为空的事件排到最后
+- 支持 `?view=canon` / `?view=all` / `?view=non_canon` 筛选
+
+### 下一阶段 v0.5.0
+- AI 推演和推演记录
 
 ```
 app/
@@ -525,53 +517,3 @@ pytest
 
 如果测试失败，不允许 commit、tag、push 稳定版本。
 
----
-
-【第一阶段任务】
-
-现在只完成第一阶段，不要直接写完整业务代码。
-
-请完成：
-
-1. 读取 .github/copilot-instructions.md。
-2. 检查 Git 状态。
-3. 检查 remote 是否指向 git1。
-4. 检查当前分支。
-5. 检查当前目录结构。
-6. 根据本需求写出功能清单。
-7. 设计技术选型。
-8. 设计项目目录结构。
-9. 设计数据库表初稿。
-10. 设计页面结构。
-11. 设计 API 路由初稿。
-12. 设计 AI 服务模块结构。
-13. 分析可能风险。
-14. 修改或创建以下文件：
-
-- README.md
-- CHANGELOG.md
-- docs/dev-log.md
-- docs/decision-log.md
-- docs/architecture.md
-- docs/todo.md
-- docs/security-review.md
-- .env.example
-- .gitignore
-
-第一阶段完成后，请运行：
-
-git status
-
-然后向我汇报：
-
-1. 当前 Git 分支
-2. 当前 remote 地址
-3. 是否确认指向 git1
-4. 已创建或修改的文件
-5. 项目目录规划
-6. 数据库表设计摘要
-7. API 路由设计摘要
-8. 第一阶段是否完成
-9. 下一阶段准备实现什么
-
-第一阶段结束后不要继续写核心业务代码，等待我下一步指令。

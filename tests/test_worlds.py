@@ -228,7 +228,8 @@ def test_world_detail_shows_module_placeholders(client):
     assert "势力管理" in response.text
     assert "地点管理" in response.text
     assert "规则管理" in response.text
+    assert "历史事件" in response.text
     assert "时间线" in response.text
     assert "AI 推演" in response.text
-    # Time and AI still show "即将推出"
+    # Only AI推演 still shows "即将推出"
     assert "即将推出" in response.text
