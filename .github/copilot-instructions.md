@@ -1,5 +1,12 @@
 # Copilot Project Instructions
 
+## Project Identity
+
+- **项目名称**: AI World Engine
+- **项目描述**: AI 小说世界观推演系统
+- **GitHub 仓库**: Mon-Knight/git1（当前已绑定 remote `origin`）
+- **技术栈**: Python / FastAPI / SQLite / Jinja2 / HTML / CSS / JS
+
 ## Project Goal
 
 你现在是一个全流程软件开发 Agent。请从零开始为我完成一个完整程序，并在 VS Code 当前工作区中完成项目初始化、需求分析、架构设计、编码、测试、备份、Git 版本管理、GitHub 新仓库创建与推送。
@@ -474,3 +481,49 @@ git commit -m "docs: update installation guide"
 - 如果 GitHub CLI 没有登录，请明确告诉我需要先执行 gh auth login。
 - 如果缺少必要环境，请先说明缺少什么，并给出安装命令。
 - 如果存在多个解决方案，请选择最稳定、最容易运行、最适合初学者维护的方案。
+
+---
+
+# AI World Engine — 项目特有规则
+
+## 项目核心约束
+
+1. **项目名**: AI World Engine
+2. **当前仓库**: Mon-Knight/git1（remote `origin`）
+3. **不允许创建新 GitHub 仓库**
+4. **不允许执行 `gh repo create`**
+5. **不允许修改 remote**
+6. **不允许删除 `.git` 目录**
+7. **不允许重新执行 `git init`**
+8. 所有 commit、tag、push 必须推送到当前已绑定的 `git1` 仓库
+
+## AI 推演核心规则
+
+1. **AI 生成结果必须先保存到 `simulation_records` 表**
+2. **AI 生成结果不允许直接写入 `historical_events`（正史）表**
+3. 用户必须手动审核推演结果后选择：采纳为正史 / 保留为分支 / 标记为废弃
+4. 采纳时：从 `simulation_records` 创建一条 `historical_events` 记录，`is_canon=True`
+5. 分支时：创建 `branches` 记录，不污染正史
+
+## 版本开发规则
+
+1. 每个稳定版本必须：本地备份 → 测试通过 → commit → tag → push
+2. 未通过测试的代码不允许打 tag
+3. 不可运行的中间状态只能普通 commit，不能打正式 tag
+4. 版本号遵循语义化版本：v0.1.0 → v0.2.0 → ... → v1.0.0
+
+## 禁止提交的文件
+
+- `.env`
+- `venv/` / `.venv/`
+- `node_modules/`
+- `.project_backups/`
+- `__pycache__/`
+- `*.pyc`
+- `*.log`
+- `.DS_Store`
+
+## Mock AI 模式
+
+- 如果 `.env` 中 `AI_API_KEY` 为空或未设置，系统必须自动使用 Mock AI 模式
+- Mock AI 模式生成基于规则的简单推演结果，用于本地测试和演示
