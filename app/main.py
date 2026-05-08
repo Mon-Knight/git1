@@ -10,6 +10,7 @@ from pathlib import Path
 from app.config import settings
 from app.database import init_db
 from app.routes.pages import router as pages_router
+from app.routes.worlds import router as worlds_router
 
 
 @asynccontextmanager
@@ -34,6 +35,7 @@ app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 # Include routers
 app.include_router(pages_router)
+app.include_router(worlds_router)
 
 
 @app.get("/health")

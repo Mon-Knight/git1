@@ -13,7 +13,7 @@ AI World Engine 是一个 AI 小说世界观推演系统，帮助作者构建小
 - **测试**: pytest
 - **AI**: OpenAI-compatible API + Mock 模式
 
-## 目录结构（v0.1.0 实际）
+## 目录结构（v0.2.0 实际）
 
 ```
 f:\git\
@@ -25,12 +25,20 @@ f:\git\
 │   ├── models.py            # SQLAlchemy 数据模型（8张表）
 │   ├── routes/
 │   │   ├── __init__.py
-│   │   └── pages.py         # 页面路由（首页）
+│   │   ├── pages.py         # 页面路由（首页）
+│   │   └── worlds.py        # 世界管理路由（CRUD）
 │   ├── services/
 │   │   ├── __init__.py
-│   │   └── ai_service.py    # AI 调用服务（Mock + 真实API）
+│   │   ├── ai_service.py    # AI 调用服务（Mock + 真实API）
+│   │   └── world_service.py # 世界业务逻辑
 │   ├── templates/
-│   │   └── index.html       # 首页模板
+│   │   ├── index.html       # 首页模板
+│   │   └── worlds/          # 世界管理模板
+│   │       ├── list.html    # 世界列表
+│   │       ├── new.html     # 创建世界
+│   │       ├── detail.html  # 世界详情
+│   │       ├── edit.html    # 编辑世界
+│   │       └── 404.html     # 世界不存在
 │   └── static/
 │       ├── css/
 │       │   └── style.css
@@ -39,9 +47,10 @@ f:\git\
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py          # 测试配置（内存数据库）
-│   ├── test_main.py         # 应用与首页测试
-│   ├── test_database.py     # 数据库表结构测试
-│   └── test_ai_service.py   # AI 服务测试
+│   ├── test_main.py         # 应用与首页测试 (6)
+│   ├── test_database.py     # 数据库表结构测试 (5)
+│   ├── test_ai_service.py   # AI 服务测试 (7)
+│   └── test_worlds.py       # 世界管理测试 (18)
 ├── docs/
 ├── .project_backups/        # 本地备份（不入Git）
 ├── .env.example

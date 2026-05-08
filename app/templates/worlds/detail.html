@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ world.name }} — AI World Engine</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">🌍 {{ world.name }}</h1>
+            <p class="subtitle">{{ world.world_type or '未分类' }} · {{ world.current_era or '未知时代' }}</p>
+        </header>
+
+        <nav class="nav">
+            <a href="/worlds" class="nav-link">← 返回世界列表</a>
+            <a href="/worlds/{{ world.id }}/edit" class="btn-sm btn-edit">编辑世界</a>
+        </nav>
+
+        <main class="main">
+            <section class="world-info">
+                <div class="info-card">
+                    <h3>📖 世界简介</h3>
+                    <p>{{ world.description or '暂无简介' }}</p>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">世界类型</span>
+                        <span class="info-value">{{ world.world_type or '未设定' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">当前时代</span>
+                        <span class="info-value">{{ world.current_era or '未设定' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">世界基调</span>
+                        <span class="info-value">{{ world.tone or '未设定' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">创建时间</span>
+                        <span class="info-value">{{ world.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">更新时间</span>
+                        <span class="info-value">{{ world.updated_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="module-nav">
+                <h2>世界管理模块</h2>
+                <div class="module-grid">
+                    <a href="#" class="module-card disabled" title="即将推出">
+                        <div class="module-icon">👥</div>
+                        <h3>角色管理</h3>
+                        <p>管理世界中的角色</p>
+                        <span class="coming-soon">即将推出</span>
+                    </a>
+                    <a href="#" class="module-card disabled" title="即将推出">
+                        <div class="module-icon">🏛️</div>
+                        <h3>势力管理</h3>
+                        <p>管理世界中的势力</p>
+                        <span class="coming-soon">即将推出</span>
+                    </a>
+                    <a href="#" class="module-card disabled" title="即将推出">
+                        <div class="module-icon">🗺️</div>
+                        <h3>地点管理</h3>
+                        <p>管理世界中的地点</p>
+                        <span class="coming-soon">即将推出</span>
+                    </a>
+                    <a href="#" class="module-card disabled" title="即将推出">
+                        <div class="module-icon">📜</div>
+                        <h3>规则管理</h3>
+                        <p>管理世界规则</p>
+                        <span class="coming-soon">即将推出</span>
+                    </a>
+                    <a href="#" class="module-card disabled" title="即将推出">
+                        <div class="module-icon">⏳</div>
+                        <h3>时间线</h3>
+                        <p>查看世界历史</p>
+                        <span class="coming-soon">即将推出</span>
+                    </a>
+                    <a href="#" class="module-card disabled" title="即将推出">
+                        <div class="module-icon">🤖</div>
+                        <h3>AI 推演</h3>
+                        <p>AI 推演世界发展</p>
+                        <span class="coming-soon">即将推出</span>
+                    </a>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>AI World Engine | <a href="/">返回首页</a></p>
+        </footer>
+    </div>
+</body>
+</html>

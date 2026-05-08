@@ -340,12 +340,18 @@ AI 生成结果必须先保存到 simulation_records，不允许直接写入 his
 
 ## 开发进度
 
+### v0.2.0 ✅ 已完成
+- 世界管理 CRUD（创建/查看/编辑/删除）
+- 世界列表页、详情页、创建/编辑表单
+- 表单校验（名称必填、长度限制）
+- 详情页含后续模块占位入口
+
 ### v0.1.0 ✅ 已完成
 - FastAPI 应用骨架
 - SQLite 数据库初始化（8张表）
 - 首页模板
 - Mock AI 服务模块
-- 基础测试（18个测试全部通过）
+- 基础测试（36个测试全部通过）
 
 ### 运行方式
 
@@ -357,8 +363,19 @@ pip install -r requirements.txt
 python -m uvicorn app.main:app --reload
 
 # 运行测试
-pytest
+pytest tests/ -v
 ```
+
+### 页面路径
+
+| 路径 | 说明 |
+|------|------|
+| `/` | 首页 |
+| `/worlds` | 世界列表 |
+| `/worlds/new` | 创建世界 |
+| `/worlds/{id}` | 世界详情 |
+| `/worlds/{id}/edit` | 编辑世界 |
+| `/health` | 健康检查 |
 
 ### 项目目录结构
 
@@ -393,8 +410,8 @@ requirements.txt
 .gitignore
 ```
 
-### 下一阶段 v0.2.0
-- 世界项目管理 CRUD
+### 下一阶段 v0.3.0
+- 角色、势力、地点、规则管理 CRUD
 
 【项目结构要求】
 
