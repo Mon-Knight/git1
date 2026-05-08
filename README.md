@@ -338,6 +338,64 @@ AI 生成结果必须先保存到 simulation_records，不允许直接写入 his
 
 ---
 
+## 开发进度
+
+### v0.1.0 ✅ 已完成
+- FastAPI 应用骨架
+- SQLite 数据库初始化（8张表）
+- 首页模板
+- Mock AI 服务模块
+- 基础测试（18个测试全部通过）
+
+### 运行方式
+
+```bash
+# 安装依赖
+pip install -r requirements.txt
+
+# 启动应用
+python -m uvicorn app.main:app --reload
+
+# 运行测试
+pytest
+```
+
+### 项目目录结构
+
+```
+app/
+  main.py          # FastAPI 入口
+  config.py        # 配置管理
+  database.py      # 数据库连接
+  models.py        # 数据模型（8张表）
+  routes/
+    pages.py       # 页面路由
+  services/
+    ai_service.py  # AI 服务（Mock + 真实API）
+  templates/
+    index.html     # 首页模板
+  static/
+    css/style.css
+    js/main.js
+tests/
+  conftest.py
+  test_main.py
+  test_database.py
+  test_ai_service.py
+docs/
+  architecture.md
+  decision-log.md
+  dev-log.md
+  todo.md
+  security-review.md
+requirements.txt
+.env.example
+.gitignore
+```
+
+### 下一阶段 v0.2.0
+- 世界项目管理 CRUD
+
 【项目结构要求】
 
 请设计清晰结构，例如：

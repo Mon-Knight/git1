@@ -13,46 +13,24 @@ AI World Engine 是一个 AI 小说世界观推演系统，帮助作者构建小
 - **测试**: pytest
 - **AI**: OpenAI-compatible API + Mock 模式
 
-## 目录结构
+## 目录结构（v0.1.0 实际）
 
 ```
 f:\git\
 ├── app/
 │   ├── __init__.py
-│   ├── main.py              # FastAPI 应用入口
+│   ├── main.py              # FastAPI 应用入口（lifespan 事件）
 │   ├── config.py            # 配置管理（读取 .env）
 │   ├── database.py          # 数据库连接与初始化
-│   ├── models.py            # SQLAlchemy 数据模型
-│   ├── schemas.py           # Pydantic 请求/响应模型
+│   ├── models.py            # SQLAlchemy 数据模型（8张表）
 │   ├── routes/
 │   │   ├── __init__.py
-│   │   ├── home.py          # 首页路由
-│   │   ├── worlds.py        # 世界管理路由
-│   │   ├── characters.py    # 角色管理路由
-│   │   ├── factions.py      # 势力管理路由
-│   │   ├── locations.py     # 地点管理路由
-│   │   ├── rules.py         # 世界规则路由
-│   │   ├── events.py        # 历史事件路由
-│   │   ├── timeline.py      # 时间线路由
-│   │   ├── simulation.py    # AI 推演路由
-│   │   └── records.py       # 推演记录路由
+│   │   └── pages.py         # 页面路由（首页）
 │   ├── services/
 │   │   ├── __init__.py
-│   │   ├── ai_service.py    # AI 调用服务（真实 + mock）
-│   │   ├── world_service.py # 世界业务逻辑
-│   │   ├── check_service.py # 矛盾检查服务
-│   │   └── branch_service.py# 分支管理服务
+│   │   └── ai_service.py    # AI 调用服务（Mock + 真实API）
 │   ├── templates/
-│   │   ├── base.html        # 基础布局模板
-│   │   ├── index.html       # 首页
-│   │   ├── worlds/          # 世界相关模板
-│   │   ├── characters/      # 角色相关模板
-│   │   ├── factions/        # 势力相关模板
-│   │   ├── locations/       # 地点相关模板
-│   │   ├── rules/           # 规则相关模板
-│   │   ├── events/          # 事件相关模板
-│   │   ├── timeline/        # 时间线模板
-│   │   └── simulation/      # 推演相关模板
+│   │   └── index.html       # 首页模板
 │   └── static/
 │       ├── css/
 │       │   └── style.css
@@ -60,18 +38,12 @@ f:\git\
 │           └── main.js
 ├── tests/
 │   ├── __init__.py
-│   ├── conftest.py
-│   ├── test_main.py
-│   ├── test_worlds.py
-│   ├── test_simulation.py
-│   └── test_checks.py
-├── data/                    # SQLite 数据库存放目录
+│   ├── conftest.py          # 测试配置（内存数据库）
+│   ├── test_main.py         # 应用与首页测试
+│   ├── test_database.py     # 数据库表结构测试
+│   └── test_ai_service.py   # AI 服务测试
 ├── docs/
-│   ├── architecture.md
-│   ├── decision-log.md
-│   ├── dev-log.md
-│   ├── todo.md
-│   └── security-review.md
+├── .project_backups/        # 本地备份（不入Git）
 ├── .env.example
 ├── .gitignore
 ├── requirements.txt

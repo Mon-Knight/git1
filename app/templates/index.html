@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI World Engine — 世界观推演系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">🌍 AI World Engine</h1>
+            <p class="subtitle">AI 小说世界观推演系统</p>
+        </header>
+
+        <main class="main">
+            <section class="hero">
+                <h2>构建你的世界，让 AI 推演未来</h2>
+                <p class="description">
+                    AI World Engine 帮助作者构建完整的小说世界观。
+                    创建角色、势力、地点和世界规则，然后让 AI 根据你的设定
+                    推演世界发展，探索无限可能的故事分支。
+                </p>
+            </section>
+
+            <section class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">🏰</div>
+                    <h3>世界构建</h3>
+                    <p>创建和管理你的世界观项目，定义世界类型、时代和基调。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>角色与势力</h3>
+                    <p>设计角色、势力、地点，建立复杂的关系网络。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📜</div>
+                    <h3>世界规则</h3>
+                    <p>定义世界的物理法则、魔法体系、社会结构等规则。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI 推演</h3>
+                    <p>基于你的设定，AI 推演世界发展，生成合理的故事走向。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⏳</div>
+                    <h3>时间线管理</h3>
+                    <p>按时间顺序查看正史事件，追溯世界的发展历程。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔀</div>
+                    <h3>分支记录</h3>
+                    <p>保留推演分支，探索"如果……会怎样"的多种可能性。</p>
+                </div>
+            </section>
+
+            <section class="cta">
+                <a href="/worlds" class="btn-primary">进入世界列表</a>
+            </section>
+
+            <section class="status">
+                <div class="status-badge {{ 'mock' if mock_ai else 'live' }}">
+                    AI 模式: {{ 'Mock (演示)' if mock_ai else 'Live API' }}
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>AI World Engine v{{ version }} | 
+               <a href="https://github.com/Mon-Knight/git1" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
