@@ -1,347 +1,21 @@
-请先读取并严格遵守项目中�?.github/copilot-instructions.md�?
+# AI World Engine
 
-注意：当前项目已经在 VS Code 中初始化 Git，并且已经连接到我的 GitHub 仓库 git1�? 
-本项目不要创建新�?GitHub 仓库�? 
-不要执行 gh repo create�? 
-不要修改 remote�? 
-不要重新 git init�? 
-不要删除 .git 目录�? 
-后续所�?commit、tag、push 都必须推送到当前已经绑定�?GitHub 仓库 git1�?
+AI 小说世界观推演系统 — 帮助作者构建小说世界观，通过 AI 推演世界发展。
 
-请先执行并检查：
-
-git status
-git remote -v
-git branch
-gh auth status
-
-我的 GitHub CLI 已经登录，GitHub 账号�?Mon-Knight，协议是 HTTPS�?
-
-如果当前 remote 已经指向 git1，请继续使用当前 remote�? 
-如果当前 remote 不是 git1，请停止操作，并向我汇报当前 remote 情况，不要擅自修改�? 
-如果当前分支不是 main，请使用当前分支名，不要擅自重命名分支�? 
-如果当前有未提交内容，请先列出变更，不要直接覆盖�?
+> **当前版本**: v1.0.0 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
 
 ---
 
-我要开发一�?AI 小说世界观推演系统，项目名为�?
-
-AI World Engine
-
-注意：项目名可以�?AI World Engine，但 GitHub 仓库仍然使用当前已经绑定�?git1，不要创�?ai-world-engine 新仓库�?
-
----
-
-【项目目标�?
-
-系统用于帮助作者构建小说世界观，并通过 AI 不断推演世界发展�?
-
-系统需要支持创建世界项目、管理角色、势力、地点、世界规则、历史事件，并允许用户输入推演问题，�?AI 根据已有设定生成剧情或世界变化�?
-
-AI 生成结果不能直接写入正史，必须先保存为推演记录。用户可以选择采纳为正史，也可以保留为分支�?
-
-系统需要支持：
-
-1. 时间线查�?
-2. 正史记录
-3. 分支记录
-4. 设定矛盾检�?
-5. 角色行为合理性检�?
-
----
-
-【第一版技术栈�?
-
-第一版使用：
-
-- Python
-- FastAPI
-- SQLite
-- HTML
-- CSS
-- JavaScript
-- Jinja2
-- pytest
-
-第一版不要使用复杂前端框架，例如 Vue、React、Next.js�?
-
-代码结构需要清晰，方便后续扩展到：
-
-- Flutter App
-- 桌面�?
-- 本地 AI 模型
-- 多用户系�?
-- 更复杂的世界观数据库
-
----
-
-【环境配置要求�?
-
-必须提供�?
-
-.env.example
-
-用于配置�?
-
-AI_API_KEY=
-AI_BASE_URL=
-AI_MODEL=
-DATABASE_URL=
-
-注意�?
-
-1. 不允许提交真�?.env�?
-2. 不允许硬编码 AI API Key�?
-3. 所�?AI 配置必须通过环境变量读取�?
-4. 如果没有真实 API Key，系统也必须支持 mock AI 推演模式，方便本地测试�?
-
----
-
-【页面要求�?
-
-第一版至少包括以下页面：
-
-1. 首页
-2. 世界列表
-3. 世界详情
-4. 角色管理
-5. 势力管理
-6. 地点管理
-7. 世界规则管理
-8. 时间线管�?
-9. AI 推演页面
-10. 推演记录页面
-
----
-
-【核心功能模块�?
-
-1. 首页
-
-需要展示：
-
-- 系统名称 AI World Engine
-- 系统简�?
-- 进入世界列表的入�?
-
-2. 世界项目管理
-
-需要支持：
-
-- 创建世界项目
-- 查看世界项目列表
-- 查看单个世界详情
-- 编辑世界基础信息
-
-世界项目字段至少包括�?
-
-- 世界名称
-- 世界类型
-- 简�?
-- 当前时代
-- 世界基调
-- 创建时间
-
-3. 角色管理
-
-需要支持：
-
-- 创建角色
-- 查看角色列表
-- 编辑角色信息
-
-角色字段至少包括�?
-
-- 姓名
-- 身份
-- 所属势�?
-- 性格
-- 目标
-- 能力
-- 当前状�?
-- 备注
-
-4. 势力管理
-
-需要支持：
-
-- 创建势力
-- 查看势力列表
-- 编辑势力信息
-
-势力字段至少包括�?
-
-- 名称
-- 类型
-- 领袖
-- 目标
-- 资源
-- 敌对势力
-- 盟友
-- 备注
-
-5. 地点管理
-
-需要支持：
-
-- 创建地点
-- 查看地点列表
-- 编辑地点信息
-
-地点字段至少包括�?
-
-- 名称
-- 类型
-- 所属区�?
-- 描述
-- 控制势力
-- 重要事件
-
-6. 世界规则管理
-
-需要支持：
-
-- 创建规则
-- 查看规则列表
-- 编辑规则
-
-规则字段至少包括�?
-
-- 规则名称
-- 规则类型
-- 规则内容
-- 限制条件
-- 影响范围
-
-7. 历史事件管理
-
-需要支持：
-
-- 创建历史事件
-- 查看历史事件列表
-
-事件字段至少包括�?
-
-- 事件标题
-- 发生时间
-- 涉及角色
-- 涉及势力
-- 地点
-- 事件内容
-- 影响结果
-- 是否正史
-- 来源记录
-
-8. 时间线管�?
-
-需要支持：
-
-- 按时间顺序查看正史事�?
-- 支持历史事件排序
-- 区分正史事件和分支事�?
-
-9. AI 推演页面
-
-需要支持：
-
-- 用户输入推演问题
-- 系统读取当前世界设定
-- AI 根据角色、势力、地点、规则、历史事件生成推演结�?
-- 生成结果保存为推演记�?
-- AI 推演结果不允许直接写入正�?
-
-10. 推演记录页面
-
-需要支持：
-
-- 查看所�?AI 推演记录
-- 查看单条推演详情
-- 支持采纳为正�?
-- 支持保留为分�?
-- 支持标记为废�?
-
-11. 正史记录
-
-要求�?
-
-- 用户采纳 AI 推演结果后，才写入正史时间线
-- 正史记录需要可追溯来源
-- 不能�?AI 自动污染正史
-
-12. 分支记录
-
-要求�?
-
-- 未采纳但保留的推演结果作为分�?
-- 分支不能污染正史
-- 分支记录需要和正史区分显示
-
-13. 设定矛盾检�?
-
-第一版可以使用规则检�?+ mock AI 分析�?
-
-需要检查：
-
-- 新事件是否与已有世界规则冲突
-- 角色状态是否前后矛�?
-- 势力关系是否矛盾
-- 历史事件是否时间顺序异常
-
-14. 角色行为合理性检�?
-
-第一版可以使用规则检�?+ mock AI 分析�?
-
-需要检查：
-
-- 角色行动是否符合性格
-- 角色行动是否符合目标
-- 角色行动是否符合当前状�?
-- 角色行动是否超出能力范围
-
----
-
-【数据库要求�?
-
-使用 SQLite�?
-
-请先设计数据库表，不要直接开始写业务代码�?
-
-至少需要考虑以下表：
-
-1. worlds
-2. characters
-3. factions
-4. locations
-5. world_rules
-6. historical_events
-7. simulation_records
-8. branches
-
-数据库设计需要写入：
-
-docs/architecture.md
-
----
-
-【AI 调用要求�?
-
-第一版需要有 AI 服务模块，但必须支持两种模式�?
-
-1. 真实 AI API 模式
-2. mock AI 模式
-
-如果 .env 中没�?AI_API_KEY，则默认使用 mock AI 模式�?
-
-AI 模块不要和路由代码混在一起，应该单独放在 services 目录中�?
-
-AI 生成结果必须先保存到 simulation_records，不允许直接写入 historical_events 正史表�?
-
----
----
-## 开发进度
-
-### v1.0.0 ✅ 当前版本 — 稳定展示版
-所有核心功能已完成，210 个测试全部通过。
+## 技术栈
+
+| 层面 | 技术 |
+|------|------|
+| 后端框架 | Python / FastAPI |
+| 数据库 | SQLite (SQLAlchemy ORM) |
+| 模板引擎 | Jinja2 |
+| 前端 | HTML / CSS / JavaScript (原生) |
+| AI 调用 | OpenAI-compatible API + Mock 模式 |
+| 测试 | pytest (210 个测试) |
 
 ---
 
@@ -349,18 +23,18 @@ AI 生成结果必须先保存到 simulation_records，不允许直接写入 his
 
 | 模块 | 说明 |
 |------|------|
-| 🏠 首页 | 系统介绍、世界列表入口 |
-| 🌍 世界管理 | 创建/查看/编辑/删除世界项目 |
-| 👥 角色管理 | 管理角色（姓名、身份、性格、目标、能力、状态） |
-| 🏛️ 势力管理 | 管理势力（类型、领袖、目标、资源、敌对/盟友） |
-| 🗺️ 地点管理 | 管理地点（类型、区域、描述、控制势力） |
-| 📜 规则管理 | 管理世界规则（类型、内容、限制条件、影响范围） |
-| 📋 历史事件 | 管理历史事件（正史/非正史、涉及角色/势力/地点） |
-| ⏳ 时间线 | 按时间查看正史/全部/非正史事件，支持筛选 |
-| 🤖 AI 推演 | 基于世界设定推演发展，Mock AI + 真实 API 双模式 |
-| 📊 推演记录 | 查看推演历史，采纳为正史 / 保存为分支 |
-| 🔀 分支记录 | 查看独立分支世界线，不影响正史 |
-| 🔍 检查中心 | 设定矛盾检查 + 角色行为合理性检查 |
+| 首页 | 系统介绍、世界列表入口 |
+| 世界管理 | 创建/查看/编辑/删除世界项目 |
+| 角色管理 | 管理角色（姓名、身份、性格、目标、能力、状态） |
+| 势力管理 | 管理势力（类型、领袖、目标、资源、敌对/盟友） |
+| 地点管理 | 管理地点（类型、区域、描述、控制势力） |
+| 规则管理 | 管理世界规则（类型、内容、限制条件、影响范围） |
+| 历史事件 | 管理历史事件（正史/非正史、涉及角色/势力/地点） |
+| 时间线 | 按时间查看正史/全部/非正史事件，支持筛选 |
+| AI 推演 | 基于世界设定推演发展，Mock AI + 真实 API 双模式 |
+| 推演记录 | 查看推演历史，采纳为正史 / 保存为分支 |
+| 分支记录 | 查看独立分支世界线，不影响正史 |
+| 检查中心 | 设定矛盾检查 + 角色行为合理性检查 |
 
 ---
 
@@ -368,38 +42,61 @@ AI 生成结果必须先保存到 simulation_records，不允许直接写入 his
 
 | 路径 | 说明 |
 |------|------|
-| / | 首页 |
-| /worlds | 世界列表 |
-| /worlds/new | 创建世界 |
-| /worlds/{id} | 世界详情（10个模块入口） |
-| /worlds/{id}/edit | 编辑世界 |
-| /worlds/{id}/characters | 角色管理 |
-| /worlds/{id}/factions | 势力管理 |
-| /worlds/{id}/locations | 地点管理 |
-| /worlds/{id}/rules | 规则管理 |
-| /worlds/{id}/events | 历史事件 |
-| /worlds/{id}/timeline | 时间线（?view=canon\|all\|non_canon） |
-| /worlds/{id}/simulation | AI 推演 |
-| /worlds/{id}/records | 推演记录 |
-| /worlds/{id}/branches | 分支记录 |
-| /worlds/{id}/checks | 检查中心 |
-| /worlds/{id}/checks/conflicts | 设定矛盾检查 |
-| /worlds/{id}/checks/behavior | 角色行为合理性检查 |
-| /health | 健康检查 |
+| `/` | 首页 |
+| `/worlds` | 世界列表 |
+| `/worlds/new` | 创建世界 |
+| `/worlds/{id}` | 世界详情（10 个模块入口） |
+| `/worlds/{id}/edit` | 编辑世界 |
+| `/worlds/{id}/characters` | 角色管理 |
+| `/worlds/{id}/factions` | 势力管理 |
+| `/worlds/{id}/locations` | 地点管理 |
+| `/worlds/{id}/rules` | 规则管理 |
+| `/worlds/{id}/events` | 历史事件 |
+| `/worlds/{id}/timeline` | 时间线（?view=canon/all/non_canon） |
+| `/worlds/{id}/simulation` | AI 推演 |
+| `/worlds/{id}/records` | 推演记录 |
+| `/worlds/{id}/branches` | 分支记录 |
+| `/worlds/{id}/checks` | 检查中心 |
+| `/worlds/{id}/checks/conflicts` | 设定矛盾检查 |
+| `/worlds/{id}/checks/behavior` | 角色行为合理性检查 |
+| `/health` | 健康检查 |
+
+---
+
+## 项目目录结构
+
+```
+app/
+  main.py                  # FastAPI 入口
+  config.py                # 配置管理
+  database.py              # 数据库连接
+  models.py                # 数据模型（8 张表）
+  routes/                  # 10 个路由模块
+  services/                # 11 个服务模块
+  templates/               # 30+ 模板文件
+  static/                  # CSS / JS
+tests/                     # 11 个测试文件，210 个测试
+scripts/                   # 工具脚本
+docs/                      # 设计文档
+.project_backups/          # 本地备份（不入 Git）
+requirements.txt
+.env.example
+.gitignore
+```
 
 ---
 
 ## 安装与运行
 
- + "`" + "ash
+```bash
 # 1. 克隆项目
 git clone https://github.com/Mon-Knight/git1.git
 cd git1
 
 # 2. 创建虚拟环境
 python -m venv .venv
-.venv\\Scripts\\activate      # Windows
-# source .venv/bin/activate   # macOS/Linux
+.venv\Scripts\activate      # Windows
+# source .venv/bin/activate   # macOS / Linux
 
 # 3. 安装依赖
 pip install -r requirements.txt
@@ -410,22 +107,125 @@ copy .env.example .env
 # 5. 启动服务
 python -m uvicorn app.main:app --reload
 
-# 6. 打开浏览器访问
+# 6. 打开浏览器
 # http://127.0.0.1:8000
-" + "`" + "
+```
 
 ### 运行测试
 
- + "`" + "ash
+```bash
 python -m compileall .
 pytest tests/ -v
-" + "`" + "
+```
+
+### 编码检查
+
+```bash
+python scripts/check_encoding.py
+```
+
+---
+
+## 环境变量配置 (.env)
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `AI_API_KEY` | AI API 密钥（为空则使用 Mock AI） | (空) |
+| `AI_BASE_URL` | AI API 地址 | `https://api.openai.com/v1` |
+| `AI_MODEL` | AI 模型名称 | `gpt-4o` |
+| `DATABASE_URL` | 数据库连接字符串 | `sqlite:///./ai_world_engine.db` |
+| `APP_HOST` | 服务监听地址 | `127.0.0.1` |
+| `APP_PORT` | 服务端口 | `8000` |
+| `APP_DEBUG` | 调试模式 | `false` |
+
+> **安全提醒**: `.env` 文件包含敏感信息，已加入 `.gitignore`，不会被提交到 Git。
+
+---
+
+## AI 模式说明
+
+| 模式 | 条件 | 说明 |
+|------|------|------|
+| **Mock AI** | `AI_API_KEY` 为空 | 使用规则式推演，适合本地测试和演示 |
+| **Live API** | 已配置 `AI_API_KEY` | 调用 OpenAI-compatible API 进行真实推演 |
+
+### 核心规则
+
+- **AI 推演结果不会自动写入正史**，必须先保存为推演记录（`simulation_records`）
+- 用户需手动审核后选择「采纳为正史」或「保存为分支」
+- 采纳后创建 `historical_events` 记录（`is_canon=True`, `source_type=simulation`）
+- 分支记录不影响正史时间线
+
+### 推演记录状态
+
+| 状态 | 说明 | 可操作 |
+|------|------|--------|
+| `pending` | 待处理 | 采纳为正史 / 保存为分支 |
+| `adopted` | 已采纳 | 已写入时间线 |
+| `branched` | 已分支 | 已保存为独立分支 |
+| `discarded` | 已废弃 | 预留状态 |
+
+---
+
+## 数据库说明
+
+| 项目 | 说明 |
+|------|------|
+| 数据库 | SQLite |
+| 默认文件 | `ai_world_engine.db`（项目根目录） |
+| Git 提交 | 不提交（已加入 `.gitignore`） |
+| 迁移工具 | 当前版本暂未引入 Alembic |
+| 开发阶段 | 模型字段变更后可删除 `.db` 文件，重启项目自动重建 |
+| 生产建议 | 后续版本建议加入数据库迁移工具 |
+
+### 数据备份
+
+每个稳定版本在 `.project_backups/` 目录下有对应的 ZIP 备份包：
+
+```
+.project_backups/
+  v0.1.0-20260509-0000.zip
+  v0.2.0-20260509-0000.zip
+  ...
+  v1.0.0-20260509-0000.zip
+```
+
+> `.project_backups/` 已加入 `.gitignore`，不会被提交到 Git。
+
+---
+
+## Docker / 正式使用准备
+
+当前版本为本地开发版。如需部署到生产环境：
+
+1. 使用 Gunicorn + Uvicorn workers 替代 `uvicorn --reload`
+2. 配置反向代理（Nginx / Caddy）
+3. 迁移到 PostgreSQL（修改 `DATABASE_URL`）
+4. 引入 Alembic 管理数据库迁移
+5. 添加用户认证和权限系统
+6. 配置真实的 AI API Key
+
+---
+
+## 已完成版本记录
+
+| 版本 | 内容 | 测试数 |
+|------|------|--------|
+| v0.1.0 | 项目骨架、首页、数据库初始化 | 18 |
+| v0.2.0 | 世界管理 CRUD | 36 |
+| v0.3.0 | 角色、势力、地点、规则 CRUD | 80 |
+| v0.4.0 | 历史事件、时间线管理 | 99 |
+| v0.5.0 | AI 推演、推演记录 | 116 |
+| v0.6.0 | 采纳为正史、分支记录 | 141 |
+| v0.7.0 | 设定矛盾检查、角色行为检查 | 166 |
+| v0.8.0 | 页面优化、错误处理、测试完善 | 210 |
+| v1.0.0 | 稳定展示版 | 210 |
 
 ---
 
 ## 演示流程
 
-1. 启动项目 → 打开 http://127.0.0.1:8000
+1. 启动项目 → 打开 `http://127.0.0.1:8000`
 2. 首页展示系统简介 → 点击「进入世界列表」
 3. 创建世界项目（如「艾泽拉斯」奇幻世界）
 4. 进入世界详情 → 创建角色、势力、地点、规则
@@ -437,62 +237,6 @@ pytest tests/ -v
 10. 将另一条推演记录「保存为分支」→ 分支独立保存
 11. 进入检查中心 → 运行设定矛盾检查
 12. 运行角色行为合理性检查
-
----
-
-## AI 配置说明
-
-| 项目 | 说明 |
-|------|------|
-| API Key | 在 .env 中配置 AI_API_KEY |
-| 未配置 Key | 自动使用 **Mock AI** 模式（规则式推演） |
-| 已配置 Key | 可接入 OpenAI-compatible API |
-| 安全要求 | AI_API_KEY 不允许硬编码，.env 不提交 Git |
-| 核心规则 | **AI 推演结果不会自动写入正史**，需用户手动采纳 |
-
-### 推演记录状态
-
-| 状态 | 说明 | 可操作 |
-|------|------|--------|
-| pending | 待处理 | 采纳为正史 / 保存为分支 |
-| dopted | 已采纳 | 已写入时间线，不可再操作 |
-| ranched | 已分支 | 已保存为独立分支，不可再操作 |
-| discarded | 已废弃 | 预留状态 |
-
----
-
-## 数据库说明
-
-| 项目 | 说明 |
-|------|------|
-| 数据库 | SQLite |
-| 默认文件 | i_world_engine.db（项目根目录） |
-| Git 提交 | 不提交（已加入 .gitignore） |
-| 迁移工具 | 当前版本暂未引入 Alembic |
-| 开发阶段 | 模型字段变更后可删除 .db 文件重启自动重建 |
-| 生产建议 | 后续版本建议加入数据库迁移工具 |
-
----
-
-## 项目目录结构
-
- + "`" + "
-app/
-  main.py                  # FastAPI 入口
-  config.py                # 配置管理
-  database.py              # 数据库连接
-  models.py                # 数据模型（8张表）
-  routes/                  # 10个路由模块
-  services/                # 11个服务模块
-  templates/               # 30+ 模板文件
-  static/                  # CSS/JS
-tests/                     # 11个测试文件，210个测试
-docs/                      # 设计文档
-.project_backups/          # 本地备份（不入Git）
-requirements.txt
-.env.example
-.gitignore
-" + "`" + "
 
 ---
 
