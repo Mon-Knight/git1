@@ -19,6 +19,30 @@
 9. 所有版本变化必须记录到 CHANGELOG.md。
 10. 所有命令执行完成后，必须根据终端输出确认是否成功，不要假设成功。
 
+【项目初始化要求】
+请先执行以下步骤：
+1. 检查当前目录是否为空。
+2. 如果目录非空，列出文件并判断是否会冲突，不要随意删除。
+3. 创建标准项目结构。
+4. 创建 .gitignore，必须排除：
+   - node_modules/
+   - venv/
+   - .venv/
+   - __pycache__/
+   - dist/
+   - build/
+   - .env
+   - *.log
+   - .DS_Store
+   - .project_backups/
+5. 创建 README.md，说明项目简介、功能、运行方式、目录结构、开发进度。
+6. 创建 CHANGELOG.md。
+7. 创建 docs/dev-log.md。
+8. 创建 docs/decision-log.md。
+9. 创建 docs/security-review.md。
+10. 创建 .env.example。
+11. 创建 .github/copilot-instructions.md，用于记录本项目后续开发规范。
+
 
 
 本项目要求 Copilot Agent 能够独立完成：
