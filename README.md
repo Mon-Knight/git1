@@ -1,4 +1,4 @@
-# AI World Engine
+﻿# AI World Engine
 
 AI 小说世界观推演系统 — 帮助作者构建小说世界观，通过 AI 推演世界发展。
 
@@ -194,6 +194,40 @@ python scripts/check_encoding.py
 
 ---
 
+## Windows 桌面端
+
+AI World Engine 支持打包为 Windows 桌面 EXE，双击即可启动。
+
+### 桌面模式运行
+
+```bash
+python desktop_launcher.py
+```
+
+### 打包为 EXE
+
+```bash
+# 使用干净 venv
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+
+# 执行打包
+powershell -ExecutionPolicy Bypass -File packaging/build_exe.ps1
+
+# 输出位置：dist/AIWorldEngine/AIWorldEngine.exe
+```
+
+### 桌面端数据库位置
+
+```
+C:\Users\<用户名>\AppData\Local\AIWorldEngine\ai_world_engine.db
+```
+
+> 详见 [docs/desktop-build.md](docs/desktop-build.md)
+
+---
+
 ## Docker / 正式使用准备
 
 当前版本为本地开发版。如需部署到生产环境：
@@ -220,6 +254,7 @@ python scripts/check_encoding.py
 | v0.7.0 | 设定矛盾检查、角色行为检查 | 166 |
 | v0.8.0 | 页面优化、错误处理、测试完善 | 210 |
 | v1.0.0 | 稳定展示版 | 210 |
+| v1.2.0 | 桌面端 EXE 打包 | 226 |
 
 ---
 

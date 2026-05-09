@@ -4,9 +4,25 @@ Reads settings from environment variables with sensible defaults.
 """
 
 import os
+import sys
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+def resource_path(relative_path: str) -> str:
+    """
+    Get the absolute path to a resource file.
+    Works both in normal Python mode and PyInstaller bundled mode.
+    """
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(os.path.dirname(__file__))
+        base_path = os.path.dirname(base_path)
+
+    return os.path.join(base_path, relative_path)
 
 
 class Settings:
@@ -26,12 +42,27 @@ class Settings:
     APP_DEBUG: bool = os.getenv("APP_DEBUG", "false").lower() == "true"
 
     # Version
-    VERSION: str = "0.1.0"
+    VERSION: str = "1.2.0"
 
     @property
     def is_mock_ai(self) -> bool:
         """Return True if AI_API_KEY is not set (mock mode)."""
         return not self.AI_API_KEY
+
+    @staticmethod
+    def get_desktop_db_path() -> str:
+        """
+        Get database path for desktop mode.
+        Uses Windows AppData/Local/AIWorldEngine/ai_world_engine.db.
+        """
+        if sys.platform == "win32":
+            appdata = os.getenv("LOCALAPPDATA")
+            if appdata:
+                db_dir = os.path.join(appdata, "AIWorldEngine")
+                os.makedirs(db_dir, exist_ok=True)
+                db_path = os.path.join(db_dir, "ai_world_engine.db")
+                return f"sqlite:///{db_path}"
+        return "sqlite:///./ai_world_engine.db"
 
 
 # Singleton instance

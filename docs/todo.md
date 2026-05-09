@@ -1,11 +1,12 @@
 # TODO — AI World Engine
 
-## v1.0.0 ✅ 稳定展示版
-- [x] README 最终整理
-- [x] 架构文档整理
-- [x] 安全审查总结
-- [x] 210个测试全部通过
-- [x] 发布
+## v1.2.0 ✅ Windows 桌面端打包
+- [x] desktop_launcher.py
+- [x] PyInstaller 打包脚本
+- [x] 资源路径兼容
+- [x] 桌面数据库路径
+- [x] 打包文档
+- [x] 8个测试全部通过
 
 ---
 

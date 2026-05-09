@@ -1,5 +1,47 @@
 # Development Log — AI World Engine
 
+## 2026-05-09 — v1.2.0: Windows 桌面端 EXE 打包
+
+### 完成内容
+- desktop_launcher.py（pywebview + 后台 uvicorn）
+- resource_path 工具函数
+- 桌面数据库路径（AppData）
+- PyInstaller 打包脚本
+- 桌面打包文档
+- 8个新测试
+
+### 修改文件
+- `desktop_launcher.py` — 新建
+- `app/config.py` — 新增 resource_path、get_desktop_db_path、VERSION→1.2.0
+- `app/main.py` — 使用 resource_path 挂载静态文件
+- `packaging/build_exe.ps1` — 新建
+- `docs/desktop-build.md` — 新建
+- `tests/test_desktop.py` — 新建（8个测试）
+- `tests/test_main.py` — 更新版本号断言
+- `requirements.txt` — 新增 pywebview、pyinstaller
+- `README.md` — 更新
+- `CHANGELOG.md` — 更新
+- `docs/dev-log.md` — 更新
+- `docs/architecture.md` — 更新
+- `docs/todo.md` — 更新
+
+### 测试命令 / 结果
+- 226 passed, 0 failed (v1.0.0: 218 + v1.2.0: 8)
+
+### 打包状态
+- PyInstaller 打包脚本已就绪（packaging/build_exe.ps1）
+- 建议使用干净 venv 执行打包
+
+### 备份 / commit / tag / push
+- `.project_backups/v1.2.0-20260509-0000.zip`
+- `feat: complete v1.2.0 desktop exe packaging`
+- `v1.2.0` — main + tag 已推送
+
+### 已知问题
+- conda base 环境 PyInstaller 打包缓慢，需用干净 venv
+
+---
+
 ## 2026-05-09 — v1.0.0: 稳定展示版
 
 ### 完成内容

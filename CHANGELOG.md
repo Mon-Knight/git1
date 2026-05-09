@@ -1,5 +1,20 @@
 # Changelog
 
+## [v1.2.0] — 2026-05-09
+
+### Added
+- desktop_launcher.py（pywebview 桌面窗口 + 后台 uvicorn）
+- resource_path 工具函数（PyInstaller 兼容）
+- 桌面模式数据库路径（AppData/Local/AIWorldEngine/）
+- packaging/build_exe.ps1（PyInstaller onedir 打包脚本）
+- docs/desktop-build.md（打包说明文档）
+- 自动端口选择（8000-9000）
+- 8个桌面/打包相关测试
+
+### Notes
+- PyInstaller 打包需要干净的 venv（conda base 环境包太多导致分析缓慢）
+- 使用 --onedir 模式，输出为 dist/AIWorldEngine/
+
 ## [v1.0.0] — 2026-05-09
 
 ### Stable Demo Release

@@ -3,11 +3,12 @@ AI World Engine - FastAPI Application Entry Point
 """
 
 from contextlib import asynccontextmanager
+import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from app.config import settings
+from app.config import settings, resource_path
 from app.database import init_db
 from app.routes.pages import router as pages_router
 from app.routes.worlds import router as worlds_router
@@ -38,9 +39,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Mount static files
-static_dir = Path(__file__).parent / "static"
-static_dir.mkdir(parents=True, exist_ok=True)
+# Mount static files (uses resource_path for PyInstaller compatibility)
+static_dir = resource_path("app/static")
+os.makedirs(static_dir, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 # Include routers
