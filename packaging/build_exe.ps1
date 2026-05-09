@@ -12,7 +12,8 @@ if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
 
 # 2. Build with PyInstaller (onedir mode)
 Write-Host "[2/4] Running PyInstaller..." -ForegroundColor Yellow
-C:/Users/17735/anaconda3/Scripts/conda.exe run -p C:\Users\17735\anaconda3 --no-capture-output python -m PyInstaller --name AIWorldEngine --onedir --windowed --clean --add-data "app/templates;app/templates" --add-data "app/static;app/static" --hidden-import uvicorn.logging --hidden-import uvicorn.loops.auto --hidden-import uvicorn.protocols.http.auto --hidden-import sqlalchemy.sql.default_comparator --hidden-import jinja2 --hidden-import jinja2.ext desktop_launcher.py
+$envPath = "C:/Users/17735/anaconda3/envs/aiworldengine"
+C:/Users/17735/anaconda3/envs/aiworldengine/python.exe -m PyInstaller --name AIWorldEngine --onedir --windowed --clean --add-data "app/templates;app/templates" --add-data "app/static;app/static" --add-binary "$envPath/Library/bin/libssl-3-x64.dll;." --add-binary "$envPath/Library/bin/libcrypto-3-x64.dll;." --add-binary "$envPath/Library/bin/ffi.dll;." --add-binary "$envPath/Library/bin/sqlite3.dll;." --hidden-import uvicorn.logging --hidden-import uvicorn.loops.auto --hidden-import uvicorn.protocols.http.auto --hidden-import sqlalchemy.sql.default_comparator --hidden-import jinja2 --hidden-import jinja2.ext --hidden-import python_multipart desktop_launcher.py
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: PyInstaller build failed!" -ForegroundColor Red

@@ -1,5 +1,43 @@
 # Development Log — AI World Engine
 
+## 2026-05-09 — v1.2.1: EXE 打包验证与修复
+
+### 完成内容
+- 修复 PyInstaller 打包：conda 环境 DLL 缺失（libssl、libcrypto、ffi、sqlite3）
+- 修复 desktop_launcher.py：使用直接 import 替代字符串 uvicorn.run
+- requirements.txt 新增 python-multipart
+- build_exe.ps1 更新：包含所有必要 DLL
+- EXE 打包验证通过：启动、首页、CSS、数据库、数据持久化
+
+### 修改文件
+- `desktop_launcher.py` — 修复 uvicorn import 方式
+- `packaging/build_exe.ps1` — 添加 DLL 路径
+- `requirements.txt` — 新增 python-multipart
+- `CHANGELOG.md` — 更新
+- `docs/dev-log.md` — 更新
+- `docs/desktop-build.md` — 更新
+- `README.md` — 更新
+
+### 测试命令 / 结果
+- 226 passed, 0 failed
+
+### 打包状态
+- PyInstaller 打包成功
+- EXE 路径：dist/AIWorldEngine/AIWorldEngine.exe
+- EXE 启动成功，首页正常，CSS 正常
+- 数据库路径：%LOCALAPPDATA%\AIWorldEngine\ai_world_engine.db
+- 数据持久化验证通过
+
+### 备份 / commit / tag / push
+- `.project_backups/v1.2.1-20260509-0000.zip`
+- `fix: verify v1.2.1 desktop exe packaging`
+- `v1.2.1` — main + tag 已推送
+
+### 已知问题
+- 无
+
+---
+
 ## 2026-05-09 — v1.2.0: Windows 桌面端 EXE 打包
 
 ### 完成内容

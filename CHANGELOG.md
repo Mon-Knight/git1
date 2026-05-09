@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.2.1] — 2026-05-09
+
+### Fixed
+- PyInstaller 打包修复：添加 conda 环境缺失 DLL（libssl、libcrypto、ffi、sqlite3）
+- desktop_launcher.py 修复：使用直接 import 替代字符串 uvicorn.run
+- requirements.txt 新增 python-multipart 依赖
+- build_exe.ps1 更新：包含所有必要 DLL
+- EXE 打包验证通过：启动、首页、CSS、数据库、数据持久化
+
 ## [v1.2.0] — 2026-05-09
 
 ### Added

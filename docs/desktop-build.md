@@ -94,6 +94,21 @@ C:\Users\<用户名>\AppData\Local\AIWorldEngine\
 
 确保打包脚本中包含 `--add-data` 参数，将 `app/templates` 和 `app/static` 打包进 EXE。
 
+### Conda 环境 DLL 缺失
+
+如果使用 conda 环境打包，可能会遇到 `_ssl`、`_ctypes`、`_sqlite3` 等 DLL 加载失败。这是因为 conda 将 DLL 放在 `Library/bin` 而非 `DLLs/` 目录。
+
+解决方案：在 PyInstaller 命令中添加 `--add-binary` 参数：
+
+```powershell
+--add-binary "$envPath/Library/bin/libssl-3-x64.dll;."
+--add-binary "$envPath/Library/bin/libcrypto-3-x64.dll;."
+--add-binary "$envPath/Library/bin/ffi.dll;."
+--add-binary "$envPath/Library/bin/sqlite3.dll;."
+```
+
+`packaging/build_exe.ps1` 已包含这些参数。
+
 ## 重新打包
 
 修改代码后重新打包：

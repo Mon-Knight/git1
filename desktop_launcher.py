@@ -39,10 +39,48 @@ def wait_for_server(url: str, timeout: int = 30) -> bool:
     return False
 
 
-def run_uvicorn(app_module: str, host: str, port: int):
+def run_uvicorn(host: str, port: int):
     """Run uvicorn in the current thread (for background thread use)."""
     import uvicorn
-    uvicorn.run(app_module, host=host, port=port, log_level="warning")
+    from app.main import app
+    uvicorn.run(app, host=host, port=port, log_level="warning")
+
+
+def _ensure_pyinstaller_imports():
+    """Force PyInstaller to bundle all app modules at analysis time.
+    This function is never actually called at runtime — it exists only
+    so that PyInstaller's import tracer discovers all app.* modules."""
+    import app.main  # noqa: F401
+    import app.config  # noqa: F401
+    import app.database  # noqa: F401
+    import app.models  # noqa: F401
+    import app.routes.pages  # noqa: F401
+    import app.routes.worlds  # noqa: F401
+    import app.routes.characters  # noqa: F401
+    import app.routes.factions  # noqa: F401
+    import app.routes.locations  # noqa: F401
+    import app.routes.rules  # noqa: F401
+    import app.routes.events  # noqa: F401
+    import app.routes.timeline  # noqa: F401
+    import app.routes.simulation  # noqa: F401
+    import app.routes.records  # noqa: F401
+    import app.routes.branches  # noqa: F401
+    import app.routes.checks  # noqa: F401
+    import app.services.ai_service  # noqa: F401
+    import app.services.world_service  # noqa: F401
+    import app.services.character_service  # noqa: F401
+    import app.services.faction_service  # noqa: F401
+    import app.services.location_service  # noqa: F401
+    import app.services.rule_service  # noqa: F401
+    import app.services.event_service  # noqa: F401
+    import app.services.timeline_service  # noqa: F401
+    import app.services.simulation_service  # noqa: F401
+    import app.services.record_action_service  # noqa: F401
+    import app.services.branch_service  # noqa: F401
+    import app.services.check_service  # noqa: F401
+    import app.services.consistency_service  # noqa: F401
+    import app.services.behavior_service  # noqa: F401
+    import app.services.world_context_service  # noqa: F401
 
 
 def main():
@@ -63,7 +101,7 @@ def main():
     # Start FastAPI in background thread
     server_thread = threading.Thread(
         target=run_uvicorn,
-        args=("app.main:app", host, port),
+        args=(host, port),
         daemon=True,
     )
     server_thread.start()
