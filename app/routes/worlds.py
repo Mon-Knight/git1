@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.services.world_service import WorldService
+from app.services.world_dashboard_service import WorldDashboardService
 from app.config import settings
 
 router = APIRouter(prefix="/worlds")
@@ -84,7 +85,7 @@ async def create_world(
 
 @router.get("/{world_id}", response_class=HTMLResponse)
 async def world_detail(request: Request, world_id: int, db: Session = Depends(get_db)):
-    """Show world detail."""
+    """Show world console dashboard."""
     world = WorldService.get_world(db, world_id)
     if not world:
         return templates.TemplateResponse(
@@ -93,10 +94,24 @@ async def world_detail(request: Request, world_id: int, db: Session = Depends(ge
             {"world_id": world_id},
             status_code=404,
         )
+    summary = WorldDashboardService.get_world_dashboard_summary(db, world_id)
+    recent = WorldDashboardService.get_world_recent_activity(db, world_id)
+    recommendations = WorldDashboardService.get_world_recommendations(db, world_id)
+    quick_actions = WorldDashboardService.get_world_quick_actions(world_id)
+
     return templates.TemplateResponse(
         request,
         "worlds/detail.html",
-        {"world": world, "active_nav": "worlds", "current_world": world, "app_version": settings.VERSION},
+        {
+            "world": world,
+            "active_nav": "worlds",
+            "current_world": world,
+            "app_version": settings.VERSION,
+            "summary": summary,
+            "recent_activity": recent,
+            "recommendations": recommendations,
+            "quick_actions": quick_actions,
+        },
     )
 
 

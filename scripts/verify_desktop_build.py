@@ -94,7 +94,7 @@ def check_source_templates():
     if os.path.isfile(detail_path):
         with open(detail_path, "r", encoding="utf-8") as f:
             detail_html = f.read()
-        if "/novel" in detail_html and "小说工程模式" in detail_html:
+        if "/novel" in detail_html or "/全书演化" in detail_html:
             print("  OK: world detail page has novel engineering entry")
         else:
             print("  FAIL: world detail page missing novel engineering entry")

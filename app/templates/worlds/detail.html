@@ -1,130 +1,225 @@
 {% extends "base.html" %}
 {% block title %}{{ world.name }} — AI World Engine{% endblock %}
-{% block page_title %}{{ world.name }}{% endblock %}
+{% block page_title %}世界控制台{% endblock %}
+{% block head_extra %}
+<link rel="stylesheet" href="/static/css/dashboard.css">
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <header class="header">
-        <h1 class="logo">🌍 {{ world.name }}</h1>
-        <p class="subtitle">{{ world.world_type or '未分类' }} · {{ world.current_era or '未知时代' }}</p>
-    </header>
+<div class="dashboard">
 
-    <nav class="nav">
-        <a href="/worlds" class="nav-link">← 返回世界列表</a>
-        <a href="/worlds/{{ world.id }}/export" class="btn-sm" style="margin-left:0.5rem">📤 导出世界</a>
-        <a href="/worlds/{{ world.id }}/edit" class="btn-sm btn-edit">编辑世界</a>
-    </nav>
+    <!-- World Header -->
+    <section class="dashboard-welcome">
+        <h1>🌍 {{ world.name }}</h1>
+        <p>{{ world.world_type or '未分类' }} · {{ world.current_era or '未知时代' }} · {{ world.tone or '' }}</p>
+        {% if world.description %}<p style="color:var(--color-text-muted);font-size:0.85rem;margin-top:0.25rem">{{ world.description[:200] }}</p>{% endif %}
+        <div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap">
+            <a href="/worlds/{{ world.id }}/edit" class="btn-sm">✏️ 编辑世界</a>
+            <a href="/worlds/{{ world.id }}/export" class="btn-sm">📤 导出世界</a>
+            <a href="/worlds" class="btn-sm">← 世界列表</a>
+        </div>
+    </section>
 
-        <main class="main">
-            <section class="world-info">
-                <div class="info-card">
-                    <h3>📖 世界简介</h3>
-                    <p>{{ world.description or '暂无简介' }}</p>
+    <!-- Data Overview -->
+    <section class="dashboard-section">
+        <h2>📊 世界数据概览</h2>
+        <div class="overview-grid">
+            <a href="/worlds/{{ world.id }}/characters" class="overview-card">
+                <div class="count">{{ summary.character_count }}</div><div class="label">角色</div>
+            </a>
+            <a href="/worlds/{{ world.id }}/factions" class="overview-card">
+                <div class="count">{{ summary.faction_count }}</div><div class="label">势力</div>
+            </a>
+            <a href="/worlds/{{ world.id }}/locations" class="overview-card">
+                <div class="count">{{ summary.location_count }}</div><div class="label">地点</div>
+            </a>
+            <a href="/worlds/{{ world.id }}/rules" class="overview-card">
+                <div class="count">{{ summary.rule_count }}</div><div class="label">规则</div>
+            </a>
+            <a href="/worlds/{{ world.id }}/events" class="overview-card">
+                <div class="count">{{ summary.canon_event_count }}</div><div class="label">正史事件</div>
+            </a>
+            <a href="/worlds/{{ world.id }}/records" class="overview-card">
+                <div class="count">{{ summary.pending_simulation_count }}</div><div class="label">待处理推演</div>
+            </a>
+            <a href="/worlds/{{ world.id }}/branches" class="overview-card">
+                <div class="count">{{ summary.branch_count }}</div><div class="label">分支</div>
+            </a>
+            <a href="/worlds/{{ world.id }}/context/packages" class="overview-card">
+                <div class="count">{{ summary.context_package_count }}</div><div class="label">上下文包</div>
+            </a>
+            <a href="/worlds/{{ world.id }}/novel/evolutions" class="overview-card">
+                <div class="count">{{ summary.novel_evolution_count }}</div><div class="label">演化方案</div>
+            </a>
+            <a href="/worlds/{{ world.id }}/novel/evolutions" class="overview-card">
+                <div class="count">{{ summary.mainline_evolution_count }}</div><div class="label">主线方案</div>
+            </a>
+            <a href="/worlds/{{ world.id }}/novel/evolutions" class="overview-card">
+                <div class="count">{{ summary.candidate_evolution_count }}</div><div class="label">备选方案</div>
+            </a>
+            <a href="/worlds/{{ world.id }}/context/styles" class="overview-card">
+                <div class="count">{{ summary.style_profile_count }}</div><div class="label">风格方案</div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Creative Progress -->
+    <section class="dashboard-section">
+        <h2>🔄 创作进度</h2>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center">
+            {% set stages = [
+                ('世界资料', summary.character_count > 0 or summary.faction_count > 0 or summary.rule_count > 0, '/worlds/' + world.id|string + '/characters'),
+                ('正史事件', summary.canon_event_count > 0, '/worlds/' + world.id|string + '/events'),
+                ('AI 推演', summary.simulation_record_count > 0, '/worlds/' + world.id|string + '/simulation'),
+                ('创作上下文', summary.context_package_count > 0, '/worlds/' + world.id|string + '/context'),
+                ('全书演化', summary.novel_evolution_count > 0, '/worlds/' + world.id|string + '/novel/evolution'),
+                ('主线方案', summary.mainline_evolution_count > 0, '/worlds/' + world.id|string + '/novel/evolutions'),
+                ('分卷大纲', false, ''),
+            ] %}
+            {% for name, done, url in stages %}
+            <a href="{{ url if url else '#' }}" style="text-decoration:none;{% if not url %}opacity:0.5;cursor:default{% endif %}">
+                <span style="display:inline-flex;align-items:center;gap:0.25rem;background:var(--color-surface);border:1px solid {% if done %}var(--color-accent){% else %}var(--color-border){% endif %};border-radius:20px;padding:0.3rem 0.75rem;font-size:0.8rem;color:{% if done %}var(--color-accent){% else %}var(--color-text-muted){% endif %}">
+                    {{ '✅' if done else '⬜' }} {{ name }}
+                </span>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Recommendations -->
+    {% if recommendations %}
+    <section class="dashboard-section">
+        <h2>💡 推荐下一步</h2>
+        <div class="item-list">
+            {% for rec in recommendations %}
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">{{ rec.title }}</div>
+                    <div class="item-meta">{{ rec.desc }}</div>
                 </div>
+                <a href="{{ rec.url }}" class="btn-sm">{{ rec.label }}</a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
 
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label">世界类型</span>
-                        <span class="info-value">{{ world.world_type or '未设定' }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">当前时代</span>
-                        <span class="info-value">{{ world.current_era or '未设定' }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">世界基调</span>
-                        <span class="info-value">{{ world.tone or '未设定' }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">创建时间</span>
-                        <span class="info-value">{{ world.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">更新时间</span>
-                        <span class="info-value">{{ world.updated_at.strftime('%Y-%m-%d %H:%M') }}</span>
-                    </div>
+    <!-- Novel Engineering Status -->
+    <section class="dashboard-section">
+        <h2>📖 小说工程状态</h2>
+        {% if summary.novel_evolution_count > 0 %}
+        <div class="overview-grid" style="grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));margin-bottom:0.5rem">
+            <div class="overview-card"><div class="count">{{ summary.novel_evolution_count }}</div><div class="label">演化方案</div></div>
+            <div class="overview-card"><div class="count">{{ summary.mainline_evolution_count }}</div><div class="label">主线</div></div>
+            <div class="overview-card"><div class="count">{{ summary.candidate_evolution_count }}</div><div class="label">备选</div></div>
+            <div class="overview-card"><div class="count">{{ summary.pending_simulation_count }}</div><div class="label">待确认</div></div>
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <a href="/worlds/{{ world.id }}/novel/evolution" class="btn-sm">📖 全书演化推演</a>
+            <a href="/worlds/{{ world.id }}/novel/evolutions" class="btn-sm">📋 演化方案列表</a>
+        </div>
+        {% if summary.mainline_evolution_count > 0 %}
+        <p style="font-size:0.8rem;color:var(--color-accent);margin-top:0.5rem">✅ 已存在主线方案，后续 v1.8.0 可用于分卷大纲。</p>
+        {% endif %}
+        {% else %}
+        <div class="empty-state-dash">
+            <p>还没有全书演化方案。</p>
+            {% if summary.context_package_count > 0 %}
+            <a href="/worlds/{{ world.id }}/novel/evolution" class="btn-primary">开始全书演化推演</a>
+            {% else %}
+            <p style="font-size:0.82rem;color:var(--color-text-muted)">请先创建创作上下文包，再进行全书演化推演。</p>
+            <a href="/worlds/{{ world.id }}/context/packages/new" class="btn-primary">创建上下文包</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Creative Assets Status -->
+    <section class="dashboard-section">
+        <h2>📦 创作资产状态</h2>
+        <div class="overview-grid" style="grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));margin-bottom:0.5rem">
+            <a href="/worlds/{{ world.id }}/context/styles" class="overview-card"><div class="count">{{ summary.style_profile_count }}</div><div class="label">风格方案</div></a>
+            <a href="/worlds/{{ world.id }}/context/anchors" class="overview-card"><div class="count">{{ summary.plot_anchor_count }}</div><div class="label">剧情时间点</div></a>
+            <a href="/worlds/{{ world.id }}/context/packages" class="overview-card"><div class="count">{{ summary.context_package_count }}</div><div class="label">上下文包</div></a>
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <a href="/worlds/{{ world.id }}/context" class="btn-sm">📦 创作上下文</a>
+            <a href="/worlds/{{ world.id }}/context/packages/new" class="btn-sm">+ 新建上下文包</a>
+            <a href="/worlds/{{ world.id }}/context/styles/new" class="btn-sm">+ 新建风格方案</a>
+            <a href="/worlds/{{ world.id }}/context/anchors/new" class="btn-sm">+ 新建时间点</a>
+        </div>
+    </section>
+
+    <!-- Recent Activity -->
+    <section class="dashboard-section">
+        <h2>🕐 最近动态</h2>
+        {% if recent_activity %}
+        <div class="item-list">
+            {% for item in recent_activity %}
+            <div class="item-row">
+                <div class="item-info">
+                    <span class="item-title">{{ item.icon }} {{ item.title }}</span>
+                    <span class="item-meta">{{ item.type }} · {{ item.time.strftime('%m-%d %H:%M') }}</span>
                 </div>
-            </section>
+                <a href="{{ item.url }}" class="btn-sm">查看</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-dash">
+            <p>暂无最近动态，可以先补充世界资料或开始 AI 推演。</p>
+        </div>
+        {% endif %}
+    </section>
 
-            <section class="module-nav">
-                <h2>世界管理模块</h2>
-                <div class="module-grid">
-                    <a href="/worlds/{{ world.id }}/characters" class="module-card">
-                        <div class="module-icon">👥</div>
-                        <h3>角色管理</h3>
-                        <p>管理世界中的角色</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/factions" class="module-card">
-                        <div class="module-icon">🏛️</div>
-                        <h3>势力管理</h3>
-                        <p>管理世界中的势力</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/locations" class="module-card">
-                        <div class="module-icon">🗺️</div>
-                        <h3>地点管理</h3>
-                        <p>管理世界中的地点</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/rules" class="module-card">
-                        <div class="module-icon">📜</div>
-                        <h3>规则管理</h3>
-                        <p>管理世界规则</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/events" class="module-card">
-                        <div class="module-icon">📋</div>
-                        <h3>历史事件</h3>
-                        <p>管理历史事件</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/timeline" class="module-card">
-                        <div class="module-icon">⏳</div>
-                        <h3>时间线</h3>
-                        <p>查看世界历史</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/simulation" class="module-card">
-                        <div class="module-icon">🤖</div>
-                        <h3>AI 推演</h3>
-                        <p>AI 推演世界发展</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/records" class="module-card">
-                        <div class="module-icon">📋</div>
-                        <h3>推演记录</h3>
-                        <p>查看推演历史</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/branches" class="module-card">
-                        <div class="module-icon">🔀</div>
-                        <h3>分支记录</h3>
-                        <p>查看分支世界线</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/checks" class="module-card">
-                        <div class="module-icon">🔍</div>
-                        <h3>检查中心</h3>
-                        <p>设定矛盾与行为检查</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/novel/evolution" class="module-card" style="border:1px dashed rgba(108,99,255,0.4);background:rgba(108,99,255,0.03)">
-                        <div class="module-icon">📖</div>
-                        <h3>全书演化推演</h3>
-                        <p>基于创作上下文包生成结构化12章全书演化方案</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/novel/evolutions" class="module-card" style="border:1px dashed rgba(108,99,255,0.3);background:rgba(108,99,255,0.02)">
-                        <div class="module-icon">📋</div>
-                        <h3>演化方案列表</h3>
-                        <p>查看、对比和管理已生成的方案（主线/备选/废弃）</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/novel" class="module-card">
-                        <div class="module-icon">✏️</div>
-                        <h3>小说工程模式</h3>
-                        <p>手动填写参数生成长篇小说全书演化方向</p>
-                    </a>
-                    <a href="/worlds/{{ world.id }}/context" class="module-card" style="border:1px dashed rgba(0,212,170,0.4);background:rgba(0,212,170,0.03)">
-                        <div class="module-icon">📦</div>
-                        <h3>创作上下文</h3>
-                        <p>保存并选择推演方案、写作风格、剧情时间点，用于后续小说推演和生成</p>
-                    </a>
-                </div>
-            </section>
-        </main>
+    <!-- Quick Actions -->
+    <section class="dashboard-section">
+        <h2>⚡ 快捷操作</h2>
+        <div class="quick-actions">
+            {% for action in quick_actions %}
+            <a href="{{ action.url }}" class="quick-action-btn">
+                <span>{{ action.icon }}</span> {{ action.label }}
+            </a>
+            {% endfor %}
+        </div>
+    </section>
 
-        <footer class="footer">
-            <p>AI World Engine | <a href="/">返回首页</a></p>
-        </footer>
-    </div>
+    <!-- Legacy Module Entries -->
+    <section class="dashboard-section">
+        <h2>📂 基础功能入口</h2>
+        <div class="module-grid">
+            <a href="/worlds/{{ world.id }}/characters" class="module-card">
+                <div class="module-icon">👥</div><h3>角色管理</h3><p>管理世界中的角色</p>
+            </a>
+            <a href="/worlds/{{ world.id }}/factions" class="module-card">
+                <div class="module-icon">🏛️</div><h3>势力管理</h3><p>管理世界中的势力</p>
+            </a>
+            <a href="/worlds/{{ world.id }}/locations" class="module-card">
+                <div class="module-icon">🗺️</div><h3>地点管理</h3><p>管理世界中的地点</p>
+            </a>
+            <a href="/worlds/{{ world.id }}/rules" class="module-card">
+                <div class="module-icon">📜</div><h3>规则管理</h3><p>管理世界规则</p>
+            </a>
+            <a href="/worlds/{{ world.id }}/events" class="module-card">
+                <div class="module-icon">📋</div><h3>历史事件</h3><p>管理历史事件</p>
+            </a>
+            <a href="/worlds/{{ world.id }}/timeline" class="module-card">
+                <div class="module-icon">⏳</div><h3>时间线</h3><p>查看世界历史</p>
+            </a>
+            <a href="/worlds/{{ world.id }}/simulation" class="module-card">
+                <div class="module-icon">🤖</div><h3>AI 推演</h3><p>AI 推演世界发展</p>
+            </a>
+            <a href="/worlds/{{ world.id }}/records" class="module-card">
+                <div class="module-icon">📋</div><h3>推演记录</h3><p>查看推演历史</p>
+            </a>
+            <a href="/worlds/{{ world.id }}/branches" class="module-card">
+                <div class="module-icon">🔀</div><h3>分支记录</h3><p>查看分支世界线</p>
+            </a>
+            <a href="/worlds/{{ world.id }}/checks" class="module-card">
+                <div class="module-icon">🔍</div><h3>检查中心</h3><p>设定矛盾与行为检查</p>
+            </a>
+        </div>
+    </section>
+
+</div>
 {% endblock %}

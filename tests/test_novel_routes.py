@@ -94,7 +94,7 @@ def test_world_detail_has_novel_entry(client):
     _create_world(client)
     response = client.get("/worlds/1")
     assert "/novel" in response.text
-    assert "小说工程模式" in response.text
+    assert "全书演化" in response.text
 
 
 def test_novel_post_with_all_optional_fields(client):

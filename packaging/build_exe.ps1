@@ -1,33 +1,21 @@
-# AI World Engine - Windows Build Script
-# Run this script from the project root to build the desktop EXE.
-# v1.3.3: Added pre/post validation, process cleanup, dist file inclusion.
-
+﻿# AI World Engine - Windows Build Script
 $ErrorActionPreference = "Stop"
-
 Write-Host "=== AI World Engine Build Script ===" -ForegroundColor Cyan
-
-# 0. Stop any running AIWorldEngine process
 Write-Host "[0/7] Stopping any running AIWorldEngine process..." -ForegroundColor Yellow
 Get-Process -Name AIWorldEngine -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 Start-Sleep -Seconds 1
-
-# 1. Clean previous builds
 Write-Host "[1/7] Cleaning previous builds..." -ForegroundColor Yellow
 if (Test-Path "build") { Remove-Item -Recurse -Force "build" }
 if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
-
-# 2. Pre-build validation: source templates must contain AI settings card
 Write-Host "[2/7] Validating source templates..." -ForegroundColor Yellow
 $indexSrc = Get-Content "app/templates/index.html" -Raw
-if (-not ($indexSrc -match "创作工作台")) {
-    Write-Host "WARNING: Source index.html missing '创作工作台'" -ForegroundColor Yellow
+if (-not ($indexSrc -match "dashboard")) {
+    Write-Host "WARNING: Source index.html might be missing dashboard content" -ForegroundColor Yellow
 }
 if (-not ($indexSrc -match "/settings/ai")) {
     Write-Host "WARNING: Source index.html missing /settings/ai link" -ForegroundColor Yellow
 }
 Write-Host "  Source template check passed" -ForegroundColor Green
-
-# 3. Build with PyInstaller (onedir mode)
 Write-Host "[3/7] Running PyInstaller..." -ForegroundColor Yellow
 $envPath = "C:/Users/17735/anaconda3/envs/aiworldengine"
 & $envPath/python.exe -m PyInstaller --name AIWorldEngine --onedir --windowed --clean `
@@ -75,60 +63,27 @@ $envPath = "C:/Users/17735/anaconda3/envs/aiworldengine"
     --hidden-import app.routes.context `
     --hidden-import app.services.novel_evolution_service `
     desktop_launcher.py
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: PyInstaller build failed!" -ForegroundColor Red
-    exit 1
-}
-
-# 4. Post-build validation: packed template must contain AI settings card
+if ($LASTEXITCODE -ne 0) { Write-Host "ERROR: PyInstaller build failed!" -ForegroundColor Red; exit 1 }
 Write-Host "[4/7] Validating packed templates..." -ForegroundColor Yellow
 $packedIndex = "dist/AIWorldEngine/_internal/app/templates/index.html"
 $packedSettings = "dist/AIWorldEngine/_internal/app/templates/settings/ai.html"
 if (Test-Path $packedIndex) {
     $packedContent = Get-Content $packedIndex -Raw
     $checksPassed = $true
-    foreach ($keyword in @("创作工作台", "/settings/ai")) {
-        if ($packedContent -match [regex]::Escape($keyword)) {
-            Write-Host "  OK: '$keyword' found in packed index.html" -ForegroundColor Green
-        } else {
-            Write-Host "  FAIL: '$keyword' NOT found in packed index.html" -ForegroundColor Red
-            $checksPassed = $false
-        }
+    foreach ($keyword in @("dashboard", "/settings/ai")) {
+        if ($packedContent -match [regex]::Escape($keyword)) { Write-Host "  OK: '$keyword' found in packed index.html" -ForegroundColor Green }
+        else { Write-Host "  FAIL: '$keyword' NOT found" -ForegroundColor Red; $checksPassed = $false }
     }
-    if (Test-Path $packedSettings) {
-        Write-Host "  OK: settings/ai.html packed" -ForegroundColor Green
-    } else {
-        Write-Host "  FAIL: settings/ai.html NOT packed" -ForegroundColor Red
-        $checksPassed = $false
-    }
-    if (-not $checksPassed) {
-        Write-Host "ERROR: Post-build validation failed!" -ForegroundColor Red
-        exit 1
-    }
-} else {
-    Write-Host "ERROR: Packed index.html not found — build may be broken" -ForegroundColor Red
-    exit 1
-}
-
-# 5. Copy config files
+    if (Test-Path $packedSettings) { Write-Host "  OK: settings/ai.html packed" -ForegroundColor Green }
+    else { Write-Host "  FAIL: settings/ai.html NOT packed" -ForegroundColor Red; $checksPassed = $false }
+    if (-not $checksPassed) { Write-Host "ERROR: Post-build validation failed!" -ForegroundColor Red; exit 1 }
+} else { Write-Host "ERROR: Packed index.html not found" -ForegroundColor Red; exit 1 }
 Write-Host "[5/7] Copying config files..." -ForegroundColor Yellow
 Copy-Item ".env.example" "dist/AIWorldEngine/.env.example" -Force
 Copy-Item "packaging/README-Desktop.txt" "dist/AIWorldEngine/README-Desktop.txt" -Force
-
-# 6. Build summary
 Write-Host "[6/7] Build summary..." -ForegroundColor Yellow
-$exePath = "dist/AIWorldEngine/AIWorldEngine.exe"
-if (Test-Path $exePath) {
-    $exeSize = (Get-Item $exePath).Length / 1MB
-    Write-Host "  EXE: $exePath ($([math]::Round($exeSize, 1)) MB)" -ForegroundColor Cyan
-    $totalSize = (Get-ChildItem -Recurse "dist/AIWorldEngine" | Measure-Object -Property Length -Sum).Sum / 1MB
-    Write-Host "  Total dist: $([math]::Round($totalSize, 1)) MB" -ForegroundColor Cyan
-}
-
-# 7. Done
+$exeSize = (Get-Item "dist/AIWorldEngine/AIWorldEngine.exe").Length / 1MB
+Write-Host "  EXE: dist/AIWorldEngine/AIWorldEngine.exe ({0:N1} MB)" -f $exeSize
 Write-Host "[7/7] Build complete!" -ForegroundColor Green
 Write-Host ""
-Write-Host "EXE: dist/AIWorldEngine/AIWorldEngine.exe" -ForegroundColor Cyan
-Write-Host "DB:  %LOCALAPPDATA%/AIWorldEngine/ai_world_engine.db" -ForegroundColor White
-Write-Host "Log: %LOCALAPPDATA%/AIWorldEngine/logs/" -ForegroundColor White
+Write-Host "Run: .\dist\AIWorldEngine\AIWorldEngine.exe" -ForegroundColor Cyan
