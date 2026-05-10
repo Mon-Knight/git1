@@ -1,5 +1,38 @@
 # Development Log — AI World Engine
 
+## 2026-05-11 — v1.3.2: EXE 首页 AI 设置入口修复
+
+### 完成内容
+- 首页新增「AI 模型设置」卡片区域，含「⚙️ 配置 AI」主按钮
+- Mock 模式下首页显示引导文案
+- 已配置 AI 时显示当前模式、模型名、API Key 状态
+- 配置不完整时显示警告提示
+- SettingsService 新增 get_ai_summary() 方法（安全，不泄露完整 API Key）
+- pages.py 首页路由传入 ai_summary 数据
+- 新增 7 个首页 AI 入口测试
+- 版本号更新为 v1.3.2
+
+### 修改文件
+- `app/templates/index.html` — 新增 AI 设置卡片和配置 AI 按钮
+- `app/routes/pages.py` — 首页传入 ai_summary
+- `app/services/settings_service.py` — 新增 get_ai_summary()
+- `app/config.py` — VERSION → 1.3.2
+- `tests/test_main.py` — 版本断言更新 + 7 个新测试
+- `tests/test_desktop.py` — 版本断言更新
+- `README.md` — 版本号、版本记录更新
+- `CHANGELOG.md` — v1.3.2 条目
+- `docs/dev-log.md` — 本条记录
+
+### 测试命令 / 结果
+- python -m compileall . ✅
+- pytest tests/ -v ✅(354 passed)
+- python scripts/check_encoding.py ✅
+
+### 已知问题
+- 无
+
+---
+
 ## 2026-05-11 — v1.3.1: EXE 桌面端稳定化 + 日志系统 + 启动自检
 
 ### 完成内容

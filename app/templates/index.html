@@ -63,6 +63,36 @@
                 </div>
             </section>
 
+            <section class="ai-config-card" style="margin-top:1.5rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem 1.5rem;">
+                <div style="display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap">
+                    <div style="flex:1;min-width:280px">
+                        <h3 style="margin:0 0 0.5rem 0;font-size:1.05rem;">
+                            🤖 AI 模型设置
+                        </h3>
+                        {% if ai_summary and ai_summary.is_functional %}
+                        <p style="margin:0 0 0.3rem 0;font-size:0.88rem;color:var(--color-text-muted)">
+                            当前 AI 模式：<strong style="color:var(--color-accent)">{{ ai_summary.mode_label }}</strong>
+                            {% if ai_summary.model %} | 模型：<code>{{ ai_summary.model }}</code>{% endif %}
+                            {% if ai_summary.has_api_key %} | API Key：<span style="color:var(--color-accent)">已设置</span>{% endif %}
+                        </p>
+                        {% elif ai_summary and ai_summary.mode_label == "配置不完整" %}
+                        <p style="margin:0 0 0.3rem 0;font-size:0.88rem;color:#ffc107">
+                            当前 AI 配置不完整，请进入 AI 设置补全 Base URL、Model 和 API Key。
+                        </p>
+                        {% else %}
+                        <p style="margin:0 0 0.3rem 0;font-size:0.88rem;color:var(--color-text-muted)">
+                            当前使用 <strong>Mock AI</strong>，适合测试和演示。
+                            如需使用 DeepSeek、MiMo、Ollama 或其他 OpenAI-compatible 模型，
+                            请进入 AI 设置页面配置 Base URL、Model 和 API Key。
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div style="display:flex;align-items:center">
+                        <a href="/settings/ai" class="btn-primary" style="white-space:nowrap">⚙️ 配置 AI</a>
+                    </div>
+                </div>
+            </section>
+
             <section class="status">
                 <div class="status-badge {{ 'mock' if mock_ai else 'live' }}">
                     AI 模式: {{ 'Mock (演示)' if mock_ai else 'Live API' }}
