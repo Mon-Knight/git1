@@ -1,5 +1,54 @@
 # Development Log — AI World Engine
 
+## 2026-05-11 — v1.3.3: EXE 构建同步修复与推演系统整理
+
+### 问题根因
+- 打包后 EXE 的 `dist/AIWorldEngine/_internal/app/templates/index.html` 是旧版本（无 AI 设置卡片）
+- `build_exe.ps1` 构建前虽清理了 dist，但之前用户运行的是未重新打包的旧 dist
+- 缺少构建后验证步骤，无法自动检测打包模板是否正确
+
+### 修复内容
+1. build_exe.ps1 重写为 7 步流程：
+   - 步骤 0：停止旧 AIWorldEngine 进程
+   - 步骤 1：清理旧 build/dist
+   - 步骤 2：源码模板预检（含 AI 设置关键字检查）
+   - 步骤 3：PyInstaller 打包
+   - 步骤 4：打包后模板验证（必须含 AI 设置卡片 + settings/ai.html）
+   - 步骤 5：复制 README-Desktop.txt 到 dist
+   - 步骤 6-7：构建摘要
+2. 新增 scripts/verify_desktop_build.py：支持 --src / --dist / --all 模式验证
+3. 新增 app/constants.py：simulation_type 常量集中管理（为 v1.4.0 准备）
+4. 版本号更新为 v1.3.3
+
+### 修改文件
+- `packaging/build_exe.ps1` — 重写：7 步构建流程 + 预检 + 打包后验证
+- `scripts/verify_desktop_build.py` — 新建：构建验证脚本
+- `app/constants.py` — 新建：simulation_type 常量
+- `app/config.py` — VERSION → 1.3.3
+- `tests/test_desktop.py` — 版本断言更新
+- `tests/test_main.py` — 版本断言更新
+- `README.md` — 版本号、版本记录更新
+- `CHANGELOG.md` — v1.3.3 条目
+- `docs/dev-log.md` — 本条记录
+
+### 测试命令 / 结果
+- python -m compileall . ✅
+- pytest tests/ -v ✅
+- python scripts/check_encoding.py ✅
+- python scripts/verify_desktop_build.py --src ✅
+
+### EXE 打包验证
+- powershell -ExecutionPolicy Bypass -File packaging/build_exe.ps1 ✅
+- dist/AIWorldEngine/AIWorldEngine.exe 存在 ✅
+- 打包后 index.html 包含「AI 模型设置」✅
+- 打包后 index.html 包含「配置 AI」✅
+- 打包后 settings/ai.html 存在 ✅
+
+### 已知问题
+- 无
+
+---
+
 ## 2026-05-11 — v1.3.2: EXE 首页 AI 设置入口修复
 
 ### 完成内容

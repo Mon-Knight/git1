@@ -1,5 +1,23 @@
 # Changelog
 
+## [v1.3.3] — 2026-05-11
+
+### Fixed
+- 修复 EXE 打包后首页没有 AI 配置按钮的问题（根因：旧 dist 未清理重新打包）
+- 构建脚本现在构建前自动停止旧进程、清理旧 build/dist
+- 构建脚本现在构建后自动验证打包模板内容正确性
+
+### Added
+- 新增 scripts/verify_desktop_build.py 构建验证脚本（支持 --src / --dist / --all）
+- 新增 app/constants.py 集中定义 simulation_type 常量（为 v1.4.0 小说工程模式准备）
+- 构建后自动校验：打包后的 index.html 必须包含「AI 模型设置」「配置 AI」「/settings/ai」
+- 构建后自动校验 settings/ai.html 是否被打包
+- 打包脚本自动将 README-Desktop.txt 复制到 dist/
+
+### Changed
+- packaging/build_exe.ps1 重写：7 步构建流程，含进程清理、模板预检、打包后验证、构建摘要
+- packaging/AIWorldEngine.spec 和 build_exe.ps1 保持一致的 hidden imports
+
 ## [v1.3.2] — 2026-05-11
 
 ### Fixed
