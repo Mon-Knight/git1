@@ -27,6 +27,7 @@ HOMEPAGE_KEYWORDS = [
 # Required templates that must exist
 REQUIRED_TEMPLATES = [
     "app/templates/index.html",
+    "app/templates/base.html",
     "app/templates/settings/ai.html",
     "app/templates/simulation/index.html",
     "app/templates/novel/form.html",

@@ -1,23 +1,19 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ world.name }} — AI World Engine</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1 class="logo">🌍 {{ world.name }}</h1>
-            <p class="subtitle">{{ world.world_type or '未分类' }} · {{ world.current_era or '未知时代' }}</p>
-        </header>
+{% extends "base.html" %}
+{% block title %}{{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}{{ world.name }}{% endblock %}
 
-        <nav class="nav">
-            <a href="/worlds" class="nav-link">← 返回世界列表</a>
-            <a href="/worlds/{{ world.id }}/export" class="btn-sm" style="margin-left:0.5rem">📤 导出世界</a>
-            <a href="/worlds/{{ world.id }}/edit" class="btn-sm btn-edit">编辑世界</a>
-        </nav>
+{% block content %}
+<div class="container">
+    <header class="header">
+        <h1 class="logo">🌍 {{ world.name }}</h1>
+        <p class="subtitle">{{ world.world_type or '未分类' }} · {{ world.current_era or '未知时代' }}</p>
+    </header>
+
+    <nav class="nav">
+        <a href="/worlds" class="nav-link">← 返回世界列表</a>
+        <a href="/worlds/{{ world.id }}/export" class="btn-sm" style="margin-left:0.5rem">📤 导出世界</a>
+        <a href="/worlds/{{ world.id }}/edit" class="btn-sm btn-edit">编辑世界</a>
+    </nav>
 
         <main class="main">
             <section class="world-info">
@@ -131,5 +127,4 @@
             <p>AI World Engine | <a href="/">返回首页</a></p>
         </footer>
     </div>
-</body>
-</html>
+{% endblock %}

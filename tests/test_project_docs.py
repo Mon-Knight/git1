@@ -49,11 +49,11 @@ class TestDocContent:
 
     def test_readme_contains_version(self):
         content = _read_root("README.md")
-        assert "v1.7.1" in content, "README.md missing v1.7.1"
+        assert "v1.7.2" in content, "README.md missing v1.7.2"
 
     def test_changelog_contains_version(self):
         content = _read_root("CHANGELOG.md")
-        assert "v1.7.1" in content, "CHANGELOG.md missing v1.7.1"
+        assert "v1.7.2" in content, "CHANGELOG.md missing v1.7.2"
 
     def test_version_roadmap_contains_v172(self):
         content = _read_doc("version-roadmap.md")

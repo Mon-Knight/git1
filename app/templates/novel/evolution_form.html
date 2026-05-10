@@ -1,8 +1,7 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>全书演化推演 — {{ world.name }} — AI World Engine</title>
-<link rel="stylesheet" href="/static/css/style.css">
+{% extends "base.html" %}
+{% block title %}全书演化推演 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}全书演化推演{% endblock %}
+{% block head_extra %}
 <style>
 .evo-form{display:grid;gap:0.75rem}
 .form-section{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.25rem}
@@ -16,8 +15,8 @@
 .field-required::after{content:" *";color:#e74c3c}
 .pkg-summary{background:rgba(0,212,170,0.04);border:1px solid rgba(0,212,170,0.2);border-radius:8px;padding:0.6rem 0.8rem;margin-top:0.3rem;font-size:0.82rem;color:var(--color-text-muted)}
 </style>
-</head>
-<body>
+{% endblock %}
+{% block content %}
 <div class="container">
 <header class="header"><h1 class="logo">📖 {{ world.name }}</h1><p class="subtitle">全书演化推演</p></header>
 <nav class="nav">
@@ -125,4 +124,5 @@
 
 </main>
 <footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
-</div></body></html>
+</div>
+{% endblock %}

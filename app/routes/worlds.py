@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.services.world_service import WorldService
+from app.config import settings
 
 router = APIRouter(prefix="/worlds")
 
@@ -26,7 +27,7 @@ async def list_worlds(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse(
         request,
         "worlds/list.html",
-        {"worlds": worlds},
+        {"worlds": worlds, "active_nav": "worlds", "app_version": settings.VERSION},
     )
 
 
@@ -95,7 +96,7 @@ async def world_detail(request: Request, world_id: int, db: Session = Depends(ge
     return templates.TemplateResponse(
         request,
         "worlds/detail.html",
-        {"world": world},
+        {"world": world, "active_nav": "worlds", "current_world": world, "app_version": settings.VERSION},
     )
 
 

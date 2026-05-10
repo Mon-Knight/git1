@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI World Engine{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/app-shell.css">
+    {% block head_extra %}{% endblock %}
+</head>
+<body class="app-shell-body">
+    <!-- ===== Top Bar ===== -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <span class="topbar-logo">🌍 AI World Engine</span>
+            <span class="topbar-version">v{{ app_version or '1.7.2' }}</span>
+        </div>
+        <div class="topbar-center">
+            {% if current_world %}
+            <span class="topbar-world">📖 {{ current_world.name }}</span>
+            {% endif %}
+            <span class="topbar-page-title">{% block page_title %}{% endblock %}</span>
+        </div>
+        <div class="topbar-right">
+            <a href="/" class="topbar-btn" title="首页">🏠</a>
+            <a href="/worlds" class="topbar-btn" title="世界列表">🌍</a>
+            <a href="/data" class="topbar-btn" title="数据管理">📦</a>
+            <a href="/settings/ai" class="topbar-btn" title="AI 设置">⚙️</a>
+        </div>
+    </header>
+
+    <!-- ===== Sidebar ===== -->
+    <nav class="sidebar">
+        <ul class="sidebar-nav">
+            {% set nav_world_id = current_world.id if current_world else None %}
+            {% set active = active_nav or '' %}
+            <li>
+                <a href="/" class="sidebar-link {% if active == 'dashboard' %}active{% endif %}">
+                    <span class="sidebar-icon">🏠</span> 工作台
+                </a>
+            </li>
+            <li>
+                <a href="/worlds" class="sidebar-link {% if active == 'worlds' %}active{% endif %}">
+                    <span class="sidebar-icon">🌍</span> 世界项目
+                </a>
+            </li>
+            <li>
+                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/novel/evolution{% else %}/worlds{% endif %}"
+                   class="sidebar-link {% if active == 'novel' %}active{% endif %}">
+                    <span class="sidebar-icon">📖</span> 小说工程
+                </a>
+            </li>
+            <li>
+                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/context{% else %}/worlds{% endif %}"
+                   class="sidebar-link {% if active == 'assets' %}active{% endif %}">
+                    <span class="sidebar-icon">📦</span> 创作资产
+                </a>
+            </li>
+            <li>
+                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/simulation{% else %}/worlds{% endif %}"
+                   class="sidebar-link {% if active == 'simulation' %}active{% endif %}">
+                    <span class="sidebar-icon">🤖</span> AI 推演
+                </a>
+            </li>
+            <li>
+                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/checks{% else %}/worlds{% endif %}"
+                   class="sidebar-link {% if active == 'checks' %}active{% endif %}">
+                    <span class="sidebar-icon">🔍</span> 检查中心
+                </a>
+            </li>
+            <li>
+                <a href="/data" class="sidebar-link {% if active == 'data' %}active{% endif %}">
+                    <span class="sidebar-icon">💾</span> 数据管理
+                </a>
+            </li>
+            <li>
+                <a href="/settings/ai" class="sidebar-link {% if active == 'settings' %}active{% endif %}">
+                    <span class="sidebar-icon">⚙️</span> 设置
+                </a>
+            </li>
+        </ul>
+
+        <!-- Future modules indicator -->
+        <div class="sidebar-future">
+            <span class="sidebar-future-label">后续版本开放</span>
+            <span class="sidebar-future-item">📋 分卷大纲</span>
+            <span class="sidebar-future-item">📝 章节大纲</span>
+            <span class="sidebar-future-item">✍️ 正文生成</span>
+        </div>
+    </nav>
+
+    <!-- ===== Main Content ===== -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ===== Scripts ===== -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -18,6 +18,7 @@ from app.services.settings_service import SettingsService
 from app.services.ai.model_router import ModelRouter
 from app.services.ai.prompt_builder import PromptBuilder
 from app.services.novel_evolution_service import NovelEvolutionService
+from app.config import settings
 from app.constants import (
     SIMULATION_TYPE_NOVEL_EVOLUTION,
     NOVEL_FORM_FIELDS,
@@ -272,6 +273,9 @@ async def evolution_form(
 
     return templates.TemplateResponse(request, "novel/evolution_form.html", {
         "world": world,
+        "active_nav": "novel",
+        "current_world": world,
+        "app_version": settings.VERSION,
         "context_packages": context_packages,
         "selected_package_id": context_package_id,
         "selected_pkg": selected_pkg,
@@ -307,6 +311,9 @@ async def run_evolution(
     if ctx.get("error") and pkg_id:
         return templates.TemplateResponse(request, "novel/evolution_form.html", {
             "world": world,
+            "active_nav": "novel",
+            "current_world": world,
+            "app_version": settings.VERSION,
             "context_packages": context_packages,
             "selected_package_id": pkg_id,
             "selected_pkg": None,
@@ -338,6 +345,9 @@ async def run_evolution(
     if errors:
         return templates.TemplateResponse(request, "novel/evolution_form.html", {
             "world": world,
+            "active_nav": "novel",
+            "current_world": world,
+            "app_version": settings.VERSION,
             "context_packages": context_packages,
             "selected_package_id": pkg_id,
             "selected_pkg": ctx.get("context_package"),
@@ -384,6 +394,9 @@ async def run_evolution(
 
         return templates.TemplateResponse(request, "novel/evolution_form.html", {
             "world": world,
+            "active_nav": "novel",
+            "current_world": world,
+            "app_version": settings.VERSION,
             "context_packages": context_packages,
             "selected_package_id": pkg_id,
             "selected_pkg": ctx.get("context_package"),
@@ -404,6 +417,9 @@ async def run_evolution(
     except Exception as e:
         return templates.TemplateResponse(request, "novel/evolution_form.html", {
             "world": world,
+            "active_nav": "novel",
+            "current_world": world,
+            "app_version": settings.VERSION,
             "context_packages": context_packages,
             "selected_package_id": pkg_id,
             "selected_pkg": ctx.get("context_package") if "ctx" in dir() else None,
@@ -431,6 +447,9 @@ async def list_evolutions(
 
     return templates.TemplateResponse(request, "novel/evolutions.html", {
         "world": world,
+        "active_nav": "novel",
+        "current_world": world,
+        "app_version": settings.VERSION,
         "evolutions": evolutions,
         "get_status_label": NovelEvolutionService.get_status_label,
         "get_status_color": NovelEvolutionService.get_status_color,
@@ -459,6 +478,9 @@ async def evolution_detail(
 
     return templates.TemplateResponse(request, "novel/evolution_detail.html", {
         "world": world,
+        "active_nav": "novel",
+        "current_world": world,
+        "app_version": settings.VERSION,
         "record": record,
         "get_status_label": NovelEvolutionService.get_status_label,
         "get_status_color": NovelEvolutionService.get_status_color,

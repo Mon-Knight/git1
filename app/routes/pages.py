@@ -36,7 +36,9 @@ async def index(request: Request):
         "index.html",
         {
             "version": settings.VERSION,
+            "app_version": settings.VERSION,
             "mock_ai": settings.is_mock_ai,
             "ai_summary": ai_summary,
+            "active_nav": "dashboard",
         },
     )

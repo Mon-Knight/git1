@@ -1,5 +1,29 @@
 # Changelog
 
+## [v1.7.2] — 2026-05-11
+
+### Added
+- 新增统一应用壳布局（base.html + app-shell.css）
+- 新增顶部栏（应用名称、版本号、当前世界、快捷按钮）
+- 新增左侧导航栏（8 个一级入口 + active 状态）
+- 新增主内容区布局
+- 新增 app-shell.css 独立样式
+- 新增 test_app_shell.py（22 个应用壳测试）
+- 新增"后续版本开放"区域（分卷大纲/章节大纲/正文生成）
+
+### Changed
+- index.html、worlds/list.html、worlds/detail.html 套入应用壳
+- novel/evolution_form.html 套入应用壳
+- pages/worlds/novel 路由传递 active_nav/current_world/app_version
+- verify_desktop_build.py 新增 base.html 检查
+- README 更新应用化 UI 说明
+
+### Notes
+- 本版本不新增业务功能
+- 本版本不修改数据库
+- 本版本不开发分卷、章节、正文
+- 本版本为 v1.7.3 主工作台首页做准备
+
 ## [v1.7.1] — 2026-05-11
 
 ### Added
