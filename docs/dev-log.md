@@ -25,7 +25,7 @@
 
 ### 测试命令 / 结果
 - python -m compileall . ✅
-- pytest tests/ -v ✅(354 passed)
+- pytest tests/ -v ✅（357 passed）
 - python scripts/check_encoding.py ✅
 
 ### 已知问题
