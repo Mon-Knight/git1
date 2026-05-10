@@ -83,4 +83,4 @@ def test_desktop_db_path_creates_directory():
 def test_config_version_updated():
     """Test that VERSION reflects 1.7.2."""
     from app.config import settings
-    assert settings.VERSION == "1.7.4"
+    assert settings.VERSION == "1.7.5"

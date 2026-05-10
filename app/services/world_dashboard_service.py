@@ -255,6 +255,135 @@ class WorldDashboardService:
         ]
 
 
+    @staticmethod
+    def get_world_module_groups(db: Session, world_id: int) -> List[Dict[str, Any]]:
+        """Return structured module groups with links and stats for the world console."""
+        summary = WorldDashboardService.get_world_dashboard_summary(db, world_id)
+
+        return [
+            {
+                "key": "world_library",
+                "title": "设定库",
+                "icon": "📚",
+                "description": "管理世界中的角色、势力、地点和规则，是后续推演和小说生成的基础。",
+                "anchor": "world-library",
+                "stats": [
+                    {"label": "角色", "count": summary["character_count"]},
+                    {"label": "势力", "count": summary["faction_count"]},
+                    {"label": "地点", "count": summary["location_count"]},
+                    {"label": "规则", "count": summary["rule_count"]},
+                ],
+                "links": [
+                    {"label": "角色管理", "url": f"/worlds/{world_id}/characters", "disabled": False},
+                    {"label": "势力管理", "url": f"/worlds/{world_id}/factions", "disabled": False},
+                    {"label": "地点管理", "url": f"/worlds/{world_id}/locations", "disabled": False},
+                    {"label": "规则管理", "url": f"/worlds/{world_id}/rules", "disabled": False},
+                ],
+            },
+            {
+                "key": "story_history",
+                "title": "剧情历史",
+                "icon": "📜",
+                "description": "管理正史事件、非正史事件和世界时间线。",
+                "anchor": "story-history",
+                "stats": [
+                    {"label": "正史事件", "count": summary["canon_event_count"]},
+                    {"label": "非正史事件", "count": summary["non_canon_event_count"]},
+                ],
+                "links": [
+                    {"label": "历史事件", "url": f"/worlds/{world_id}/events", "disabled": False},
+                    {"label": "时间线", "url": f"/worlds/{world_id}/timeline", "disabled": False},
+                    {"label": "正史时间线", "url": f"/worlds/{world_id}/timeline?view=canon", "disabled": False},
+                    {"label": "非正史事件", "url": f"/worlds/{world_id}/timeline?view=non_canon", "disabled": False},
+                ],
+            },
+            {
+                "key": "ai_simulation",
+                "title": "AI 推演",
+                "icon": "🤖",
+                "description": "基于世界资料进行 AI 推演，推演结果需要用户确认后才可采纳或保存为分支。",
+                "anchor": "ai-simulation",
+                "stats": [
+                    {"label": "推演记录", "count": summary["simulation_record_count"]},
+                    {"label": "待处理推演", "count": summary["pending_simulation_count"]},
+                    {"label": "分支", "count": summary["branch_count"]},
+                ],
+                "links": [
+                    {"label": "开始 AI 推演", "url": f"/worlds/{world_id}/simulation", "disabled": False},
+                    {"label": "推演记录", "url": f"/worlds/{world_id}/records", "disabled": False},
+                    {"label": "分支记录", "url": f"/worlds/{world_id}/branches", "disabled": False},
+                ],
+            },
+            {
+                "key": "novel_engineering",
+                "title": "小说工程",
+                "icon": "📖",
+                "description": "围绕长篇小说创作流程，管理全书演化、后续分卷、章节和正文生成。",
+                "anchor": "novel-engineering",
+                "stats": [
+                    {"label": "演化方案", "count": summary["novel_evolution_count"]},
+                    {"label": "主线方案", "count": summary["mainline_evolution_count"]},
+                    {"label": "备选方案", "count": summary["candidate_evolution_count"]},
+                    {"label": "待确认方案", "count": summary["pending_simulation_count"]},
+                ],
+                "links": [
+                    {"label": "全书演化推演", "url": f"/worlds/{world_id}/novel/evolution", "disabled": False},
+                    {"label": "演化方案列表", "url": f"/worlds/{world_id}/novel/evolutions", "disabled": False},
+                    {"label": "分卷大纲", "url": "", "disabled": True, "hint": "后续版本开放"},
+                    {"label": "章节大纲", "url": "", "disabled": True, "hint": "后续版本开放"},
+                    {"label": "正文生成", "url": "", "disabled": True, "hint": "后续版本开放"},
+                ],
+            },
+            {
+                "key": "creative_assets",
+                "title": "创作资产",
+                "icon": "📦",
+                "description": "管理写作风格方案、剧情时间点和创作上下文包，用于减少重复输入并提高长期创作连续性。",
+                "anchor": "creative-assets",
+                "stats": [
+                    {"label": "风格方案", "count": summary["style_profile_count"]},
+                    {"label": "剧情时间点", "count": summary["plot_anchor_count"]},
+                    {"label": "上下文包", "count": summary["context_package_count"]},
+                ],
+                "links": [
+                    {"label": "创作上下文总览", "url": f"/worlds/{world_id}/context", "disabled": False},
+                    {"label": "写作风格方案", "url": f"/worlds/{world_id}/context/styles", "disabled": False},
+                    {"label": "剧情时间点", "url": f"/worlds/{world_id}/context/anchors", "disabled": False},
+                    {"label": "创作上下文包", "url": f"/worlds/{world_id}/context/packages", "disabled": False},
+                ],
+            },
+            {
+                "key": "checks",
+                "title": "检查中心",
+                "icon": "🔍",
+                "description": "检查世界设定矛盾和角色行为合理性，后续扩展到长篇正文一致性检查。",
+                "anchor": "checks",
+                "stats": [],
+                "links": [
+                    {"label": "检查中心", "url": f"/worlds/{world_id}/checks", "disabled": False},
+                    {"label": "设定矛盾检查", "url": f"/worlds/{world_id}/checks/conflicts", "disabled": False},
+                    {"label": "角色行为合理性检查", "url": f"/worlds/{world_id}/checks/behavior", "disabled": False},
+                    {"label": "时间线冲突检查", "url": "", "disabled": True, "hint": "后续版本开放"},
+                    {"label": "正文一致性检查", "url": "", "disabled": True, "hint": "后续版本开放"},
+                    {"label": "风格一致性检查", "url": "", "disabled": True, "hint": "后续版本开放"},
+                ],
+            },
+            {
+                "key": "data_settings",
+                "title": "数据与设置",
+                "icon": "⚙️",
+                "description": "管理世界导出、数据备份恢复和 AI 模型设置。",
+                "anchor": "data-settings",
+                "stats": [],
+                "links": [
+                    {"label": "导出当前世界", "url": f"/worlds/{world_id}/export", "disabled": False},
+                    {"label": "数据管理", "url": "/data", "disabled": False},
+                    {"label": "AI 设置", "url": "/settings/ai", "disabled": False},
+                ],
+            },
+        ]
+
+
 def _count(db: Session, model_class, world_id: int) -> int:
     """Count records for a model filtered by world_id."""
     return db.query(func.count(model_class.id)).filter(

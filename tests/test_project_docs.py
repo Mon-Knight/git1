@@ -49,11 +49,11 @@ class TestDocContent:
 
     def test_readme_contains_version(self):
         content = _read_root("README.md")
-        assert "v1.7.4" in content, "README.md missing v1.7.4"
+        assert "v1.7.5" in content, "README.md missing v1.7.5"
 
     def test_changelog_contains_version(self):
         content = _read_root("CHANGELOG.md")
-        assert "v1.7.4" in content, "CHANGELOG.md missing v1.7.4"
+        assert "v1.7.5" in content, "CHANGELOG.md missing v1.7.5"
 
     def test_version_roadmap_contains_v172(self):
         content = _read_doc("version-roadmap.md")
@@ -65,7 +65,7 @@ class TestDocContent:
 
     def test_version_roadmap_contains_v174(self):
         content = _read_doc("version-roadmap.md")
-        assert "v1.7.4" in content, "version-roadmap.md missing v1.7.4"
+        assert "v1.7.5" in content, "version-roadmap.md missing v1.7.5"
 
     def test_version_roadmap_contains_v180(self):
         content = _read_doc("version-roadmap.md")

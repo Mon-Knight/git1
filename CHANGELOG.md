@@ -1,5 +1,29 @@
 # Changelog
 
+## [v1.7.5] — 2026-05-11
+
+### Added
+- 新增模块分组导航（设定库/剧情历史/AI 推演/小说工程/创作资产/检查中心/数据与设置）
+- 新增世界内二级导航（8 个锚点导航）
+- 新增 module-group-card / module-group-link 样式系统
+- 新增 WorldDashboardService.get_world_module_groups()
+- 新增 test_module_groups_service.py（16 个测试）
+- 新增 test_module_groups_routes.py（26 个测试）
+
+### Changed
+- 世界控制台"基础功能入口"升级为"功能分组导航"
+- 旧功能入口全部保留，仅改变展示组织方式
+- 分卷大纲/章节大纲/正文生成显示为"后续版本开放"
+- 时间线冲突检查/正文一致性检查/风格一致性检查显示为"后续版本开放"
+- verify_desktop_build.py 新增模块分组内容检查
+- README 更新模块分组与二级导航说明
+
+### Notes
+- 本版本不新增业务功能
+- 本版本不修改数据库
+- 本版本不开发分卷、章节、正文
+- 阶段性整理与 EXE 验证留到 v1.7.6
+
 ## [v1.7.4] — 2026-05-11
 
 ### Added

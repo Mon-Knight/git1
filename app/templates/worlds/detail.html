@@ -20,8 +20,20 @@
         </div>
     </section>
 
+    <!-- Secondary Navigation -->
+    <nav class="dashboard-subnav" id="dashboard-subnav">
+        <a href="#overview" class="subnav-item">📊 总览</a>
+        <a href="#world-library" class="subnav-item">📚 设定库</a>
+        <a href="#story-history" class="subnav-item">📜 剧情历史</a>
+        <a href="#ai-simulation" class="subnav-item">🤖 AI 推演</a>
+        <a href="#novel-engineering" class="subnav-item">📖 小说工程</a>
+        <a href="#creative-assets" class="subnav-item">📦 创作资产</a>
+        <a href="#checks" class="subnav-item">🔍 检查中心</a>
+        <a href="#data-settings" class="subnav-item">⚙️ 数据与设置</a>
+    </nav>
+
     <!-- Data Overview -->
-    <section class="dashboard-section">
+    <section class="dashboard-section" id="overview">
         <h2>📊 世界数据概览</h2>
         <div class="overview-grid">
             <a href="/worlds/{{ world.id }}/characters" class="overview-card">
@@ -184,41 +196,53 @@
         </div>
     </section>
 
-    <!-- Legacy Module Entries -->
-    <section class="dashboard-section">
-        <h2>📂 基础功能入口</h2>
-        <div class="module-grid">
-            <a href="/worlds/{{ world.id }}/characters" class="module-card">
-                <div class="module-icon">👥</div><h3>角色管理</h3><p>管理世界中的角色</p>
-            </a>
-            <a href="/worlds/{{ world.id }}/factions" class="module-card">
-                <div class="module-icon">🏛️</div><h3>势力管理</h3><p>管理世界中的势力</p>
-            </a>
-            <a href="/worlds/{{ world.id }}/locations" class="module-card">
-                <div class="module-icon">🗺️</div><h3>地点管理</h3><p>管理世界中的地点</p>
-            </a>
-            <a href="/worlds/{{ world.id }}/rules" class="module-card">
-                <div class="module-icon">📜</div><h3>规则管理</h3><p>管理世界规则</p>
-            </a>
-            <a href="/worlds/{{ world.id }}/events" class="module-card">
-                <div class="module-icon">📋</div><h3>历史事件</h3><p>管理历史事件</p>
-            </a>
-            <a href="/worlds/{{ world.id }}/timeline" class="module-card">
-                <div class="module-icon">⏳</div><h3>时间线</h3><p>查看世界历史</p>
-            </a>
-            <a href="/worlds/{{ world.id }}/simulation" class="module-card">
-                <div class="module-icon">🤖</div><h3>AI 推演</h3><p>AI 推演世界发展</p>
-            </a>
-            <a href="/worlds/{{ world.id }}/records" class="module-card">
-                <div class="module-icon">📋</div><h3>推演记录</h3><p>查看推演历史</p>
-            </a>
-            <a href="/worlds/{{ world.id }}/branches" class="module-card">
-                <div class="module-icon">🔀</div><h3>分支记录</h3><p>查看分支世界线</p>
-            </a>
-            <a href="/worlds/{{ world.id }}/checks" class="module-card">
-                <div class="module-icon">🔍</div><h3>检查中心</h3><p>设定矛盾与行为检查</p>
-            </a>
+    <!-- Module Groups Navigation -->
+    <section class="dashboard-section" id="module-groups">
+        <h2>🧭 功能分组导航</h2>
+        {% if module_groups %}
+        <div class="module-groups">
+            {% for group in module_groups %}
+            <div class="module-group-card" id="{{ group.anchor }}">
+                <div class="module-group-header">
+                    <span class="module-group-icon">{{ group.icon }}</span>
+                    <div>
+                        <h3>{{ group.title }}</h3>
+                        <p class="module-group-desc">{{ group.description }}</p>
+                    </div>
+                </div>
+                {% if group.stats %}
+                <div class="module-group-stats">
+                    {% for stat in group.stats %}
+                    <span class="module-group-stat">
+                        <span class="stat-count">{{ stat.count }}</span>
+                        <span class="stat-label">{{ stat.label }}</span>
+                    </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="module-group-links">
+                    {% for link in group.links %}
+                    {% if link.disabled %}
+                    <span class="module-group-link disabled" title="{{ link.hint }}">
+                        <span>{{ link.label }}</span>
+                        <span class="link-hint">{{ link.hint }}</span>
+                    </span>
+                    {% else %}
+                    <a href="{{ link.url }}" class="module-group-link">
+                        <span>{{ link.label }}</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
         </div>
+        {% else %}
+        <div class="empty-state-dash">
+            <p>无法加载模块分组信息。</p>
+        </div>
+        {% endif %}
     </section>
 
 </div>

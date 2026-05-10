@@ -89,11 +89,30 @@ def check_source_templates():
             print(f"  FAIL: {tpl} missing")
             errors.append(f"Missing source template: {tpl}")
 
-    # Check world detail page has novel entry
+    # Check world detail page has module groups
     detail_path = os.path.join(PROJECT_ROOT, "app", "templates", "worlds", "detail.html")
     if os.path.isfile(detail_path):
         with open(detail_path, "r", encoding="utf-8") as f:
             detail_html = f.read()
+        # Check module group navigation
+        module_group_checks = [
+            ("功能分组导航", "module group nav section"),
+            ("设定库", "world library group"),
+            ("剧情历史", "story history group"),
+            ("AI 推演", "AI simulation group"),
+            ("小说工程", "novel engineering group"),
+            ("创作资产", "creative assets group"),
+            ("检查中心", "checks group"),
+            ("数据与设置", "data & settings group"),
+            ("module-group-link disabled", "disabled future link class"),
+            ("dashboard-subnav", "secondary navigation"),
+        ]
+        for keyword, desc in module_group_checks:
+            if keyword in detail_html:
+                print(f"  OK: world detail page has '{desc}'")
+            else:
+                print(f"  FAIL: world detail page missing '{desc}'")
+                errors.append(f"World detail missing: {keyword}")
         if "/novel" in detail_html or "/全书演化" in detail_html:
             print("  OK: world detail page has novel engineering entry")
         else:

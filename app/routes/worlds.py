@@ -98,6 +98,7 @@ async def world_detail(request: Request, world_id: int, db: Session = Depends(ge
     recent = WorldDashboardService.get_world_recent_activity(db, world_id)
     recommendations = WorldDashboardService.get_world_recommendations(db, world_id)
     quick_actions = WorldDashboardService.get_world_quick_actions(world_id)
+    module_groups = WorldDashboardService.get_world_module_groups(db, world_id)
 
     return templates.TemplateResponse(
         request,
@@ -111,6 +112,7 @@ async def world_detail(request: Request, world_id: int, db: Session = Depends(ge
             "recent_activity": recent,
             "recommendations": recommendations,
             "quick_actions": quick_actions,
+            "module_groups": module_groups,
         },
     )
 
