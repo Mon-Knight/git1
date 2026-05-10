@@ -103,10 +103,10 @@ def test_log_directory_writable_on_non_windows():
 
 
 def test_server_log_setup():
-    """_setup_server_logging should create a server_logger that writes to server.log."""
+    """_setup_server_file_logger should create a server_logger that writes to server.log."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        from desktop_launcher import _setup_server_logging
-        _setup_server_logging(tmpdir)
+        from desktop_launcher import _setup_server_file_logger
+        _setup_server_file_logger(tmpdir)
         server_logger = logging.getLogger("server")
         server_logger.info("server test message")
         server_log = os.path.join(tmpdir, "server.log")

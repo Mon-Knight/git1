@@ -1,5 +1,49 @@
 # Development Log — AI World Engine
 
+## 2026-05-11 — v1.3.4: EXE 后端启动失败修复 + server.log 增强
+
+### 问题根因
+- v1.3.3 EXE 启动后直接退出，无窗口，日志显示 "Server failed to start within timeout"
+- server.log 为空：uvicorn 日志未配置写入文件，后端线程异常未捕获
+- run_uvicorn() 函数无 try/except → 任何异常导致线程静默退出
+- wait_for_server() 无诊断输出 → 30s 超时无失败原因
+- SQLite URL 使用 Windows 反斜杠 `sqlite:///C:\Users\...` → 可能导致路径解析问题
+
+### 修复内容
+1. start_server() 替代 run_uvicorn()，完整包裹 try/except BaseException + traceback 写入 server.log
+2. uvicorn 使用 loop="asyncio", http="h11"（避免 httptools 等二进制依赖）
+3. uvicorn log_config 配置 file handler 写入 server.log
+4. _configure_desktop_db() 使用 Path.as_posix() 生成正斜杠 SQLite URL
+5. wait_for_server() 每次失败记录异常类型和已尝试次数
+6. 启动失败弹出 tkinter.messagebox 错误提示 + 日志路径
+7. 新增 AIWORLDENGINE_HEADLESS=1 模式（自动验证用）
+8. build_exe.ps1 + spec 新增 uvicorn 全量 hidden imports（h11/anyio/starlette/fastapi/asyncio）
+
+### 修改文件
+- `desktop_launcher.py` — 重写后端启动：start_server + headless + 错误弹窗 + SQLite 路径修复
+- `packaging/build_exe.ps1` — 新增 15+ 个 uvicorn/h11/anyio/starlette hidden imports
+- `packaging/AIWorldEngine.spec` — 同步新增 hidden imports + app.constants
+- `app/config.py` — VERSION → 1.3.4
+- `tests/test_desktop.py` — 版本断言更新
+- `tests/test_main.py` — 版本断言更新
+- `README.md` — 版本号、版本记录更新
+- `CHANGELOG.md` — v1.3.4 条目
+- `docs/dev-log.md` — 本条记录
+
+### 测试命令 / 结果
+- python -m compileall . ✅
+- pytest tests/ -v ✅
+- python scripts/check_encoding.py ✅
+
+### EXE 打包验证
+- powershell -ExecutionPolicy Bypass -File packaging/build_exe.ps1 ✅
+- dist/AIWorldEngine/AIWorldEngine.exe ✅
+
+### 已知问题
+- 无
+
+---
+
 ## 2026-05-11 — v1.3.3: EXE 构建同步修复与推演系统整理
 
 ### 问题根因

@@ -1,5 +1,26 @@
 # Changelog
 
+## [v1.3.4] — 2026-05-11
+
+### Fixed
+- 修复 EXE 启动后内置后端服务（uvicorn/FastAPI）无法启动的问题
+- 修复 server.log 始终为空的问题（增加 uvicorn log_config + 文件 handler）
+- 修复 SQLite URL 在 Windows 使用反斜杠的问题（改为 Path.as_posix()）
+- 修复后端线程异常无法追踪（start_server 包裹 BaseException + traceback 写入 server.log）
+- 修复 wait_for_server 超时无诊断信息的问题（每次失败记录异常类型）
+
+### Added
+- 桌面端 headless 模式（AIWORLDENGINE_HEADLESS=1），方便自动验证
+- 启动失败时弹出 Windows 错误提示框（含日志路径）
+- 打包脚本新增 uvicorn/h11/anyio/starlette/fastapi/asyncio 等 hidden imports
+- spec 文件同步新增所有 uvicorn 内部模块 hidden imports
+
+### Changed
+- desktop_launcher.py v1.3.4 全面重写后端启动逻辑
+  - uvicorn 使用 loop="asyncio", http="h11"（避免二进制依赖）
+  - 所有后端异常写入 server.log + error.log
+  - Health check 轮询记录每次失败原因
+
 ## [v1.3.3] — 2026-05-11
 
 ### Fixed
