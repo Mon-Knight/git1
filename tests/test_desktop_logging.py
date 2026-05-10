@@ -119,3 +119,196 @@ def test_server_log_setup():
             if hasattr(h, "close"):
                 h.close()
             server_logger.removeHandler(h)
+
+
+# ── v1.3.5: ensure_stdio_available Tests ──
+
+def test_ensure_stdio_available_with_none():
+    """ensure_stdio_available should handle None stdout/stderr without error."""
+    import sys as _sys
+    from desktop_launcher import ensure_stdio_available
+
+    old_stdout = _sys.stdout
+    old_stderr = _sys.stderr
+    try:
+        _sys.stdout = None
+        _sys.stderr = None
+        ensure_stdio_available()
+        # After call, they should not be None
+        assert _sys.stdout is not None
+        assert _sys.stderr is not None
+        assert hasattr(_sys.stdout, "write")
+        assert hasattr(_sys.stderr, "write")
+    finally:
+        _sys.stdout = old_stdout
+        _sys.stderr = old_stderr
+
+
+def test_ensure_stdio_available_with_normal():
+    """ensure_stdio_available should not change stdout/stderr when they exist."""
+    import sys as _sys
+    from desktop_launcher import ensure_stdio_available
+
+    old_stdout = _sys.stdout
+    old_stderr = _sys.stderr
+    try:
+        ensure_stdio_available()
+        assert _sys.stdout is old_stdout
+        assert _sys.stderr is old_stderr
+    finally:
+        pass  # no cleanup needed
+
+
+def test_ensure_stdio_available_has_write_method():
+    """After ensure_stdio_available, stdout/stderr must have write method."""
+    import sys as _sys
+    from desktop_launcher import ensure_stdio_available
+
+    old_stdout = _sys.stdout
+    old_stderr = _sys.stderr
+    try:
+        _sys.stdout = None
+        ensure_stdio_available()
+        _sys.stdout.write("test")
+    except Exception as e:
+        assert False, f"stdout.write failed: {e}"
+    finally:
+        _sys.stdout = old_stdout
+        _sys.stderr = old_stderr
+
+
+# ── v1.3.5: build_uvicorn_log_config Tests ──
+
+def test_build_uvicorn_log_config_returns_dict():
+    """build_uvicorn_log_config should return a dict."""
+    from desktop_launcher import build_uvicorn_log_config
+    config = build_uvicorn_log_config("/tmp/test_server.log")
+    assert isinstance(config, dict)
+
+
+def test_build_uvicorn_log_config_no_default_formatter():
+    """build_uvicorn_log_config must NOT use uvicorn.logging.DefaultFormatter."""
+    from desktop_launcher import build_uvicorn_log_config
+    config = build_uvicorn_log_config("/tmp/test_server.log")
+    config_str = str(config)
+    assert "DefaultFormatter" not in config_str
+    assert "AccessFormatter" not in config_str
+
+
+def test_build_uvicorn_log_config_no_use_colors():
+    """build_uvicorn_log_config must NOT contain use_colors."""
+    from desktop_launcher import build_uvicorn_log_config
+    config = build_uvicorn_log_config("/tmp/test_server.log")
+    config_str = str(config)
+    assert "use_colors" not in config_str
+
+
+def test_build_uvicorn_log_config_formatter_is_plain():
+    """build_uvicorn_log_config formatters should be plain format strings."""
+    from desktop_launcher import build_uvicorn_log_config
+    config = build_uvicorn_log_config("/tmp/test_server.log")
+    fmt = config["formatters"]["default"]["format"]
+    assert "%(asctime)" in fmt or "%(levelname)" in fmt
+    # Must not reference uvicorn_module
+    assert "()" not in config["formatters"]["default"].keys()
+
+
+def test_build_uvicorn_log_config_has_server_file_handler():
+    """build_uvicorn_log_config should have a server_file FileHandler."""
+    from desktop_launcher import build_uvicorn_log_config
+    config = build_uvicorn_log_config("/tmp/test_server.log")
+    handler = config["handlers"]["server_file"]
+    assert handler["class"] == "logging.FileHandler"
+    assert "server.log" in handler["filename"]
+
+
+def test_build_uvicorn_log_config_has_uvicorn_loggers():
+    """build_uvicorn_log_config should configure uvicorn/error/access loggers."""
+    from desktop_launcher import build_uvicorn_log_config
+    config = build_uvicorn_log_config("/tmp/test_server.log")
+    loggers = config["loggers"]
+    assert "uvicorn" in loggers
+    assert "uvicorn.error" in loggers
+    assert "uvicorn.access" in loggers
+    # All should write to server_file
+    for name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
+        assert "server_file" in loggers[name]["handlers"]
+
+
+# ── v1.3.5: ASCII Log Tests ──
+
+def test_self_check_logs_use_ascii_markers():
+    """Self-check log messages should use ASCII markers [OK]/[WARN]/[ERROR]."""
+    import sys as _sys, tempfile, logging, os as _os
+    from desktop_launcher import run_self_check
+
+    old_out = _sys.stdout
+    old_stderr = _sys.stderr
+    tmpdir = tempfile.TemporaryDirectory()
+    try:
+        _sys.stdout = open(_os.devnull, "w", encoding="utf-8")
+        _sys.stderr = open(_os.devnull, "w", encoding="utf-8")
+
+        log_path = _os.path.join(tmpdir.name, "test.log")
+        logger = logging.getLogger("ascii_test")
+        logger.setLevel(logging.DEBUG)
+        fh = logging.FileHandler(log_path, encoding="utf-8")
+        fh.setLevel(logging.DEBUG)
+        logger.addHandler(fh)
+
+        _os.environ["LOCALAPPDATA"] = tmpdir.name
+        try:
+            run_self_check(logger)
+        finally:
+            _os.environ.pop("LOCALAPPDATA", None)
+        fh.close()
+
+        with open(log_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        # Must NOT contain Unicode emoji/symbols
+        for symbol in ["✅", "❌", "⚠️", "→", "—", "鈥"]:
+            assert symbol not in content, f"Log contains Unicode symbol: {symbol}"
+        # Must contain ASCII markers
+        assert "[OK]" in content, "Log missing [OK] marker"
+    finally:
+        tmpdir.cleanup()
+        _sys.stdout = old_out
+        _sys.stderr = old_stderr
+
+
+def test_self_check_log_no_api_key():
+    """Self-check log must NOT contain API key."""
+    import sys as _sys, tempfile, logging, os as _os
+    test_key = "sk-log-leak-test-key-abcde"
+    _os.environ["AI_API_KEY"] = test_key
+
+    from desktop_launcher import run_self_check
+    old_out = _sys.stdout
+    old_stderr = _sys.stderr
+    tmpdir = tempfile.TemporaryDirectory()
+    try:
+        _sys.stdout = open(_os.devnull, "w", encoding="utf-8")
+        _sys.stderr = open(_os.devnull, "w", encoding="utf-8")
+
+        log_path = _os.path.join(tmpdir.name, "test.log")
+        logger = logging.getLogger("noleak_test")
+        logger.setLevel(logging.DEBUG)
+        fh = logging.FileHandler(log_path, encoding="utf-8")
+        fh.setLevel(logging.DEBUG)
+        logger.addHandler(fh)
+
+        _os.environ["LOCALAPPDATA"] = tmpdir.name
+        try:
+            run_self_check(logger)
+        finally:
+            _os.environ.pop("LOCALAPPDATA", None)
+        fh.close()
+
+        with open(log_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        assert test_key not in content, "API key leaked in self-check log!"
+    finally:
+        tmpdir.cleanup()
+        _sys.stdout = old_out
+        _sys.stderr = old_stderr
+        _os.environ.pop("AI_API_KEY", None)

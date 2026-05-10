@@ -1,5 +1,44 @@
 # Development Log — AI World Engine
 
+## 2026-05-11 — v1.3.5: EXE uvicorn logging 崩溃修复
+
+### 问题根因
+- v1.3.4 EXE 启动后 uvicorn 崩溃，health check 一直 timeout
+- server.log 显示: `AttributeError: 'NoneType' object has no attribute 'isatty'`
+  `ValueError: Unable to configure formatter 'default'`
+- 根因：PyInstaller `--windowed` 模式下 `sys.stdout` / `sys.stderr` 为 `None`
+  uvicorn 默认 `LOGING_CONFIG` 使用 `DefaultFormatter`，后者构造时调用 `sys.stderr.isatty()`
+  因为 `stderr is None`，所以崩溃，服务还没真正启动就退出
+
+### 修复内容
+1. 新增 `ensure_stdio_available()`：stdout/stderr 为 None 时重定向到 os.devnull
+2. 新增 `build_uvicorn_log_config()`：纯 Python `logging.Formatter`，不使用 uvicorn 默认 formatter
+3. uvicorn.run 使用新 log_config，不再引用 `uvicorn.config.LOGGING_CONFIG`
+4. 自检日志标记改为 ASCII：`[OK]` / `[WARN]` / `[ERROR]`（避免 Windows 乱码）
+5. `main()` 启动入口和 `start_server()` 调用 uvicorn.run 前都调用 `ensure_stdio_available()`
+
+### 修改文件
+- `desktop_launcher.py` — 新增 ensure_stdio_available() + build_uvicorn_log_config()，修复 uvicorn log_config，ASCII 日志
+- `app/config.py` — VERSION → 1.3.5
+- `tests/test_desktop.py` — 版本断言更新
+- `tests/test_main.py` — 版本断言更新
+- `README.md` — 版本号、版本记录更新
+- `CHANGELOG.md` — v1.3.5 条目
+- `docs/dev-log.md` — 本条记录
+
+### 测试命令 / 结果
+- python -m compileall . ✅
+- pytest tests/ -v ✅
+- python scripts/check_encoding.py ✅
+
+### EXE 打包验证
+- powershell -ExecutionPolicy Bypass -File packaging/build_exe.ps1 ✅
+
+### 已知问题
+- 无
+
+---
+
 ## 2026-05-11 — v1.3.4: EXE 后端启动失败修复 + server.log 增强
 
 ### 问题根因

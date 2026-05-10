@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.3.5] — 2026-05-11
+
+### Fixed
+- 修复 PyInstaller EXE 无控制台环境下 uvicorn logging DefaultFormatter 调用 isatty() 崩溃
+- 修复 EXE 后端启动后 health check 一直 timeout 的问题（根因：uvicorn 在 log_config 配置阶段崩溃）
+- 修复桌面端日志中 Unicode 特殊符号在 Windows PowerShell 下显示乱码的问题
+
+### Changed
+- uvicorn log_config 改用纯 Python logging.Formatter（移除 DefaultFormatter/AccessFormatter/use_colors）
+- 启动 uvicorn 前调用 ensure_stdio_available() 补齐可能为 None 的 sys.stdout/stderr
+- 桌面端自检日志统一改为 ASCII 标记：[OK]、[WARN]、[ERROR]
+
 ## [v1.3.4] — 2026-05-11
 
 ### Fixed
