@@ -27,7 +27,15 @@ from app.routes.checks import router as checks_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize database on application startup."""
+    from app.database import SessionLocal
+    from app.services.settings_service import SettingsService
     init_db()
+    # Seed default settings
+    db = SessionLocal()
+    try:
+        SettingsService.init_defaults(db)
+    finally:
+        db.close()
     yield
 
 

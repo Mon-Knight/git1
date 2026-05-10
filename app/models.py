@@ -199,3 +199,19 @@ class Branch(Base):
 
     def __repr__(self):
         return f"<Branch id={self.id} name='{self.branch_name}'>"
+
+
+class AppSetting(Base):
+    """Application configuration stored in database. Keys are unique."""
+    __tablename__ = "app_settings"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    key = Column(String(100), unique=True, nullable=False)
+    value = Column(Text, nullable=True, default="")
+    description = Column(String(300), nullable=True, default="")
+    is_secret = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+    def __repr__(self):
+        return f"<AppSetting key='{self.key}'>"
