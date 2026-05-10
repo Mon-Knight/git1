@@ -1,0 +1,175 @@
+# UI 信息架构 — AI World Engine
+
+## 文档目的
+
+本文件定义 AI World Engine 的最终应用 UI 结构，指导 v1.7.2～v1.7.6 的应用化改造。
+
+**核心原则**：UI 改造是加上层结构，不是删除旧路由。旧 URL 继续可访问。新导航只负责组织入口。
+
+## 最终应用结构
+
+```
+AI World Engine
+├── 工作台 (Dashboard)
+├── 世界项目 (Worlds)
+├── 小说工程 (Novel Engineering)
+├── 创作资产 (Creative Assets)
+├── AI 推演 (AI Simulation)
+├── 世界资料库 (World Library)
+├── 检查中心 (Check Center)
+├── 数据管理 (Data Management)
+└── 设置 (Settings)
+```
+
+## 一级模块职责定义
+
+### 1. 工作台 (Dashboard)
+
+**页面**：`/` → 工作台首页
+
+**负责显示**：
+- 最近访问的世界（最后 3-5 个）
+- 最近创建的上下文包
+- 最近生成的全书演化方案
+- 待处理推演记录数量
+- 主线方案/备选方案数量统计
+- AI 模式状态（Mock/真实 AI/模型名）
+- 快捷操作（创建世界、进入上次访问的世界等）
+
+**不负责**：世界 CRUD、AI 推演执行、小说生成
+
+### 2. 世界项目 (Worlds)
+
+**页面**：
+- `/worlds` → 世界列表 + 创建
+- `/worlds/{id}` → 世界控制台（v1.7.4 升级后）
+- `/worlds/{id}/edit` → 编辑世界
+
+**负责**：世界列表、创建、编辑、删除、世界控制台
+
+**不负责**：角色/势力/地点等设定库操作
+
+### 3. 世界资料库 (World Library)
+
+**页面**：
+- `/worlds/{id}/characters` → 角色管理
+- `/worlds/{id}/factions` → 势力管理
+- `/worlds/{id}/locations` → 地点管理
+- `/worlds/{id}/rules` → 规则管理
+- `/worlds/{id}/events` → 历史事件
+- `/worlds/{id}/timeline` → 时间线
+
+**负责**：世界基础设定的增删改查
+
+**不负责**：正文生成、风格润色、分卷规划、章节规划
+
+### 4. AI 推演 (AI Simulation)
+
+**页面**：
+- `/worlds/{id}/simulation` → AI 推演表单
+- `/worlds/{id}/records` → 推演记录
+- `/worlds/{id}/branches` → 分支记录
+
+**负责**：世界推演、推演记录管理、分支管理、采纳正史、保存分支
+
+**不负责**：自动写入小说正文、自动决定主线小说方案
+
+### 5. 小说工程 (Novel Engineering)
+
+**页面**：
+- `/worlds/{id}/novel` → 小说工程模式（手动参数）
+- `/worlds/{id}/novel/evolution` → 全书演化推演
+- `/worlds/{id}/novel/evolutions` → 演化方案列表
+- `/worlds/{id}/novel/evolutions/{rid}` → 方案详情
+
+**未来页面**（v1.8.0+）：
+- 分卷大纲生成与列表
+- 章节大纲生成与列表
+- 正文生成
+- 正文版本管理
+
+**负责**：全书演化、分卷大纲、章节大纲、正文生成、润色
+
+**不负责**：基础世界 CRUD、数据备份恢复、AI 设置
+
+### 6. 创作资产 (Creative Assets)
+
+**页面**：
+- `/worlds/{id}/context` → 创作上下文总览
+- `/worlds/{id}/context/styles` → 风格方案列表
+- `/worlds/{id}/context/styles/new` → 新建风格方案
+- `/worlds/{id}/context/styles/{id}/edit` → 编辑风格方案
+- `/worlds/{id}/context/anchors` → 剧情时间点列表
+- `/worlds/{id}/context/anchors/new` → 新建剧情时间点
+- `/worlds/{id}/context/anchors/{id}/edit` → 编辑剧情时间点
+- `/worlds/{id}/context/packages` → 上下文包列表
+- `/worlds/{id}/context/packages/new` → 新建上下文包
+- `/worlds/{id}/context/packages/{id}` → 上下文包详情
+
+**负责**：风格方案、剧情时间点、上下文包、供生成任务复用的上下文资产
+
+**不负责**：直接生成正文、自动分析参考小说、自动修改世界设定
+
+### 7. 检查中心 (Check Center)
+
+**页面**：
+- `/worlds/{id}/checks` → 检查中心总览
+- `/worlds/{id}/checks/conflicts` → 设定矛盾检查
+- `/worlds/{id}/checks/behavior` → 角色行为检查
+
+**未来页面**（v2.2.0+）：
+- 正文一致性检查
+- 风格一致性检查
+
+**负责**：检查问题、输出报告、给出修正建议
+
+**不负责**：自动修改正史、自动修改正文、自动删除设定
+
+### 8. 数据管理 (Data Management)
+
+**页面**：
+- `/data` → 数据管理总览
+- `/data/import` → 导入世界
+- `/data/backups` → 备份管理
+
+**负责**：导出、导入、备份、恢复
+
+**不负责**：AI 生成、修改创作逻辑
+
+### 9. 设置 (Settings)
+
+**页面**：
+- `/settings/ai` → AI 设置
+
+**负责**：AI 模型配置、API Key、温度、应用信息
+
+**不负责**：世界设定、小说参数
+
+## 未完成模块处理
+
+对于尚未实现的模块入口（如分卷大纲、正文生成、参考小说导入）：
+
+- 在导航中显示模块名称
+- 点击后显示"该功能将在 vX.Y.Z 开放"
+- 注明当前可用版本
+- **不要**伪装成已完成
+- **不要**放空的模板占位
+
+## 旧路由保留规则
+
+以下所有旧路由必须**永久保留**可访问：
+
+- 所有的 `/worlds/{id}/...` 模块页面
+- 所有的 `/data/...` 页面
+- 所有的 `/settings/...` 页面
+- 所有的 `/context/...` 页面
+- 所有的权限相关路由
+
+新导航只是**加了一层入口组织**，不删除原始路由。用户可以直接输入旧 URL 访问对应页面。
+
+## UI 改造原则
+
+1. **一次只改一级**：v1.7.2 只加壳（顶栏+侧栏），v1.7.3 只改首页，v1.7.4 只改世界详情。
+2. **不重写所有模板**：新布局用 Jinja2 模板继承，子模板渐进式适配。
+3. **保持可用**：每个改造小版本提交时，所有路由和功能必须仍可用。
+4. **测试先行**：改 UI 前确保现有测试仍通过，改完后确认新测试覆盖。

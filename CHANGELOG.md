@@ -1,5 +1,25 @@
 # Changelog
 
+## [v1.7.1] — 2026-05-11
+
+### Added
+- 新增 development-rules.md（开发规范与不可破坏规则）
+- 新增 version-roadmap.md（v1.7.1～v2.4.0+ 完整版本路线）
+- 新增 ui-information-architecture.md（9 模块应用信息架构）
+- 新增 agent-task-rules.md（Agent 开发前/中/后必须遵守的规则）
+- 新增 module-boundaries.md（7 大模块边界与依赖关系）
+
+### Changed
+- README 增加应用化路线说明、当前小说工程能力说明
+- 明确 v1.7.x 为应用化补课阶段
+- 明确 v1.8.0 之后再进入分卷大纲
+
+### Notes
+- 本版本不新增业务功能
+- 本版本不修改数据库结构
+- 本版本不开发分卷、章节、正文
+- 本版本用于防止后续 Agent 开发混乱
+
 ## [v1.7.0] — 2026-05-11
 
 ### Added
