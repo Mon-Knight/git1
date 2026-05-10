@@ -150,6 +150,29 @@
                 </div>
             </section>
 
+            <!-- Full-Novel Evolution Section -->
+            <section style="margin-bottom:1.5rem">
+                <div class="info-card" style="background:rgba(108,99,255,0.03);border:1px solid rgba(108,99,255,0.2)">
+                    <h3>📖 用于全书演化推演</h3>
+                    {% set missing = [] %}
+                    {% if not pkg.simulation_record_id %}{% set _ = missing.append('推演记录') %}{% endif %}
+                    {% if not pkg.style_profile_id %}{% set _ = missing.append('风格方案') %}{% endif %}
+                    {% if not pkg.plot_anchor_id %}{% set _ = missing.append('剧情时间点') %}{% endif %}
+                    
+                    {% if missing %}
+                    <p style="color:#f39c12;font-size:0.85rem">⚠️ 该上下文包缺少以下内容：{{ missing|join('、') }}。缺少这些内容不影响推演，但 AI 的生成将缺少相应约束。</p>
+                    {% else %}
+                    <p style="color:#27ae60;font-size:0.85rem">✅ 该上下文包包含完整的推演方案、风格方案和剧情时间点，适合用于全书演化推演。</p>
+                    {% endif %}
+                    
+                    <p style="font-size:0.82rem;color:var(--color-text-muted);margin-top:0.5rem">
+                        全书演化推演会基于此上下文包生成 12 章节结构化全书演化方案（小说定位、核心矛盾、主角路线、阶段结构等）。
+                        生成结果<strong>不会自动写入正史</strong>。
+                    </p>
+                    <a href="/worlds/{{ world.id }}/novel/evolution?context_package_id={{ pkg.id }}" class="btn-primary" style="margin-top:0.3rem">📖 使用此上下文包进行全书演化推演 →</a>
+                </div>
+            </section>
+
             <!-- Actions -->
             <section style="margin-bottom:1.5rem">
                 <div style="display:flex;gap:1rem;flex-wrap:wrap">

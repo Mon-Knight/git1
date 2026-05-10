@@ -81,7 +81,7 @@ def test_novel_mock_result_has_structure(client):
         "main_story_direction": "结构化测试",
     })
     text = response.text
-    assert "全书核心卖点" in text
+    assert "小说定位" in text or "全书核心卖点" in text
     assert "主角成长路线" in text
 
 

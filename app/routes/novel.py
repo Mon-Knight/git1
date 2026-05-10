@@ -17,6 +17,7 @@ from app.services.world_context_service import WorldContextService
 from app.services.settings_service import SettingsService
 from app.services.ai.model_router import ModelRouter
 from app.services.ai.prompt_builder import PromptBuilder
+from app.services.novel_evolution_service import NovelEvolutionService
 from app.constants import (
     SIMULATION_TYPE_NOVEL_EVOLUTION,
     NOVEL_FORM_FIELDS,
@@ -237,3 +238,303 @@ async def run_novel_evolution(
             "context_packages": context_packages,
             "selected_package_id": selected_package_id,
         })
+
+
+# ================================================================
+# v1.7.0: Full-novel Evolution (with Context Package)
+# ================================================================
+
+@router.get("/evolution", response_class=HTMLResponse)
+async def evolution_form(
+    request: Request,
+    world_id: int,
+    context_package_id: int = None,
+    db: Session = Depends(get_db),
+):
+    """Show the full-novel evolution form with context package support."""
+    world = WorldService.get_world(db, world_id)
+    if not world:
+        return templates.TemplateResponse(
+            request, "worlds/404.html", {"world_id": world_id}, status_code=404
+        )
+
+    from app.services.context_package_service import ContextPackageService
+    context_packages = ContextPackageService.list_context_packages_by_world(db, world_id)
+
+    # If context_package_id is provided, validate it
+    selected_pkg = None
+    if context_package_id:
+        selected_pkg = ContextPackageService.get_context_package(db, context_package_id)
+        if not selected_pkg or selected_pkg.world_id != world_id:
+            return templates.TemplateResponse(
+                request, "worlds/404.html", {"world_id": world_id}, status_code=404
+            )
+
+    return templates.TemplateResponse(request, "novel/evolution_form.html", {
+        "world": world,
+        "context_packages": context_packages,
+        "selected_package_id": context_package_id,
+        "selected_pkg": selected_pkg,
+        "ai_mode_info": _get_ai_mode_info(db),
+        "errors": {},
+        "form_data": {},
+        "result": None,
+    })
+
+
+@router.post("/evolution", response_class=HTMLResponse)
+async def run_evolution(
+    request: Request,
+    world_id: int,
+    db: Session = Depends(get_db),
+    context_package_id: str = Form(default=""),
+    user_goal: str = Form(default=""),
+):
+    """Run a full-novel evolution generation using a context package."""
+    world = WorldService.get_world(db, world_id)
+    if not world:
+        return templates.TemplateResponse(
+            request, "worlds/404.html", {"world_id": world_id}, status_code=404
+        )
+
+    from app.services.context_package_service import ContextPackageService
+    context_packages = ContextPackageService.list_context_packages_by_world(db, world_id)
+
+    # Build context
+    pkg_id = int(context_package_id) if context_package_id and context_package_id.strip() else None
+
+    ctx = NovelEvolutionService.build_novel_evolution_context(db, world_id, pkg_id or 0)
+    if ctx.get("error") and pkg_id:
+        return templates.TemplateResponse(request, "novel/evolution_form.html", {
+            "world": world,
+            "context_packages": context_packages,
+            "selected_package_id": pkg_id,
+            "selected_pkg": None,
+            "ai_mode_info": _get_ai_mode_info(db),
+            "errors": {"submit": ctx["error"]},
+            "form_data": {"user_goal": user_goal},
+            "result": None,
+        })
+
+    # Build prompt
+    messages = NovelEvolutionService.build_novel_evolution_prompt(
+        world_context=ctx["world_context"],
+        pkg_data=ctx.get("pkg_data"),
+        user_goal=user_goal,
+    )
+
+    # Build context_snapshot
+    context_snapshot = NovelEvolutionService.build_context_snapshot(
+        world_id=world_id,
+        context_package_id=pkg_id,
+        pkg_data=ctx.get("pkg_data"),
+        user_goal=user_goal,
+    )
+
+    errors = {}
+    if not user_goal.strip():
+        errors["user_goal"] = "推演目标不能为空"
+
+    if errors:
+        return templates.TemplateResponse(request, "novel/evolution_form.html", {
+            "world": world,
+            "context_packages": context_packages,
+            "selected_package_id": pkg_id,
+            "selected_pkg": ctx.get("context_package"),
+            "ai_mode_info": _get_ai_mode_info(db),
+            "errors": errors,
+            "form_data": {"user_goal": user_goal},
+            "result": None,
+        }, status_code=422)
+
+    # Run AI
+    try:
+        client = ModelRouter.get_client(db, "novel_evolution")
+        config = SettingsService.get_effective_config(db)
+
+        options = {
+            "temperature": config.get("ai_temperature", 0.7),
+            "max_tokens": config.get("ai_max_tokens", 3000),
+            "timeout": config.get("ai_timeout", 120),
+        }
+
+        ai_result = client.generate(messages, options)
+
+        if not ai_result.get("success"):
+            error = ai_result.get("error", {})
+            raise RuntimeError(error.get("message", "AI 调用失败，请检查 AI 设置配置。"))
+
+        # Build question summary
+        question_parts = ["[全书演化推演]"]
+        if pkg_id:
+            question_parts.append(f"上下文包ID:{pkg_id}")
+        question_parts.append(user_goal[:100])
+        question_summary = " | ".join(question_parts)
+
+        # Save record
+        record = NovelEvolutionService.save_novel_evolution_record(
+            db=db,
+            world_id=world_id,
+            question=question_summary,
+            ai_response=ai_result["content"],
+            context_snapshot=context_snapshot,
+            ai_model=ai_result.get("model", "mock"),
+            is_mock=ai_result.get("provider") == "mock",
+        )
+
+        return templates.TemplateResponse(request, "novel/evolution_form.html", {
+            "world": world,
+            "context_packages": context_packages,
+            "selected_package_id": pkg_id,
+            "selected_pkg": ctx.get("context_package"),
+            "ai_mode_info": _get_ai_mode_info(db),
+            "errors": {},
+            "form_data": {},
+            "result": {
+                "id": record.id,
+                "question": record.question,
+                "ai_response": record.ai_response,
+                "status": record.status,
+                "is_mock": record.is_mock,
+                "ai_model": record.ai_model or ("Mock" if record.is_mock else "unknown"),
+                "created_at": record.created_at.strftime("%Y-%m-%d %H:%M"),
+            },
+        })
+
+    except Exception as e:
+        return templates.TemplateResponse(request, "novel/evolution_form.html", {
+            "world": world,
+            "context_packages": context_packages,
+            "selected_package_id": pkg_id,
+            "selected_pkg": ctx.get("context_package") if "ctx" in dir() else None,
+            "ai_mode_info": _get_ai_mode_info(db),
+            "errors": {"submit": f"推演失败: {e}"},
+            "form_data": {"user_goal": user_goal},
+            "result": None,
+        })
+
+
+@router.get("/evolutions", response_class=HTMLResponse)
+async def list_evolutions(
+    request: Request,
+    world_id: int,
+    db: Session = Depends(get_db),
+):
+    """List all novel evolution plans for this world."""
+    world = WorldService.get_world(db, world_id)
+    if not world:
+        return templates.TemplateResponse(
+            request, "worlds/404.html", {"world_id": world_id}, status_code=404
+        )
+
+    evolutions = NovelEvolutionService.list_novel_evolution_records(db, world_id)
+
+    return templates.TemplateResponse(request, "novel/evolutions.html", {
+        "world": world,
+        "evolutions": evolutions,
+        "get_status_label": NovelEvolutionService.get_status_label,
+        "get_status_color": NovelEvolutionService.get_status_color,
+    })
+
+
+@router.get("/evolutions/{record_id}", response_class=HTMLResponse)
+async def evolution_detail(
+    request: Request,
+    world_id: int,
+    record_id: int,
+    db: Session = Depends(get_db),
+):
+    """Show a single novel evolution plan detail."""
+    world = WorldService.get_world(db, world_id)
+    if not world:
+        return templates.TemplateResponse(
+            request, "worlds/404.html", {"world_id": world_id}, status_code=404
+        )
+
+    record = NovelEvolutionService.get_novel_evolution_record(db, record_id)
+    if not record or record.world_id != world_id:
+        return templates.TemplateResponse(
+            request, "worlds/404.html", {"world_id": world_id}, status_code=404
+        )
+
+    return templates.TemplateResponse(request, "novel/evolution_detail.html", {
+        "world": world,
+        "record": record,
+        "get_status_label": NovelEvolutionService.get_status_label,
+        "get_status_color": NovelEvolutionService.get_status_color,
+    })
+
+
+@router.post("/evolutions/{record_id}/set-mainline", response_class=HTMLResponse)
+async def set_mainline(
+    request: Request,
+    world_id: int,
+    record_id: int,
+    db: Session = Depends(get_db),
+):
+    """Set a novel evolution record as the mainline plan."""
+    world = WorldService.get_world(db, world_id)
+    if not world:
+        return templates.TemplateResponse(
+            request, "worlds/404.html", {"world_id": world_id}, status_code=404
+        )
+
+    result = NovelEvolutionService.set_record_status(db, record_id, "adopted", world_id)
+    if not result:
+        return templates.TemplateResponse(
+            request, "worlds/404.html", {"world_id": world_id}, status_code=404
+        )
+
+    return RedirectResponse(
+        url=f"/worlds/{world_id}/novel/evolutions", status_code=303
+    )
+
+
+@router.post("/evolutions/{record_id}/set-candidate", response_class=HTMLResponse)
+async def set_candidate(
+    request: Request,
+    world_id: int,
+    record_id: int,
+    db: Session = Depends(get_db),
+):
+    """Set a novel evolution record as a candidate plan."""
+    world = WorldService.get_world(db, world_id)
+    if not world:
+        return templates.TemplateResponse(
+            request, "worlds/404.html", {"world_id": world_id}, status_code=404
+        )
+
+    result = NovelEvolutionService.set_record_status(db, record_id, "branched", world_id)
+    if not result:
+        return templates.TemplateResponse(
+            request, "worlds/404.html", {"world_id": world_id}, status_code=404
+        )
+
+    return RedirectResponse(
+        url=f"/worlds/{world_id}/novel/evolutions", status_code=303
+    )
+
+
+@router.post("/evolutions/{record_id}/discard", response_class=HTMLResponse)
+async def discard_evolution(
+    request: Request,
+    world_id: int,
+    record_id: int,
+    db: Session = Depends(get_db),
+):
+    """Discard a novel evolution record."""
+    world = WorldService.get_world(db, world_id)
+    if not world:
+        return templates.TemplateResponse(
+            request, "worlds/404.html", {"world_id": world_id}, status_code=404
+        )
+
+    result = NovelEvolutionService.set_record_status(db, record_id, "discarded", world_id)
+    if not result:
+        return templates.TemplateResponse(
+            request, "worlds/404.html", {"world_id": world_id}, status_code=404
+        )
+
+    return RedirectResponse(
+        url=f"/worlds/{world_id}/novel/evolutions", status_code=303
+    )

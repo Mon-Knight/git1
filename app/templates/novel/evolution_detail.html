@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ record.question[:60] }} — 方案详情 — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<style>
+.status-badge{display:inline-block;padding:0.15rem 0.6rem;border-radius:12px;font-size:0.78rem;font-weight:600;color:#fff}
+.evo-content{white-space:pre-wrap;line-height:1.7;color:var(--color-text);margin-top:0.75rem;max-height:700px;overflow-y:auto;border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem}
+.evo-content h2{font-size:1.1rem;color:var(--color-primary);margin:1.2rem 0 0.5rem 0;padding-bottom:0.3rem;border-bottom:1px solid var(--color-border)}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">📖 方案详情</h1><p class="subtitle">{{ world.name }}</p></header>
+<nav class="nav">
+    <a href="/worlds/{{ world.id }}/novel/evolutions" class="nav-link">← 返回方案列表</a>
+    <a href="/worlds/{{ world.id }}/novel/evolution" class="btn-sm">+ 新建推演</a>
+</nav>
+<main class="main">
+
+<div class="alert-info" style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:var(--color-primary)">
+    ⚠️ 该方案不会自动写入正史。如需将方案中的具体事件纳入正史，请手动创建历史事件。
+</div>
+
+<section class="world-info" style="margin-bottom:1.5rem">
+    <div class="info-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem">
+            <h3 style="margin:0">{{ record.question[:100] }}</h3>
+            <span class="status-badge" style="background:{{ get_status_color(record.status) }}">{{ get_status_label(record.status) }}</span>
+        </div>
+        <div class="info-grid" style="margin-top:0.75rem">
+            <div class="info-item">
+                <span class="info-label">创建时间</span>
+                <span class="info-value">{{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">AI 模式</span>
+                <span class="info-value">{{ 'Mock AI' if record.is_mock else 'Live AI' }}</span>
+            </div>
+            {% if record.ai_model %}
+            <div class="info-item">
+                <span class="info-label">AI 模型</span>
+                <span class="info-value">{{ record.ai_model }}</span>
+            </div>
+            {% endif %}
+            <div class="info-item">
+                <span class="info-label">模拟类型</span>
+                <span class="info-value">{{ record.simulation_type }}</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="world-info" style="margin-bottom:1.5rem">
+    <div class="info-card">
+        <h3>📖 全书演化方案内容</h3>
+        {% set content = record.ai_response %}
+        {# Convert ## headings to HTML h2 tags for better display #}
+        <div class="evo-content">{{ record.ai_response }}</div>
+    </div>
+</section>
+
+<section style="margin-bottom:1.5rem">
+    <h3 style="margin-bottom:0.75rem">⚡ 方案操作</h3>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+        <form action="/worlds/{{ world.id }}/novel/evolutions/{{ record.id }}/set-mainline" method="post" style="display:inline">
+            <button type="submit" class="btn-primary" style="background:#27ae60;border-color:#27ae60">⭐ 设为主线方案</button>
+        </form>
+        <form action="/worlds/{{ world.id }}/novel/evolutions/{{ record.id }}/set-candidate" method="post" style="display:inline">
+            <button type="submit" class="btn-sm" style="background:#3498db;color:#fff;border-color:#3498db">📋 设为备选方案</button>
+        </form>
+        <form action="/worlds/{{ world.id }}/novel/evolutions/{{ record.id }}/discard" method="post" onsubmit="return confirm('确定要废弃该方案吗？')" style="display:inline">
+            <button type="submit" class="btn-sm" style="background:#95a5a6;color:#fff;border-color:#95a5a6">🗑️ 废弃方案</button>
+        </form>
+    </div>
+    <p style="font-size:0.8rem;color:var(--color-text-muted);margin-top:0.5rem">
+        • <strong>主线方案</strong>：后续分卷大纲优先基于此方案生成<br>
+        • <strong>备选方案</strong>：保留作为参考但不作为默认路线<br>
+        • <strong>废弃方案</strong>：不再使用此方案
+    </p>
+</section>
+
+{% if record.context_snapshot %}
+<section class="world-info" style="margin-bottom:1.5rem">
+    <div class="info-card" style="background:rgba(108,99,255,0.02);border:1px solid rgba(108,99,255,0.1)">
+        <details>
+            <summary style="cursor:pointer;font-size:0.9rem;color:var(--color-primary)">查看 context_snapshot（技术信息）</summary>
+            <pre style="font-size:0.75rem;color:var(--color-text-muted);white-space:pre-wrap;line-height:1.5;margin-top:0.5rem;max-height:300px;overflow-y:auto">{{ record.context_snapshot }}</pre>
+        </details>
+    </div>
+</section>
+{% endif %}
+
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

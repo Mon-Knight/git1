@@ -1,5 +1,31 @@
 # Changelog
 
+## [v1.7.0] — 2026-05-11
+
+### Added
+- 新增基于创作上下文包的全书演化推演（`/novel/evolution`）
+- 新增 NovelEvolutionService（结构化 Prompt 构建、context_snapshot、方案管理）
+- 新增全书演化方案列表页（`/novel/evolutions`）和详情页
+- 新增方案状态操作：设为主线方案 / 设为备选方案 / 废弃方案
+- 状态映射：adopted→主线方案 / branched→备选方案 / discarded→已废弃
+- 世界详情页新增「全书演化推演」和「演化方案列表」入口
+- 上下文包详情页新增「用于全书演化推演」区域和快捷入口
+- Mock AI 输出升级为 12 章节结构化全书演化方案
+- 新增 3 个模板（evolution_form/evolutions/evolution_detail）
+- 新增 19 个服务层测试 + 28 个路由测试 + 5 个导出导入测试
+- build 系统同步更新（spec/build_exe.ps1/verify）
+
+### Design
+- 方案 B：复用 simulation_records.status，不新增字段
+- 允许多个主线方案（不做唯一约束）
+- AI 生成结果不自动写入正史
+- 方案状态操作不创建 historical_events
+
+### Notes
+- v1.7.0 不做正文生成、分卷大纲、章节大纲
+- v1.7.0 不做参考小说导入和自动风格分析
+- v1.7.0 只是全书演化推演增强版
+
 ## [v1.6.0] — 2026-05-11
 
 ### Added

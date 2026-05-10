@@ -55,7 +55,7 @@ def test_novel_post_success_creates_record(client):
         "writing_style": "理性克制",
     })
     assert response.status_code == 200
-    assert "小说工程推演" in response.text or "novel_evolution" in response.text
+    assert "小说工程推演" in response.text or "novel_evolution" in response.text or "全书演化方向" in response.text
 
 
 def test_novel_post_simulation_type_is_novel_evolution(client):

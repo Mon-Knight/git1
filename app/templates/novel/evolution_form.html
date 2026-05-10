@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全书演化推演 — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<style>
+.evo-form{display:grid;gap:0.75rem}
+.form-section{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.25rem}
+.form-section h3{font-size:0.95rem;margin-bottom:0.5rem;color:var(--color-primary)}
+.form-row{display:grid;grid-template-columns:140px 1fr;gap:0.5rem;align-items:start}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}}
+.form-row label{padding-top:0.45rem;font-size:0.88rem;font-weight:600;color:var(--color-text)}
+.form-row input,.form-row textarea,.form-row select{padding:0.5rem 0.7rem;border:1px solid var(--color-border);border-radius:var(--radius);background:var(--color-bg);color:var(--color-text);font-size:0.88rem;width:100%;box-sizing:border-box}
+.form-row textarea{min-height:80px;resize:vertical}
+.field-hint{font-size:0.78rem;color:var(--color-text-muted);margin-top:0.15rem}
+.field-required::after{content:" *";color:#e74c3c}
+.pkg-summary{background:rgba(0,212,170,0.04);border:1px solid rgba(0,212,170,0.2);border-radius:8px;padding:0.6rem 0.8rem;margin-top:0.3rem;font-size:0.82rem;color:var(--color-text-muted)}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">📖 {{ world.name }}</h1><p class="subtitle">全书演化推演</p></header>
+<nav class="nav">
+    <a href="/worlds/{{ world.id }}" class="nav-link">← 返回世界详情</a>
+    <a href="/worlds/{{ world.id }}/novel/evolutions" class="btn-sm">📋 方案列表</a>
+    <a href="/worlds/{{ world.id }}/context" class="btn-sm">📦 创作上下文</a>
+</nav>
+<main class="main">
+
+<div class="alert-info" style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:var(--color-primary)">
+    💡 全书演化推演会基于你选择的<b>创作上下文包</b>（包含推演方案、写作风格、剧情时间点），生成一份结构化的12章全书演化方案。生成结果<strong>不会自动写入正史</strong>，你需要审核后决定是否设为主线方案。
+</div>
+
+{{ ai_mode_info|safe }}
+
+{% if errors.submit %}
+<div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:#e74c3c">
+    ❌ {{ errors.submit }}
+</div>
+{% endif %}
+
+{% if result %}
+<section class="world-info" style="margin-bottom:1.5rem">
+    <div class="info-card" style="background:var(--color-surface)">
+        <h3>📖 全书演化方案</h3>
+        <div style="white-space:pre-wrap;line-height:1.7;color:var(--color-text);margin-top:0.75rem;max-height:700px;overflow-y:auto;border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem">{{ result.ai_response }}</div>
+        <div style="display:flex;gap:1rem;margin-top:0.75rem;font-size:0.8rem;color:var(--color-text-muted)">
+            <span>状态: {{ result.status }}</span>
+            <span>{{ 'Mock AI' if result.is_mock else 'Live AI' }}</span>
+            {% if result.ai_model %}<span>模型: {{ result.ai_model }}</span>{% endif %}
+            <span>{{ result.created_at }}</span>
+        </div>
+        <p style="margin-top:0.75rem">
+            <a href="/worlds/{{ world.id }}/novel/evolutions/{{ result.id }}" class="btn-primary btn-sm">📋 查看方案详情 →</a>
+            <a href="/worlds/{{ world.id }}/novel/evolutions" class="btn-sm" style="margin-left:0.5rem">📋 方案列表</a>
+        </p>
+    </div>
+</section>
+{% endif %}
+
+<form action="/worlds/{{ world.id }}/novel/evolution" method="post" class="evo-form world-form">
+
+    <div class="form-section" style="border:1px dashed rgba(0,212,170,0.4);background:rgba(0,212,170,0.02)">
+        <h3>📦 选择创作上下文包</h3>
+        {% if context_packages %}
+        <div class="form-row">
+            <label>创作上下文包</label>
+            <div>
+                <select name="context_package_id" style="width:100%" onchange="this.form.querySelector('#pkg-info').style.display=this.value?'block':'none'">
+                    <option value="">— 不使用上下文包 —</option>
+                    {% for cp in context_packages %}
+                    <option value="{{ cp.id }}" {% if selected_package_id == cp.id %}selected{% endif %}>
+                        {{ cp.name }}
+                        {% if cp.simulation_record_id %} [含推演记录]{% endif %}
+                        {% if cp.style_profile_id %} [含风格]{% endif %}
+                        {% if cp.plot_anchor_id %} [含时间点]{% endif %}
+                        {% if cp.is_default %} [默认]{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                <div class="field-hint">
+                    选择已保存的创作上下文包，AI 将基于其中的推演方案、写作风格、剧情时间点生成全书演化方案。
+                    <a href="/worlds/{{ world.id }}/context/packages">管理上下文包 →</a>
+                </div>
+                {% if selected_pkg %}
+                <div class="pkg-summary" id="pkg-info" style="display:block">
+                    <strong>{{ selected_pkg.name }}</strong>
+                    {% if selected_pkg.description %}<br>{{ selected_pkg.description }}{% endif %}
+                    {% if selected_pkg.simulation_record_id %}<br>📋 已引用推演记录{% endif %}
+                    {% if selected_pkg.style_profile_id %}<br>✏️ 已引用风格方案{% endif %}
+                    {% if selected_pkg.plot_anchor_id %}<br>📍 已引用剧情时间点{% endif %}
+                </div>
+                {% else %}
+                <div class="pkg-summary" id="pkg-info" style="display:none"></div>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div style="background:rgba(255,193,7,0.08);border:1px solid rgba(255,193,7,0.3);border-radius:8px;padding:0.75rem 1rem;text-align:center">
+            <p style="margin:0 0 0.5rem 0;color:var(--color-text-muted)">📦 尚未创建创作上下文包</p>
+            <a href="/worlds/{{ world.id }}/context/packages/new" class="btn-primary btn-sm">+ 新建上下文包</a>
+            <p style="margin:0.5rem 0 0 0;font-size:0.78rem;color:var(--color-text-muted)">也可以不选择上下文包，直接填写推演目标后提交</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="form-section">
+        <h3>🎯 本次全书演化目标</h3>
+        <div class="form-row">
+            <label class="field-required">推演目标</label>
+            <div>
+                <textarea name="user_goal" rows="3" maxlength="2000" required
+                    placeholder="如：基于当前世界与主角能力，生成一条适合百万字长篇的全书演化路线。聚焦主角如何从边境小镇的平民成长为改变世界格局的关键人物。">{{ form_data.user_goal if form_data else '' }}</textarea>
+                {% if errors.user_goal %}<span class="error-msg">{{ errors.user_goal }}</span>{% endif %}
+                <div class="field-hint">描述你希望 AI 聚焦的推演方向和目标（必填）</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:1rem;margin-top:0.5rem">
+        <button type="submit" class="btn-primary">📝 生成全书演化方案</button>
+        <span style="font-size:0.8rem;color:var(--color-text-muted)">AI 将基于上下文包生成 12 章节结构化全书演化方案</span>
+    </div>
+</form>
+
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>
