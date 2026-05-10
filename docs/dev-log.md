@@ -23,7 +23,8 @@
 - python scripts/check_encoding.py ✅
 
 ### 备份 / commit / tag / push
-- 待定
+- `fa209f4` — `docs: v1.2.2 release - unify version, add EXE distribution guide, usage scenarios and limits`
+- `v1.2.2` — main + tag 已推送
 
 ### 已知问题
 - 无
