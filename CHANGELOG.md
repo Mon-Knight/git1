@@ -1,5 +1,20 @@
 # Changelog
 
+## [v1.3.1] — 2026-05-11
+
+### Added
+- 新增桌面端启动自检（模板、静态文件、AI模块、数据库目录、端口、app_settings表）
+- 新增桌面端日志系统（desktop.log、server.log、error.log）
+- 新增 EXE 分发说明文件（packaging/README-Desktop.txt）
+- 新增浏览器回退模式（WebView不可用时自动用系统浏览器）
+- 新增 44 个桌面端测试（日志/自检/AI配置持久化/构建配置验证）
+
+### Fixed
+- 修复 EXE 启动失败时缺少日志的问题
+- 修复桌面端启动异常无日志记录的问题
+- 修复 WebView 启动失败时直接退出的问题（改为浏览器回退）
+- 修复 self-check 中数据库目录写入权限检测不够健壮的问题
+
 ## [v1.3.0] — 2026-05-11
 
 ### Added

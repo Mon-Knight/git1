@@ -2,7 +2,7 @@
 
 AI 小说世界观推演系统 — 帮助作者构建小说世界观，通过 AI 推演世界发展。
 
-> **当前版本**: v1.3.0 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
+> **当前版本**: v1.3.1 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
 
 ---
 
@@ -310,6 +310,7 @@ C:\Users\<用户名>\AppData\Local\AIWorldEngine\ai_world_engine.db
 | v1.2.1 | EXE 打包修复与验证 | 226 |
 | v1.2.2 | 文档整理、版本号统一、发布说明完善 | 226 |
 | v1.3.0 | AI API 接入、设置页面、模型路由、错误处理增强 | 303 |
+| v1.3.1 | EXE 桌面端稳定化、启动自检、日志系统、分发包完善 | 347 |
 
 ---
 
