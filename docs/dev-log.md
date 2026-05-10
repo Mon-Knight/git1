@@ -1,5 +1,39 @@
 # Development Log — AI World Engine
 
+## 2026-05-11 — v1.3.1: EXE 桌面端稳定化 + 日志系统 + 启动自检
+
+### 完成内容
+- desktop_launcher.py 全面重写：新增日志系统、启动自检、浏览器回退
+- 桌面端日志目录：AppData/Local/AIWorldEngine/logs/（desktop.log、server.log、error.log）
+- 启动自检项目：版本号、PyInstaller 模式、模板/静态文件定位、AI模块导入、数据库目录、端口
+- 新增 packaging/README-Desktop.txt 分发说明文件
+- 44 个新测试全部通过（日志/自检/AI配置持久化/构建配置）
+- 版本号更新为 1.3.1
+
+### 修改文件
+- `desktop_launcher.py` — 新增日志系统、启动自检、Health检查输出、浏览器回退
+- `packaging/README-Desktop.txt` — 新建
+- `app/config.py` — VERSION → 1.3.1
+- `tests/test_desktop.py` — 版本号断言更新
+- `tests/test_main.py` — 版本号断言更新
+- `tests/test_desktop_logging.py` — 新建
+- `tests/test_desktop_self_check.py` — 新建
+- `tests/test_desktop_ai_settings.py` — 新建
+- `tests/test_build_config.py` — 新建
+- `README.md` — 版本号、测试数更新
+- `CHANGELOG.md` — v1.3.1 条目
+- `docs/dev-log.md` — 本条记录
+
+### 测试命令 / 结果
+- python -m compileall . ✅
+- pytest tests/ -v ✅ (347 passed)
+- python scripts/check_encoding.py ✅
+
+### 已知问题
+- 无
+
+---
+
 ## 2026-05-11 — v1.3.0: 正式 AI API 接入 + AI 设置页面 + 模型路由
 
 ### 完成内容
