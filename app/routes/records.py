@@ -13,11 +13,15 @@ from app.database import get_db
 from app.services.world_service import WorldService
 from app.services.simulation_service import SimulationService
 from app.services.record_action_service import RecordActionService
+from app.constants import get_simulation_type_label
 
 router = APIRouter(prefix="/worlds/{world_id}/records")
 
 templates_dir = Path(__file__).parent.parent / "templates"
 templates = Jinja2Templates(directory=str(templates_dir))
+
+# Register the label helper as a Jinja2 global so templates can call it
+templates.env.globals["get_type_label"] = get_simulation_type_label
 
 
 @router.get("", response_class=HTMLResponse)

@@ -1,5 +1,65 @@
 # Development Log — AI World Engine
 
+## 2026-05-11 — v1.4.0: 小说工程模式基础版
+
+### 开发内容
+- 新增小说工程模式（全书演化方向推演）
+- 新增 /worlds/{id}/novel GET/POST 路由
+- 新增 app/templates/novel/form.html 表单页面（17个字段）
+- 新增 app/routes/novel.py 路由处理
+- 世界详情页增加小说工程模式入口卡片
+- PromptBuilder.build_novel_evolution_prompt：基于世界上下文+小说参数构建推演prompt
+- MockAI新增_build_novel_evolution_output：返回结构化14板块小说推演结果
+- ModelRouter新增novel_evolution任务类型映射（使用ai_simulation_model）
+- 推演记录类型标签集中管理（app/constants.py → get_simulation_type_label）
+- records列表和detail页使用Jinja2全局函数显示中文类型
+- build_exe.ps1和AIWorldEngine.spec同步新增hidden imports
+
+### 设计决策
+- 复用simulation_records存储小说工程推演结果，暂不新建novel_evolution表
+- 小说工程表单参数通过question字段保存摘要，full context通过context_snapshot保存
+- 用户仍通过原有记录页面手动采纳或保存分支
+- 暂不实现正文生成、章节大纲、参考小说分析
+
+### 修改文件
+- `app/constants.py` — 新增 novel_evolution 常量、NOVEL_FORM_FIELDS/LABELS
+- `app/services/ai/prompt_builder.py` — 新增 NOVEL_SYSTEM、build_novel_evolution_prompt
+- `app/services/ai/mock_client.py` — 新增 _build_novel_evolution_output 结构化推演
+- `app/services/ai/model_router.py` — TASK_MODEL_KEYS 新增 novel_evolution
+- `app/routes/novel.py` — 新建
+- `app/templates/novel/form.html` — 新建
+- `app/templates/worlds/detail.html` — 增加小说工程模式入口卡片
+- `app/templates/records/list.html` — 显示优化
+- `app/templates/records/detail.html` — 类型标签优化
+- `app/routes/records.py` — 注册Jinja全局函数get_type_label
+- `app/main.py` — 注册novel_router
+- `app/config.py` — VERSION → 1.4.0
+- `desktop_launcher.py` — 同步更新app.routes.novel
+- `packaging/build_exe.ps1` — 新增app.routes.novel hidden import
+- `packaging/AIWorldEngine.spec` — 同步
+- `README.md` — 功能总览、演示流程、已知限制更新
+- `CHANGELOG.md` — v1.4.0 条目
+- `tests/test_novel_routes.py` — 14个路由测试
+- `tests/test_novel_prompt_builder.py` — 14个PromptBuilder测试
+- `tests/test_novel_integration.py` — 10个集成测试
+- `tests/test_desktop.py` — 版本断言更新
+- `tests/test_main.py` — 版本断言更新
+- `docs/dev-log.md` — 本条记录
+
+### 测试命令 / 结果
+- python -m compileall . ✅
+- pytest tests/ -v ✅ (403 passed)
+- python scripts/check_encoding.py ✅
+- python scripts/verify_desktop_build.py --src --all ✅
+
+### EXE 打包验证
+- powershell -ExecutionPolicy Bypass -File packaging/build_exe.ps1 ✅
+
+### 已知问题
+- 无
+
+---
+
 ## 2026-05-11 — v1.3.5: EXE uvicorn logging 崩溃修复
 
 ### 问题根因

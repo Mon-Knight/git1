@@ -19,7 +19,7 @@
 <div class="world-card">
     <div class="world-card-header">
         <h3><a href="/worlds/{{ world.id }}/records/{{ r.id }}">{{ r.question[:60] }}{% if r.question|length > 60 %}…{% endif %}</a></h3>
-        <span class="badge">{{ r.simulation_type or '未分类' }}</span>
+        <span class="badge">{{ get_type_label(r.simulation_type) }}</span>
     </div>
     <div class="world-card-body">
         <p class="world-desc">{% if r.ai_response %}{{ r.ai_response[:100] }}{% else %}<span class="muted">暂无结果</span>{% endif %}</p>

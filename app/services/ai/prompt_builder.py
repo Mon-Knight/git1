@@ -176,3 +176,124 @@ class PromptBuilder:
             {"role": "system", "content": "你是小说世界观总结助手，请用结构化方式简洁总结用户提供的世界观。"},
             {"role": "user", "content": user_prompt},
         ]
+
+    NOVEL_SYSTEM = """你是长篇小说工程规划助手。
+你需要基于已有世界观、角色、势力、地点、规则和正史事件，推演一部长篇小说的全书演化方向。
+你不能直接推翻已有正史。
+你不能让主角无代价获得胜利。
+你不能忽视已有世界规则。
+如果用户给出的设定与现有世界矛盾，需要明确指出。
+你输出的是"全书演化方向"，不是正文，不是章节正文。
+你可以给出粗略分卷建议，但不要展开到具体章节正文。
+你必须保留用户最终审核权，不要直接替用户决定正史。
+
+输出格式应包含：
+1. 全书核心卖点
+2. 主角成长路线
+3. 主线剧情方向
+4. 世界局势演化
+5. 主要势力变化
+6. 关键剧情阶段
+7. 粗略分卷建议
+8. 重大转折点
+9. 主要反派或阻力来源
+10. 主角特殊能力的使用边界
+11. 与现有设定的潜在矛盾
+12. 建议采纳为正史的内容
+13. 适合保存为分支的内容
+14. 后续可继续推演的问题"""
+
+    @staticmethod
+    def build_novel_evolution_prompt(world_context: dict, novel_form: dict) -> list:
+        """Build a novel evolution prompt pair (system + user).
+
+        Args:
+            world_context: Aggregated world setting context
+            novel_form: User-filled novel engineering form fields (dict)
+
+        Returns:
+            List of message dicts for AI generation.
+        """
+        from app.constants import NOVEL_FORM_LABELS
+
+        parts = []
+
+        # World context section
+        parts.append("【世界名称】" + world_context.get("world_name", "未知"))
+        wc_type = world_context.get("world_type")
+        if wc_type:
+            parts.append("【世界类型】" + wc_type)
+        current_era = world_context.get("current_era")
+        if current_era:
+            parts.append("【当前时代】" + current_era)
+        tone = world_context.get("tone")
+        if tone:
+            parts.append("【世界基调】" + tone)
+        desc = world_context.get("description")
+        if desc:
+            parts.append("【世界简介】" + desc[:300])
+
+        characters = world_context.get("characters", [])
+        if characters:
+            parts.append("\n【角色设定】")
+            for c in characters[:10]:
+                parts.append("- {}: 角色={}, 性格={}, 目标={}".format(
+                    c.get("name", "?"),
+                    c.get("role", "?"),
+                    c.get("personality", "?"),
+                    c.get("goal", "?"),
+                ))
+
+        factions = world_context.get("factions", [])
+        if factions:
+            parts.append("\n【势力设定】")
+            for f in factions[:10]:
+                parts.append("- {}: 类型={}, 目标={}".format(
+                    f.get("name", "?"),
+                    f.get("faction_type", "?"),
+                    f.get("goal", "?"),
+                ))
+
+        locations = world_context.get("locations", [])
+        if locations:
+            parts.append("\n【地点设定】")
+            for loc in locations[:10]:
+                parts.append("- {}: 类型={}, 区域={}".format(
+                    loc.get("name", "?"),
+                    loc.get("location_type", "?"),
+                    loc.get("region", "?"),
+                ))
+
+        rules = world_context.get("rules", [])
+        if rules:
+            parts.append("\n【世界规则】")
+            for r in rules[:10]:
+                parts.append("- {}: {}".format(r.get("name", "?"), r.get("content", "?")[:100]))
+
+        events = world_context.get("canon_events", world_context.get("events", []))
+        if events:
+            parts.append("\n【正史事件】")
+            for e in events[:10]:
+                parts.append("- {}: {}".format(e.get("title", "?"), e.get("content", "?")[:100]))
+
+        # Novel engineering form section
+        parts.append("\n\n=== 用户填写的小说工程参数 ===")
+
+        for field, label in NOVEL_FORM_LABELS.items():
+            value = novel_form.get(field, "").strip()
+            if value:
+                parts.append("【{}】{}".format(label, value))
+
+        if not novel_form.get("main_story_direction", "").strip():
+            parts.append("\n[注意：用户未填写主线方向，由AI根据世界设定自行推演]")
+
+        parts.append("\n\n请基于以上世界设定和小说工程参数，生成一部长篇小说的全书演化方向。")
+        parts.append("请严格遵守输出格式要求，依次列出14个板块。")
+        parts.append("不要生成正文。不要展开到具体章节。")
+
+        user_prompt = "\n".join(parts)
+
+        return [
+            {"role": "system", "content": PromptBuilder.NOVEL_SYSTEM},
+            {"role": "user", "content": user_prompt},
+        ]

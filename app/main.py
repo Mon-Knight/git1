@@ -23,6 +23,7 @@ from app.routes.records import router as records_router
 from app.routes.branches import router as branches_router
 from app.routes.checks import router as checks_router
 from app.routes.settings import router as settings_router
+from app.routes.novel import router as novel_router
 
 
 @asynccontextmanager
@@ -67,6 +68,7 @@ app.include_router(records_router)
 app.include_router(branches_router)
 app.include_router(checks_router)
 app.include_router(settings_router)
+app.include_router(novel_router)
 
 
 @app.get("/health")

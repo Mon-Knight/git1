@@ -15,6 +15,7 @@ from app.services.settings_service import SettingsService
 # Task type -> settings key for per-task model override
 TASK_MODEL_KEYS = {
     "simulation": "ai_simulation_model",
+    "novel_evolution": "ai_simulation_model",
     "conflict_check": "ai_check_model",
     "behavior_check": "ai_check_model",
     "summary": "ai_summary_model",
