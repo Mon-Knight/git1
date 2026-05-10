@@ -1,5 +1,35 @@
 # Development Log — AI World Engine
 
+## 2026-05-11 — v1.2.2: 发布整理版（文档统一 + 版本号统一）
+
+### 完成内容
+- README.md 版本号从 v1.0.0 更新为 v1.2.2
+- app/config.py VERSION 统一更新为 1.2.2
+- README 增加「Windows EXE 分发说明」
+- README 增加「当前适用场景」
+- README「已知限制」重命名为「已知限制 / 当前限制」，增加多用户/权限/云端限制
+- CHANGELOG.md 新增 v1.2.2 条目
+- docs/dev-log.md 新增本条记录
+
+### 修改文件
+- `README.md` — 版本号、EXE 分发说明、适用场景、限制说明
+- `app/config.py` — VERSION → 1.2.2
+- `CHANGELOG.md` — 新增 v1.2.2 条目
+- `docs/dev-log.md` — 新增本条记录
+
+### 测试命令 / 结果
+- python -m compileall . ✅
+- pytest tests/ -v ✅ (226 passed)
+- python scripts/check_encoding.py ✅
+
+### 备份 / commit / tag / push
+- 待定
+
+### 已知问题
+- 无
+
+---
+
 ## 2026-05-09 — v1.2.1: EXE 打包验证与修复
 
 ### 完成内容

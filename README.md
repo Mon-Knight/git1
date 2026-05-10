@@ -2,7 +2,7 @@
 
 AI 小说世界观推演系统 — 帮助作者构建小说世界观，通过 AI 推演世界发展。
 
-> **当前版本**: v1.0.0 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
+> **当前版本**: v1.2.2 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
 
 ---
 
@@ -142,6 +142,17 @@ python scripts/check_encoding.py
 
 ---
 
+## 当前适用场景
+
+- **单人本地小说世界观推演**：作者构建、管理、推演自己的小说世界观
+- **世界观结构化管理**：角色、势力、地点、规则、历史事件的完整管理
+- **AI 推演与分支实验**：通过 AI 推演世界发展，支持正史/分支双线管理
+- **设定一致性检查**：规则式矛盾检测和角色行为合理性检查
+- **Windows 桌面端使用**：打包为 EXE，双击即可使用，无需命令行
+- **Web 浏览器使用**：支持 `uvicorn` 启动后通过浏览器访问
+
+---
+
 ## AI 模式说明
 
 | 模式 | 条件 | 说明 |
@@ -197,6 +208,18 @@ python scripts/check_encoding.py
 ## Windows 桌面端
 
 AI World Engine 支持打包为 Windows 桌面 EXE，双击即可启动。
+
+### Windows EXE 分发说明
+
+> ⚠️ **重要**：不能只复制 `AIWorldEngine.exe`！必须分发整个 `dist/AIWorldEngine/` 文件夹。
+
+- **启动程序**: `dist/AIWorldEngine/AIWorldEngine.exe`
+- **分发方式**：将整个 `dist/AIWorldEngine/` 文件夹压缩为 ZIP，分发给使用者
+- **数据位置**: `C:\Users\<用户名>\AppData\Local\AIWorldEngine\ai_world_engine.db`
+  - 用户数据、推演记录、分支记录均保存在此 SQLite 数据库中
+  - 卸载 EXE 不会自动删除数据库（如需清理可手动删除该目录）
+- **EXE 结构**：`dist/AIWorldEngine/` 目录包含 EXE、DLL、Python 运行时、模板、静态资源等
+  - 缺少任何文件都可能导致启动失败
 
 ### 桌面模式运行
 
@@ -255,6 +278,8 @@ C:\Users\<用户名>\AppData\Local\AIWorldEngine\ai_world_engine.db
 | v0.8.0 | 页面优化、错误处理、测试完善 | 210 |
 | v1.0.0 | 稳定展示版 | 210 |
 | v1.2.0 | 桌面端 EXE 打包 | 226 |
+| v1.2.1 | EXE 打包修复与验证 | 226 |
+| v1.2.2 | 文档整理、版本号统一、发布说明完善 | 226 |
 
 ---
 
@@ -275,12 +300,14 @@ C:\Users\<用户名>\AppData\Local\AIWorldEngine\ai_world_engine.db
 
 ---
 
-## 已知限制
+## 已知限制 / 当前限制
 
-- 单用户本地应用，无多用户和权限系统
+- **暂不支持多用户和权限系统**：当前为单人本地应用，无登录/注册功能
+- **暂不支持云端同步**：所有数据存储在本地 SQLite，无法跨设备同步
 - 无数据库迁移工具，模型变更需手动重建数据库
 - AI 推演默认使用 Mock 模式，需配置 API Key 才能接入真实 AI
 - 检查功能使用规则式关键词匹配，非 NLP 深度分析
+- Windows EXE 仅支持 Windows 平台
 
 ---
 

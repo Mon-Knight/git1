@@ -1,5 +1,20 @@
 # Changelog
 
+## [v1.2.2] — 2026-05-11
+
+### Changed
+- 文档整理：README.md 版本号从 v1.0.0 更新为 v1.2.2
+- 代码中 VERSION 统一更新为 1.2.2（app/config.py）
+- README 增加「Windows EXE 分发说明」：必须分发整个 dist/AIWorldEngine 文件夹
+- README 增加「当前适用场景」：单人本地世界观推演、Windows 桌面端等
+- README「已知限制」重命名为「已知限制 / 当前限制」，明确暂不支持多用户/权限/云端同步
+- CHANGELOG.md v1.2.1 条目补充
+- 版本记录表补充 v1.2.1、v1.2.2
+
+### Notes
+- 本次为发布整理版，不新增复杂业务功能
+- 核心业务逻辑未改动
+
 ## [v1.2.1] — 2026-05-09
 
 ### Fixed
