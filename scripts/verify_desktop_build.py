@@ -30,6 +30,10 @@ REQUIRED_TEMPLATES = [
     "app/templates/settings/ai.html",
     "app/templates/simulation/index.html",
     "app/templates/novel/form.html",
+    "app/templates/data/index.html",
+    "app/templates/data/import.html",
+    "app/templates/data/backups.html",
+    "app/templates/data/export_result.html",
 ]
 
 # Required hidden import modules

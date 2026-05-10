@@ -1,5 +1,30 @@
 # Changelog
 
+## [v1.5.0] — 2026-05-11
+
+### Added
+- 新增数据管理页面 /data（导入/导出/备份/恢复）
+- 新增单世界 JSON 导出功能（含角色/势力/地点/规则/事件/推演记录/分支）
+- 新增世界 JSON 导入功能（自动创建新世界，重名自动重命名，事务保护）
+- 新增数据库一键备份（含 metadata JSON + SHA256 校验）
+- 新增数据库备份恢复（恢复前自动备份，确认机制）
+- 新增 EXE 模式 AppData backups/ 目录
+- 新增 export_service / import_service / backup_service
+- 新增 22 个数据服务测试 + 12 个路由测试
+- 世界详情页新增「导出世界」按钮
+- 首页新增「数据管理」入口
+- .gitignore 新增 backups/
+
+### Security
+- 导出文件不包含 app_settings
+- 导出文件不包含 AI API Key
+- 导出文件不包含 .env 和日志
+- 恢复数据库前自动备份当前数据库
+
+### Notes
+- v1.5.0 不包含云同步、多用户、PostgreSQL、Alembic
+- v1.5.0 不包含正文生成和章节大纲
+
 ## [v1.4.0] — 2026-05-11
 
 ### Added

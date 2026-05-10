@@ -33,6 +33,7 @@ Thumbs.db
 
 # Backups
 .project_backups/
+backups/
 
 # Database
 *.db
