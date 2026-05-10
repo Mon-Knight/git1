@@ -4,7 +4,8 @@ AI World Engine - Desktop Launcher
 Launches the FastAPI backend in a background thread and opens a
 pywebview desktop window.
 
-v1.3.1: Added desktop logging, startup self-check, and configuration reporting.
+v1.3.4: Fixed backend server startup, added full exception logging,
+server.log capture with uvicorn log_config, headless mode, error dialog.
 """
 
 import os
@@ -13,6 +14,7 @@ import socket
 import threading
 import time
 import logging
+import io
 from pathlib import Path
 
 # Suppress pywebview's default logging unless debugging
@@ -76,23 +78,23 @@ def _setup_desktop_logging(log_dir: str) -> logging.Logger:
     return logger
 
 
-# ── Server log handler ──────────────────────────────────────────────────────
+# ── Server logging ──────────────────────────────────────────────────────────
 
-def _setup_server_logging(log_dir: str) -> None:
-    """Configure a file handler for uvicorn/server messages → server.log."""
-    try:
-        server_logger = logging.getLogger("server")
-        server_logger.setLevel(logging.DEBUG)
-        fh = logging.FileHandler(
-            os.path.join(log_dir, "server.log"), encoding="utf-8"
-        )
-        fh.setLevel(logging.DEBUG)
-        fh.setFormatter(
-            logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
-        )
-        server_logger.addHandler(fh)
-    except Exception:
-        pass
+SERVER_LOG_PATH = None  # Set during startup, read by server thread
+
+def _setup_server_file_logger(log_dir: str) -> logging.Logger:
+    """Create a dedicated server file logger that uvicorn can use."""
+    global SERVER_LOG_PATH
+    SERVER_LOG_PATH = os.path.join(log_dir, "server.log")
+    srv = logging.getLogger("server")
+    srv.setLevel(logging.DEBUG)
+    for h in list(srv.handlers):
+        srv.removeHandler(h)
+    fh = logging.FileHandler(SERVER_LOG_PATH, encoding="utf-8", mode="a")
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S"))
+    srv.addHandler(fh)
+    return srv
 
 
 # ── Self-check ──────────────────────────────────────────────────────────────
@@ -238,24 +240,95 @@ def find_free_port(start: int = 8000, end: int = 9000) -> int:
     raise RuntimeError(f"No free port found in range {start}-{end}")
 
 
-def wait_for_server(url: str, timeout: int = 30) -> bool:
-    """Wait until the server responds or timeout is reached."""
+def wait_for_server(url: str, timeout: int = 30, logger=None) -> bool:
+    """Wait until the server responds, logging each failure for diagnosis."""
     import urllib.request
     deadline = time.time() + timeout
+    attempt = 0
+    last_error = None
     while time.time() < deadline:
         try:
+            attempt += 1
             urllib.request.urlopen(url, timeout=1)
+            if logger:
+                logger.info(f"Health check OK on attempt {attempt}")
             return True
-        except Exception:
+        except Exception as e:
+            last_error = e
+            if logger:
+                logger.debug(f"Health check attempt {attempt}/{int(timeout*2)} failed: {type(e).__name__}: {e}")
             time.sleep(0.5)
+    if logger:
+        logger.error(f"Server failed to start within {timeout}s. Last error: {type(last_error).__name__}: {last_error}")
     return False
 
 
-def run_uvicorn(host: str, port: int):
-    """Run uvicorn in the current thread (for background thread use)."""
+def start_server(host: str, port: int, log_dir: str, logger: logging.Logger):
+    """
+    Start uvicorn in the current thread. Fully wrapped for EXE reliability.
+
+    - Imports app.main:app directly (never uses string import in PyInstaller)
+    - Configures uvicorn logging to write to server.log file
+    - Captures all exceptions with full traceback to server.log and error.log
+    """
+    try:
+        logger.info(f"Backend: importing app.main...")
+        from app.main import app  # noqa: F811 - direct import, not string
+        logger.info("Backend: FastAPI app imported successfully")
+    except BaseException as e:
+        logger.exception("Backend: FAILED to import app.main")
+        if SERVER_LOG_PATH:
+            try:
+                with open(SERVER_LOG_PATH, "a", encoding="utf-8") as f:
+                    import traceback
+                    f.write(f"\n=== APP IMPORT FAILED ===\n")
+                    traceback.print_exc(file=f)
+            except Exception:
+                pass
+        raise
+
+    logger.info(f"Backend: starting uvicorn on {host}:{port}...")
     import uvicorn
-    from app.main import app
-    uvicorn.run(app, host=host, port=port, log_level="warning")
+
+    # Build uvicorn log config that writes to server.log
+    log_config = uvicorn.config.LOGGING_CONFIG
+    if SERVER_LOG_PATH:
+        log_config["handlers"]["file"] = {
+            "class": "logging.FileHandler",
+            "filename": SERVER_LOG_PATH,
+            "mode": "a",
+            "encoding": "utf-8",
+            "formatter": "default",
+        }
+        log_config["loggers"]["uvicorn"]["handlers"] = ["file"]
+        log_config["loggers"]["uvicorn.error"]["handlers"] = ["file"]
+        log_config["loggers"]["uvicorn.access"]["handlers"] = ["file"]
+        # Also keep console handler for debugging
+        log_config["loggers"]["uvicorn"]["handlers"].append("console")
+        log_config["loggers"]["uvicorn.error"]["handlers"].append("console")
+
+    try:
+        uvicorn.run(
+            app,
+            host=host,
+            port=port,
+            log_config=log_config,
+            log_level="info",
+            access_log=True,
+            loop="asyncio",
+            http="h11",
+        )
+    except BaseException as e:
+        logger.exception(f"Backend: uvicorn crashed with {type(e).__name__}")
+        if SERVER_LOG_PATH:
+            try:
+                with open(SERVER_LOG_PATH, "a", encoding="utf-8") as f:
+                    import traceback
+                    f.write(f"\n=== UVICORN CRASH ===\n")
+                    traceback.print_exc(file=f)
+            except Exception:
+                pass
+        raise
 
 
 def _ensure_pyinstaller_imports():
@@ -305,15 +378,38 @@ def _ensure_pyinstaller_imports():
 
 # ── Main ────────────────────────────────────────────────────────────────────
 
+def _show_error_dialog(message: str, log_dir: str):
+    """Show an error dialog using tkinter (always available on Windows)."""
+    try:
+        import tkinter.messagebox as mb
+        from tkinter import Tk
+        root = Tk()
+        root.withdraw()
+        mb.showerror(
+            "AI World Engine — 启动失败",
+            f"{message}\n\n"
+            f"错误日志路径：\n{log_dir}\\server.log\n{log_dir}\\error.log\n\n"
+            f"请查看上述文件获取详细错误信息，或联系开发者。"
+        )
+        root.destroy()
+    except Exception:
+        pass  # If even tkinter fails, we still have log files
+
+
 def main():
     """Main entry point for the desktop launcher."""
+    # 0. Check for headless mode (for automated verification)
+    headless = os.getenv("AIWORLDENGINE_HEADLESS", "0") in ("1", "true", "True", "yes")
+
     # 1. Setup logging
     log_dir = get_log_dir()
     logger = _setup_desktop_logging(log_dir)
-    _setup_server_logging(log_dir)
+    _setup_server_file_logger(log_dir)
 
     logger.info(f"=== AI World Engine Desktop Launcher ===")
     logger.info(f"Log directory: {log_dir}")
+    if headless:
+        logger.info("HEADLESS mode — no desktop window")
 
     # 2. Configure database path for desktop mode
     _configure_desktop_db(logger)
@@ -330,43 +426,55 @@ def main():
         port = find_free_port()
     except RuntimeError as e:
         logger.critical(f"No free port available: {e}")
-        print(f"ERROR: {e}")
+        _show_error_dialog(f"无法获取可用端口: {e}", log_dir)
         sys.exit(1)
 
     host = "127.0.0.1"
     url = f"http://{host}:{port}"
     logger.info(f"Server will listen on {url}")
 
-    # 5. Start FastAPI in background thread
+    # 5. Start FastAPI in background thread (uses start_server for full logging)
     server_thread = threading.Thread(
-        target=run_uvicorn,
-        args=(host, port),
+        target=start_server,
+        args=(host, port, log_dir, logger),
         daemon=True,
     )
     server_thread.start()
 
-    # 6. Wait for server to be ready
+    # 6. Wait for server to be ready (with detailed failure logging)
     logger.info("Waiting for server to start...")
     print(f"Starting AI World Engine server on {url} ...")
-    if not wait_for_server(f"{url}/health"):
+    if not wait_for_server(f"{url}/health", logger=logger):
         logger.error("Server failed to start within timeout.")
-        print("ERROR: Server failed to start within timeout.")
+        _show_error_dialog("后端服务未能启动。请查看日志文件获取详细错误信息。", log_dir)
+        if headless:
+            time.sleep(3)
         sys.exit(1)
 
-    # 7. Health check
+    # 7. Health check (with more detail)
     try:
         import urllib.request
         import json as _json
         resp = urllib.request.urlopen(f"{url}/health", timeout=5)
         data = _json.loads(resp.read().decode())
-        logger.info(f"Health check: {data}")
+        logger.info(f"Health check: version={data.get('version')}, status={data.get('status')}")
     except Exception as e:
-        logger.warning(f"Health check failed: {e}")
+        logger.warning(f"Health check detail fetch failed: {e}")
 
     logger.info(f"Server ready on {url}")
     print(f"Server ready. Opening desktop window...")
 
-    # 8. Open desktop window
+    # 8. Open desktop window (or stay in headless mode)
+    if headless:
+        logger.info("HEADLESS mode: server is running, no window will open.")
+        logger.info(f"Server URL: {url}")
+        try:
+            while True:
+                time.sleep(60)
+        except KeyboardInterrupt:
+            logger.info("Shutting down (keyboard interrupt).")
+        return
+
     try:
         import webview
         window = webview.create_window(
@@ -380,7 +488,6 @@ def main():
         webview.start()
     except Exception as e:
         logger.error(f"Desktop window failed: {e}", exc_info=True)
-        # Fallback: open in browser
         logger.info("Falling back to system browser...")
         try:
             import webbrowser
@@ -392,6 +499,7 @@ def main():
             logger.info("Shutting down.")
         except Exception as e2:
             logger.critical(f"Cannot start server or open browser: {e2}", exc_info=True)
+            _show_error_dialog(f"无法打开桌面窗口或浏览器: {e2}", log_dir)
             sys.exit(1)
 
 
@@ -400,17 +508,19 @@ def _configure_desktop_db(logger: logging.Logger = None):
     if os.getenv("DATABASE_URL"):
         if logger:
             logger.info("Using explicit DATABASE_URL from environment")
-        return  # User explicitly configured
+        return
 
     if sys.platform == "win32":
         appdata = os.getenv("LOCALAPPDATA")
         if appdata:
             db_dir = os.path.join(appdata, "AIWorldEngine")
             os.makedirs(db_dir, exist_ok=True)
-            db_path = os.path.join(db_dir, "ai_world_engine.db")
-            os.environ["DATABASE_URL"] = f"sqlite:///{db_path}"
+            # Use forward slashes for SQLite URL on Windows
+            db_path = Path(db_dir) / "ai_world_engine.db"
+            os.environ["DATABASE_URL"] = f"sqlite:///{db_path.as_posix()}"
             if logger:
                 logger.info(f"Desktop database path: {db_path}")
+                logger.info(f"Desktop DATABASE_URL: sqlite:///{db_path.as_posix()}")
         else:
             if logger:
                 logger.warning("LOCALAPPDATA not set; using default database path")

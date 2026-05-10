@@ -41,13 +41,28 @@ $envPath = "C:/Users/17735/anaconda3/envs/aiworldengine"
     --add-binary "$envPath/Library/bin/ffi.dll;." `
     --add-binary "$envPath/Library/bin/sqlite3.dll;." `
     --hidden-import uvicorn.logging `
+    --hidden-import uvicorn.loops `
+    --hidden-import uvicorn.loops.asyncio `
     --hidden-import uvicorn.loops.auto `
+    --hidden-import uvicorn.protocols `
+    --hidden-import uvicorn.protocols.http `
     --hidden-import uvicorn.protocols.http.auto `
+    --hidden-import uvicorn.protocols.http.h11_impl `
+    --hidden-import uvicorn.protocols.websockets `
+    --hidden-import uvicorn.lifespan `
+    --hidden-import uvicorn.lifespan.on `
     --hidden-import sqlalchemy.sql.default_comparator `
     --hidden-import jinja2 `
     --hidden-import jinja2.ext `
     --hidden-import python_multipart `
     --hidden-import requests `
+    --hidden-import h11 `
+    --hidden-import anyio `
+    --hidden-import sniffio `
+    --hidden-import starlette `
+    --hidden-import fastapi `
+    --hidden-import asyncio `
+    --hidden-import app.constants `
     --hidden-import app.services.ai `
     --hidden-import app.services.ai.base `
     --hidden-import app.services.ai.errors `

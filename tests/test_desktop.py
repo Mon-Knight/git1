@@ -81,6 +81,6 @@ def test_desktop_db_path_creates_directory():
 
 
 def test_config_version_updated():
-    """Test that VERSION reflects 1.3.3."""
+    """Test that VERSION reflects 1.3.4."""
     from app.config import settings
-    assert settings.VERSION == "1.3.3"
+    assert settings.VERSION == "1.3.4"
