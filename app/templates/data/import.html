@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>导入世界 — AI World Engine</title><link rel="stylesheet" href="/static/css/style.css">
+<style>.result-box{background:rgba(0,212,170,0.05);border:1px solid rgba(0,212,170,0.3);border-radius:var(--radius);padding:1rem;margin-top:1rem}</style>
+</head>
+<body><div class="container">
+<header class="header"><h1 class="logo">📥 导入世界</h1></header>
+<nav class="nav"><a href="/data" class="nav-link">← 返回数据管理</a></nav>
+<main class="main">
+
+{% if errors.file %}<div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);padding:0.75rem 1rem;border-radius:8px;color:#e74c3c;margin-bottom:1rem">{{ errors.file }}</div>{% endif %}
+
+{% if result %}
+<div class="result-box"><h3>✅ 导入成功</h3>
+<table style="width:100%;font-size:0.9rem;line-height:2"><tr><td>新世界名称</td><td><strong>{{ result.new_world_name }}</strong></td></tr>
+<tr><td>新世界 ID</td><td>{{ result.new_world_id }}</td></tr>
+<tr><td>角色</td><td>{{ result.counts.characters }} 个</td></tr>
+<tr><td>势力</td><td>{{ result.counts.factions }} 个</td></tr>
+<tr><td>地点</td><td>{{ result.counts.locations }} 个</td></tr>
+<tr><td>规则</td><td>{{ result.counts.rules }} 个</td></tr>
+<tr><td>历史事件</td><td>{{ result.counts.historical_events }} 个</td></tr>
+<tr><td>推演记录</td><td>{{ result.counts.simulation_records }} 个{% if result.contains_novel_evolution %}（含小说工程推演）{% endif %}</td></tr>
+<tr><td>分支</td><td>{{ result.counts.branches }} 个</td></tr></table>
+<p style="margin-top:1rem"><a href="/worlds/{{ result.new_world_id }}" class="btn-primary">进入新世界 →</a></p></div>
+{% else %}
+<form action="/data/import" method="post" enctype="multipart/form-data" class="world-form">
+<div class="form-group"><label>选择 JSON 文件</label><input type="file" name="import_file" accept=".json" required>
+<div class="field-hint">支持 AI World Engine 导出的 single_world JSON 文件。最大 20MB。</div></div>
+<div class="form-actions"><button type="submit" class="btn-primary">📥 导入世界</button></div>
+</form>
+<div style="margin-top:1.5rem;background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2);border-radius:var(--radius);padding:0.75rem 1rem;font-size:0.85rem;color:var(--color-text-muted)">
+<p>导入时会自动创建新世界，不会覆盖已有世界。如果世界名重复，会自动重命名。</p></div>
+{% endif %}
+</main></div></body></html>

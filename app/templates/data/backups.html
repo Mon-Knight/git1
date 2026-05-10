@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>备份与恢复 — AI World Engine</title><link rel="stylesheet" href="/static/css/style.css">
+<style>.blist-item{background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:1rem}</style>
+</head>
+<body><div class="container">
+<header class="header"><h1 class="logo">💾 备份与恢复</h1></header>
+<nav class="nav"><a href="/data" class="nav-link">← 返回数据管理</a></nav>
+<main class="main">
+
+{% if message %}<div style="background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.3);padding:0.75rem 1rem;border-radius:8px;margin-bottom:1rem;color:var(--color-accent)">✅ {{ message }}</div>{% endif %}
+{% if error %}<div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);padding:0.75rem 1rem;border-radius:8px;margin-bottom:1rem;color:#e74c3c">{{ error }}</div>{% endif %}
+{% if restore_result and restore_result.success %}<div style="background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.3);padding:0.75rem 1rem;border-radius:8px;margin-bottom:1rem;color:var(--color-accent)">✅ {{ restore_result.message }}<br><small style="color:var(--color-text-muted)">恢复前自动备份：{{ restore_result.pre_restore_backup }}</small></div>{% endif %}
+
+<div class="dcard" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem">
+<h3>创建新备份</h3>
+<p style="color:var(--color-text-muted);font-size:0.88rem">备份整个 SQLite 数据库（包含所有世界、角色、推演记录等）。</p>
+<form action="/data/backups/create" method="post"><button type="submit" class="btn-primary" style="margin-top:0.5rem">💾 立即备份</button></form>
+</div>
+
+<div class="dcard" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem">
+<h3>已有备份</h3>
+{% if backups %}
+{% for b in backups %}<div class="blist-item"><div style="flex:1"><strong>{{ b.filename }}</strong><br><small style="color:var(--color-text-muted)">{{ b.created_at }} · {% if b.size > 1048576 %}{{ '%.1f'|format(b.size/1048576) }} MB{% else %}{{ (b.size/1024)|int }} KB{% endif %}</small>
+{% if b.metadata and b.metadata.world_count %}<br><small style="color:var(--color-text-muted)">世界: {{ b.metadata.world_count }} · 记录: {{ b.metadata.simulation_record_count }} · 分支: {{ b.metadata.branch_count }}</small>{% endif %}
+</div><form action="/data/backups/restore" method="post" onsubmit="return confirm('⚠️ 恢复数据库将替换当前所有数据！\n\n恢复前会自动备份当前数据库。\n\n确认恢复？')" style="margin:0"><input type="hidden" name="backup_filename" value="{{ b.filename }}"><input type="text" name="confirm" value="" placeholder="输入 YES_RESTORE" style="width:140px;font-size:0.8rem;margin-right:0.3rem"><button type="submit" class="btn-secondary" style="font-size:0.82rem">🔄 恢复</button></form></div>{% endfor %}
+{% else %}<p style="color:var(--color-text-muted)">暂无备份。</p>{% endif %}</div>
+
+<div style="background:rgba(231,76,60,0.05);border:1px solid rgba(231,76,60,0.2);border-radius:var(--radius);padding:0.75rem 1rem;font-size:0.85rem;color:var(--color-text-muted)">
+⚠️ <strong>恢复数据库会替换当前所有数据。</strong>恢复前会自动备份当前数据库。恢复完成后请重启 AI World Engine。</div>
+
+</main></div></body></html>

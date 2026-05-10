@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>导出世界 — {{ world.name }} — AI World Engine</title><link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body><div class="container">
+<header class="header"><h1 class="logo">📤 导出世界</h1><p class="subtitle">{{ world.name }}</p></header>
+<nav class="nav"><a href="/worlds/{{ world.id }}" class="nav-link">← 返回世界详情</a> <a href="/data" class="nav-link">数据管理</a></nav>
+<main class="main">
+
+<div class="info-card"><h3>📊 导出内容预览</h3>
+<table style="width:100%;font-size:0.9rem;line-height:2"><tr><td>角色</td><td>{{ metadata.counts.characters }} 个</td></tr>
+<tr><td>势力</td><td>{{ metadata.counts.factions }} 个</td></tr>
+<tr><td>地点</td><td>{{ metadata.counts.locations }} 个</td></tr>
+<tr><td>规则</td><td>{{ metadata.counts.rules }} 个</td></tr>
+<tr><td>历史事件</td><td>{{ metadata.counts.historical_events }} 个</td></tr>
+<tr><td>推演记录</td><td>{{ metadata.counts.simulation_records }} 个{% if metadata.contains_novel_evolution %}（含小说工程推演）{% endif %}</td></tr>
+<tr><td>分支</td><td>{{ metadata.counts.branches }} 个</td></tr></table></div>
+
+<div class="info-card"><h3>📥 下载导出文件</h3><p style="color:var(--color-text-muted)">文件名：{{ filename }}</p>
+<p><a href="/worlds/{{ world.id }}/export.json" download class="btn-primary">📥 下载 JSON 文件</a></p></div>
+
+<div class="info-card" style="background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2)"><h3>⚠️ 说明</h3>
+<ul style="margin:0.5rem 0;padding-left:1.2rem;font-size:0.85rem;color:var(--color-text-muted);line-height:1.8"><li>导出文件不包含 API Key、app_settings 或 .env。</li><li>此文件可在其他 AI World Engine 实例中导入。</li></ul></div>
+
+</main></div></body></html>
