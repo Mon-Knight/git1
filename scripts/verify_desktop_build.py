@@ -19,8 +19,8 @@ INTERNAL_DIR = os.path.join(DIST_DIR, "_internal")
 
 # Required keywords in homepage template
 HOMEPAGE_KEYWORDS = [
-    ("AI 模型设置", "AI settings card title"),
-    ("配置 AI", "AI settings button text"),
+    ("创作工作台", "Dashboard title"),
+    ("数据概览", "Dashboard overview section"),
     ("/settings/ai", "AI settings link"),
 ]
 
@@ -29,6 +29,7 @@ REQUIRED_TEMPLATES = [
     "app/templates/index.html",
     "app/templates/base.html",
     "app/templates/settings/ai.html",
+    "app/static/css/dashboard.css",
     "app/templates/simulation/index.html",
     "app/templates/novel/form.html",
     "app/templates/novel/evolution_form.html",
@@ -66,9 +67,14 @@ def check_source_templates():
     print("\n=== Source Template Check ===")
     errors = []
     for keyword, desc in HOMEPAGE_KEYWORDS:
+        # Check both index.html and base.html
         src_path = os.path.join(PROJECT_ROOT, "app", "templates", "index.html")
+        base_path = os.path.join(PROJECT_ROOT, "app", "templates", "base.html")
         with open(src_path, "r", encoding="utf-8") as f:
             content = f.read()
+        if os.path.isfile(base_path):
+            with open(base_path, "r", encoding="utf-8") as f:
+                content += f.read()
         if keyword in content:
             print(f"  OK: {desc} → '{keyword}'")
         else:
@@ -112,17 +118,25 @@ def check_dist_templates():
         print(f"  Run build_exe.ps1 first to generate dist/")
         return []
 
-    # Check index.html content
+    # Check index.html + base.html content
     dist_index = os.path.join(INTERNAL_DIR, "app", "templates", "index.html")
+    dist_base = os.path.join(INTERNAL_DIR, "app", "templates", "base.html")
+    combined_content = ""
     if os.path.isfile(dist_index):
         with open(dist_index, "r", encoding="utf-8") as f:
-            content = f.read()
+            combined_content = f.read()
+    if os.path.isfile(dist_base):
+        with open(dist_base, "r", encoding="utf-8") as f:
+            combined_content += f.read()
+    if combined_content:
         for keyword, desc in HOMEPAGE_KEYWORDS:
-            if keyword in content:
+            if keyword in combined_content:
                 print(f"  OK: {desc} → '{keyword}'")
             else:
-                print(f"  FAIL: {desc} → '{keyword}' NOT found in packed index.html")
+                print(f"  FAIL: {desc} → '{keyword}' NOT found in packed templates")
                 errors.append(f"Packed template missing: {keyword}")
+    elif os.path.isfile(dist_index):
+        print(f"  OK: app/templates/index.html packed (base.html not found)")
     else:
         print(f"  FAIL: Packed index.html not found at {dist_index}")
         errors.append("Packed index.html not found")

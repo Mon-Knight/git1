@@ -25,7 +25,7 @@ def test_home_page_contains_title(client):
 def test_home_page_contains_version(client):
     """Test that the home page contains the version number."""
     response = client.get("/")
-    assert "v1.7.2" in response.text
+    assert "v1.7.3" in response.text
 
 
 def test_health_check(client):
@@ -60,9 +60,9 @@ def test_home_page_has_ai_settings_button(client):
 
 
 def test_home_page_shows_ai_config_card(client):
-    """Home page should display an AI config card section."""
+    """Home page should display AI mode status."""
     response = client.get("/")
-    assert "AI 模型设置" in response.text
+    assert "Mock AI" in response.text or "Live API" in response.text
 
 
 def test_home_page_shows_mock_ai_hint(client):
@@ -93,8 +93,6 @@ def test_home_page_passes_ai_summary(client):
 
 
 def test_home_page_has_primary_config_button(client):
-    """Home page should have a primary-style '⚙️ 配置 AI' button."""
+    """Home page should have a link to AI settings."""
     response = client.get("/")
-    # The primary button should link to /settings/ai
     assert 'href="/settings/ai"' in response.text
-    assert "配置 AI" in response.text

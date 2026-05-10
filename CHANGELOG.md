@@ -1,5 +1,24 @@
 # Changelog
 
+## [v1.7.3] — 2026-05-11
+
+### Added
+- 新增主工作台首页（数据概览/最近世界/待处理事项/最近上下文包/最近演化方案/快捷操作）
+- 新增 DashboardService 数据聚合服务
+- 新增 dashboard.css 首页样式
+- 新增 test_dashboard_service.py（17个服务测试）
+- 新增 test_dashboard_routes.py（14个路由测试）
+
+### Changed
+- 首页从系统介绍页升级为创作工作台
+- verify_desktop_build.py 新增 dashboard.css 检查
+
+### Notes
+- 本版本不新增业务功能
+- 本版本不修改数据库
+- 本版本不开发分卷、章节、正文
+- 世界控制台留到 v1.7.4
+
 ## [v1.7.2] — 2026-05-11
 
 ### Added

@@ -19,11 +19,8 @@ if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
 # 2. Pre-build validation: source templates must contain AI settings card
 Write-Host "[2/7] Validating source templates..." -ForegroundColor Yellow
 $indexSrc = Get-Content "app/templates/index.html" -Raw
-if (-not ($indexSrc -match "AI 模型设置")) {
-    Write-Host "WARNING: Source index.html missing 'AI 模型设置'" -ForegroundColor Yellow
-}
-if (-not ($indexSrc -match "配置 AI")) {
-    Write-Host "WARNING: Source index.html missing '配置 AI' button" -ForegroundColor Yellow
+if (-not ($indexSrc -match "创作工作台")) {
+    Write-Host "WARNING: Source index.html missing '创作工作台'" -ForegroundColor Yellow
 }
 if (-not ($indexSrc -match "/settings/ai")) {
     Write-Host "WARNING: Source index.html missing /settings/ai link" -ForegroundColor Yellow
@@ -91,7 +88,7 @@ $packedSettings = "dist/AIWorldEngine/_internal/app/templates/settings/ai.html"
 if (Test-Path $packedIndex) {
     $packedContent = Get-Content $packedIndex -Raw
     $checksPassed = $true
-    foreach ($keyword in @("AI 模型设置", "配置 AI", "/settings/ai")) {
+    foreach ($keyword in @("创作工作台", "/settings/ai")) {
         if ($packedContent -match [regex]::Escape($keyword)) {
             Write-Host "  OK: '$keyword' found in packed index.html" -ForegroundColor Green
         } else {
