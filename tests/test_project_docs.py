@@ -24,24 +24,24 @@ class TestDocExistence:
     """Tests that required documentation files exist."""
 
     def test_development_rules_exists(self):
-        path = os.path.join(PROJECT_ROOT, "docs", "development-rules.md")
-        assert os.path.isfile(path), "docs/development-rules.md not found"
+        path = os.path.join(PROJECT_ROOT, "docs", "project", "development-rules.md")
+        assert os.path.isfile(path), "docs/project/development-rules.md not found"
 
     def test_version_roadmap_exists(self):
-        path = os.path.join(PROJECT_ROOT, "docs", "version-roadmap.md")
-        assert os.path.isfile(path), "docs/version-roadmap.md not found"
+        path = os.path.join(PROJECT_ROOT, "docs", "project", "version-roadmap.md")
+        assert os.path.isfile(path), "docs/project/version-roadmap.md not found"
 
     def test_ui_information_architecture_exists(self):
-        path = os.path.join(PROJECT_ROOT, "docs", "ui-information-architecture.md")
-        assert os.path.isfile(path), "docs/ui-information-architecture.md not found"
+        path = os.path.join(PROJECT_ROOT, "docs", "project", "ui-information-architecture.md")
+        assert os.path.isfile(path), "docs/project/ui-information-architecture.md not found"
 
     def test_agent_task_rules_exists(self):
-        path = os.path.join(PROJECT_ROOT, "docs", "agent-task-rules.md")
-        assert os.path.isfile(path), "docs/agent-task-rules.md not found"
+        path = os.path.join(PROJECT_ROOT, "docs", "project", "agent-task-rules.md")
+        assert os.path.isfile(path), "docs/project/agent-task-rules.md not found"
 
     def test_module_boundaries_exists(self):
-        path = os.path.join(PROJECT_ROOT, "docs", "module-boundaries.md")
-        assert os.path.isfile(path), "docs/module-boundaries.md not found"
+        path = os.path.join(PROJECT_ROOT, "docs", "project", "module-boundaries.md")
+        assert os.path.isfile(path), "docs/project/module-boundaries.md not found"
 
 
 class TestDocContent:
@@ -49,39 +49,39 @@ class TestDocContent:
 
     def test_readme_contains_version(self):
         content = _read_root("README.md")
-        assert "v1.7.5" in content, "README.md missing v1.7.5"
+        assert "v1.7.6" in content, "README.md missing v1.7.6"
 
     def test_changelog_contains_version(self):
         content = _read_root("CHANGELOG.md")
-        assert "v1.7.5" in content, "CHANGELOG.md missing v1.7.5"
+        assert "v1.7.6" in content, "CHANGELOG.md missing v1.7.6"
 
     def test_version_roadmap_contains_v172(self):
-        content = _read_doc("version-roadmap.md")
+        content = _read_doc("project/version-roadmap.md")
         assert "v1.7.2" in content, "version-roadmap.md missing v1.7.2"
 
     def test_version_roadmap_contains_v173(self):
-        content = _read_doc("version-roadmap.md")
+        content = _read_doc("project/version-roadmap.md")
         assert "v1.7.3" in content, "version-roadmap.md missing v1.7.3"
 
-    def test_version_roadmap_contains_v174(self):
-        content = _read_doc("version-roadmap.md")
-        assert "v1.7.5" in content, "version-roadmap.md missing v1.7.5"
+    def test_version_roadmap_contains_v176(self):
+        content = _read_doc("project/version-roadmap.md")
+        assert "v1.7.6" in content, "version-roadmap.md missing v1.7.6"
 
     def test_version_roadmap_contains_v180(self):
-        content = _read_doc("version-roadmap.md")
+        content = _read_doc("project/version-roadmap.md")
         assert "v1.8.0" in content, "version-roadmap.md missing v1.8.0"
 
     def test_development_rules_has_no_auto_canon(self):
-        content = _read_doc("development-rules.md")
+        content = _read_doc("project/development-rules.md")
         assert "AI 生成结果不能自动写入正史" in content or "AI 结果不能自动写入正史" in content, \
             "development-rules.md missing auto-canon prohibition"
 
     def test_agent_task_rules_has_no_delete_routes(self):
-        content = _read_doc("agent-task-rules.md")
+        content = _read_doc("project/agent-task-rules.md")
         assert "旧路由不能删除" in content or "不能删除旧路由" in content, \
             "agent-task-rules.md missing route deletion prohibition"
 
     def test_development_rules_has_no_delete_tests(self):
-        content = _read_doc("development-rules.md")
+        content = _read_doc("project/development-rules.md")
         assert "旧测试不能删除" in content, \
             "development-rules.md missing test deletion prohibition"

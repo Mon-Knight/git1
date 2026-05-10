@@ -72,19 +72,19 @@ def test_readme_contains_required_sections():
 
     required = [
         "AI World Engine",
+        "v1.7.6",
         "技术栈",
-        "功能总览",
-        "页面路径总览",
-        "项目目录结构",
-        "安装与运行",
-        "环境变量配置",
-        "AI 模式说明",
-        "数据库说明",
-        "Docker",
-        "已完成版本记录",
-        "演示流程",
-        "已知限制",
-        "后续规划",
+        "当前核心能力",
+        "快速开始",
+        "Windows EXE",
+        "页面入口",
+        "AI 模式与配置",
+        "核心规则",
+        "当前版本路线",
+        "项目结构",
+        "测试与构建",
+        "当前限制",
+        "文档索引",
     ]
     for section in required:
         assert section in content, f"Missing section: {section}"

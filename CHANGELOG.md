@@ -1,5 +1,34 @@
 # Changelog
 
+## [v1.7.6] — 2026-05-11
+
+### Added
+- 新增 docs/README.md 文档索引
+- 新增 docs/user/ 目录（5 个用户文档）
+- 新增 docs/project/ 目录（8 个项目文档）
+- 新增 docs/technical/ 目录（6 个技术文档，含新建 deployment.md / database.md / testing.md / api-routes.md）
+- 新增 docs/design/ 目录（4 个设计文档，含新建 setting-suggestions.md / future-interactive-story.md）
+- 新增 test_docs_structure.py（20 个文档结构测试）
+- 新增 docs/project/release-history.md 版本发布历史
+
+### Changed
+- 重构 README.md 结构（精简历史版本、拆分长说明到子文档）
+- 重整 docs 目录为 user/project/technical/design 四组
+- 整合 CHANGELOG v1.7.5 完整记录
+- 同步 version-roadmap.md（新增 v1.7.7–v1.7.10）
+- 同步 ui-information-architecture.md（更新当前版本和进展）
+- 部署说明移至 docs/technical/deployment.md
+- 桌面端使用说明移至 docs/user/desktop-usage.md
+- 测试说明移至 docs/technical/testing.md
+- 数据库说明移至 docs/technical/database.md
+- API 路由参考移至 docs/technical/api-routes.md
+
+### Notes
+- 本版本不新增业务功能
+- 本版本不修改数据库结构
+- 本版本不开发分卷、章节、正文
+- 本版本用于完成 v1.7.x 应用化阶段的文档与结构收尾
+
 ## [v1.7.5] — 2026-05-11
 
 ### Added

@@ -2,132 +2,35 @@
 
 AI 小说世界观推演系统 — 帮助作者构建小说世界观，通过 AI 推演世界发展。
 
-> **当前版本**: v1.7.5 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
+> **当前版本**: v1.7.6 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
+>
+> **当前阶段**: 应用化阶段整理完成（v1.7.1–v1.7.6），准备进入桌面体验优化、导出优化、设定库 AI 推演（v1.7.7–v1.7.10），以及分卷大纲（v1.8.0）。
 
 ---
 
-## 技术栈
-
-| 层面 | 技术 |
-|------|------|
-| 后端框架 | Python / FastAPI |
-| 数据库 | SQLite (SQLAlchemy ORM) |
-| 模板引擎 | Jinja2 |
-| 前端 | HTML / CSS / JavaScript (原生) |
-| AI 调用 | OpenAI-compatible API + Mock 模式 |
-| 测试 | pytest (706 个测试) |
-
----
-
-## 功能总览
+## 当前核心能力
 
 | 模块 | 说明 |
 |------|------|
-| 首页 | 系统介绍、世界列表入口 |
-| 世界管理 | 创建/查看/编辑/删除世界项目 |
-| 角色管理 | 管理角色（姓名、身份、性格、目标、能力、状态） |
-| 势力管理 | 管理势力（类型、领袖、目标、资源、敌对/盟友） |
-| 地点管理 | 管理地点（类型、区域、描述、控制势力） |
-| 规则管理 | 管理世界规则（类型、内容、限制条件、影响范围） |
-| 历史事件 | 管理历史事件（正史/非正史、涉及角色/势力/地点） |
-| 时间线 | 按时间查看正史/全部/非正史事件，支持筛选 |
-| AI 推演 | 基于世界设定推演发展，Mock AI + 真实 API 双模式 |
-| 推演记录 | 查看推演历史，采纳为正史 / 保存为分支 |
-| 分支记录 | 查看独立分支世界线，不影响正史 |
-| 检查中心 | 设定矛盾检查 + 角色行为合理性检查 |
-| 小说工程模式 | 基于已有世界观生成长篇小说全书演化方向 |
-| 全书演化推演 | 基于创作上下文包生成 12 章节结构化全书演化方案 |
-| 创作上下文资产库 | 风格方案、剧情时间点、创作上下文包管理 |
-| 数据管理 | 单世界 JSON 导出/导入、数据库备份/恢复 |
+| 首页工作台 | 数据概览、最近世界、待处理事项、快捷操作 |
+| 世界控制台 | 数据概览、创作进度、推荐下一步、功能分组导航 |
+| 设定库 | 角色、势力、地点、规则的结构化管理 |
+| 剧情历史 | 正史/非正史事件、时间线管理 |
+| AI 推演 | 基于世界设定的推演，Mock AI + 真实 API 双模式 |
+| 推演审核 | 推演记录 → 采纳为正史 / 保存为分支 |
+| 小说工程 | 全书演化推演、演化方案管理 |
+| 创作资产 | 风格方案、剧情时间点、创作上下文包 |
+| 检查中心 | 设定矛盾检查、角色行为合理性检查 |
+| 数据管理 | 世界 JSON 导出/导入、数据库备份/恢复 |
+| Windows EXE | 双击启动，无需命令行 |
+
+> 详细文档索引：[docs/README.md](docs/README.md)
 
 ---
 
-## 页面路径总览
+## 快速开始
 
-| 路径 | 说明 |
-|------|------|
-| `/` | 首页 |
-| `/worlds` | 世界列表 |
-| `/worlds/new` | 创建世界 |
-| `/worlds/{id}` | 世界详情（11 个模块入口） |
-| `/worlds/{id}/edit` | 编辑世界 |
-| `/worlds/{id}/characters` | 角色管理 |
-| `/worlds/{id}/factions` | 势力管理 |
-| `/worlds/{id}/locations` | 地点管理 |
-| `/worlds/{id}/rules` | 规则管理 |
-| `/worlds/{id}/events` | 历史事件 |
-| `/worlds/{id}/timeline` | 时间线（?view=canon/all/non_canon） |
-| `/worlds/{id}/simulation` | AI 推演 |
-| `/worlds/{id}/records` | 推演记录 |
-| `/worlds/{id}/branches` | 分支记录 |
-| `/worlds/{id}/checks` | 检查中心 |
-| `/worlds/{id}/novel` | 小说工程模式（全书演化方向推演） |
-| `/worlds/{id}/checks/conflicts` | 设定矛盾检查 |
-| `/worlds/{id}/checks/behavior` | 角色行为合理性检查 |
-| `/health` | 健康检查 |
-
----
-
-## 应用化路线
-
-AI World Engine 已从"世界观推演工具"进入"小说工程化创作应用"过渡阶段。当前 v1.7.1 为规范整理版，不新增业务功能。
-
-| 版本 | 目标 |
-|------|------|
-| v1.7.0 | 全书演化推演增强版【已完成】 |
-| **v1.7.5** | **模块分组与二级导航【当前】** |
-| v1.7.6 | 阶段性整理与 EXE 验证 |
-| v1.8.0 | 基于主线方案的分卷大纲生成 |
-| v1.9.0 | 章节大纲生成 |
-| v2.0.0 | 正文初稿生成 |
-
-> 详细路线见 `docs/version-roadmap.md`
-
-## 当前小说工程能力
-
-| 功能 | 路径 | 状态 |
-|------|------|------|
-| 小说工程模式（手动参数） | `/novel` | ✅ |
-| 全书演化推演（上下文包） | `/novel/evolution` | ✅ |
-| 演化方案列表 | `/novel/evolutions` | ✅ |
-| 方案详情 | `/novel/evolutions/{id}` | ✅ |
-| 主线/备选/废弃状态管理 | — | ✅ |
-| 风格方案管理 | `/context/styles` | ✅ |
-| 剧情时间点管理 | `/context/anchors` | ✅ |
-| 创作上下文包管理 | `/context/packages` | ✅ |
-| 分卷大纲 | — | v1.8.0 |
-| 章节大纲 | — | v1.9.0 |
-| 正文初稿 | — | v2.0.0 |
-| 风格润色 | — | v2.1.0 |
-
----
-
-## 项目目录结构
-
-```
-app/
-  main.py                  # FastAPI 入口
-  config.py                # 配置管理
-  database.py              # 数据库连接
-  models.py                # 数据模型（8 张表）
-  routes/                  # 16 个路由模块
-  services/                # 18 个服务模块
-  templates/               # 40+ 模板文件
-  static/                  # CSS / JS
-tests/                     # 20+ 个测试文件，553 个测试
-scripts/                   # 工具脚本
-docs/                      # 设计文档
-.project_backups/          # 本地备份（不入 Git）
-requirements.txt
-.env.example
-.gitignore
-```
-
----
-
-## 安装与运行
-
-```bash
+``bash
 # 1. 克隆项目
 git clone https://github.com/Mon-Knight/git1.git
 cd git1
@@ -146,263 +49,164 @@ copy .env.example .env
 # 5. 启动服务
 python -m uvicorn app.main:app --reload
 
-# 6. 打开浏览器
-# http://127.0.0.1:8000
-```
+# 6. 打开浏览器 http://127.0.0.1:8000
+``
 
-### 运行测试
-
-```bash
-python -m compileall .
-pytest tests/ -v
-```
-
-### 编码检查
-
-```bash
-python scripts/check_encoding.py
-```
+> 详细安装指引：[docs/user/quick-start.md](docs/user/quick-start.md)
 
 ---
 
-## 环境变量配置 (.env)
+## Windows EXE 使用
 
-| 变量 | 说明 | 默认值 |
-|------|------|--------|
-| `AI_API_KEY` | AI API 密钥（为空则使用 Mock AI） | (空) |
-| `AI_BASE_URL` | AI API 地址 | `https://api.openai.com/v1` |
-| `AI_MODEL` | AI 模型名称 | `gpt-4o` |
-| `DATABASE_URL` | 数据库连接字符串 | `sqlite:///./ai_world_engine.db` |
-| `APP_HOST` | 服务监听地址 | `127.0.0.1` |
-| `APP_PORT` | 服务端口 | `8000` |
-| `APP_DEBUG` | 调试模式 | `false` |
+AI World Engine 可打包为 Windows 桌面 EXE，双击即可启动。
 
-> **安全提醒**: `.env` 文件包含敏感信息，已加入 `.gitignore`，不会被提交到 Git。
+``bash
+# 打包
+powershell -ExecutionPolicy Bypass -File packaging/build_exe.ps1
 
----
+# 启动：双击 dist/AIWorldEngine/AIWorldEngine.exe
+``
 
-## 当前适用场景
-
-- **单人本地小说世界观推演**：作者构建、管理、推演自己的小说世界观
-- **世界观结构化管理**：角色、势力、地点、规则、历史事件的完整管理
-- **AI 推演与分支实验**：通过 AI 推演世界发展，支持正史/分支双线管理
-- **设定一致性检查**：规则式矛盾检测和角色行为合理性检查
-- **Windows 桌面端使用**：打包为 EXE，双击即可使用，无需命令行
-- **Web 浏览器使用**：支持 `uvicorn` 启动后通过浏览器访问
+> 注意：必须分发整个 dist/AIWorldEngine/ 文件夹，不能只复制 EXE。
+>
+> 详细说明：[docs/user/desktop-usage.md](docs/user/desktop-usage.md) | 打包详情：[docs/technical/desktop-build.md](docs/technical/desktop-build.md)
 
 ---
 
-## AI 模式说明
+## 页面入口
+
+| 路径 | 说明 |
+|------|------|
+| / | 首页工作台 |
+| /worlds | 世界列表 |
+| /worlds/{id} | 世界控制台（含功能分组导航） |
+| /worlds/{id}/characters | 角色管理 |
+| /worlds/{id}/factions | 势力管理 |
+| /worlds/{id}/locations | 地点管理 |
+| /worlds/{id}/rules | 规则管理 |
+| /worlds/{id}/events | 历史事件 |
+| /worlds/{id}/timeline | 时间线 |
+| /worlds/{id}/simulation | AI 推演 |
+| /worlds/{id}/records | 推演记录 |
+| /worlds/{id}/branches | 分支记录 |
+| /worlds/{id}/checks | 检查中心 |
+| /worlds/{id}/context | 创作上下文 |
+| /worlds/{id}/novel/evolution | 全书演化推演 |
+| /data | 数据管理 |
+| /settings/ai | AI 设置 |
+
+> 完整路由：[docs/technical/api-routes.md](docs/technical/api-routes.md)
+
+---
+
+## AI 模式与配置
 
 | 模式 | 条件 | 说明 |
 |------|------|------|
-| **Mock AI** | 未启用真实 AI | 使用规则式推演，适合本地测试和演示 |
-| **OpenAI-compatible API** | 已在 /settings/ai 配置并启用 | 调用兼容 API 进行真实推演 |
+| **Mock AI** | 未配置 API Key | 规则式推演，适合测试演示 |
+| **真实 API** | 已配置 API Key | 调用 OpenAI-compatible API（支持 DeepSeek / Ollama 等） |
 
-> 自 v1.3.0 起，所有 AI 配置通过 **AI 设置页面** 管理（优先级：数据库 > .env），而不仅仅是 .env 文件。
+AI 配置页面：/settings/ai（优先级：数据库 > .env）
 
-### 核心规则
+> 详细配置指南：[docs/user/ai-settings.md](docs/user/ai-settings.md)
 
-- **AI 推演结果不会自动写入正史**，必须先保存为推演记录（`simulation_records`）
+---
+
+## 核心规则
+
+- **AI 推演结果不会自动写入正史**，必须先保存为推演记录
 - 用户需手动审核后选择「采纳为正史」或「保存为分支」
-- 采纳后创建 `historical_events` 记录（`is_canon=True`, `source_type=simulation`）
 - 分支记录不影响正史时间线
 
-### 推演记录状态
+---
 
-| 状态 | 说明 | 可操作 |
-|------|------|--------|
-| `pending` | 待处理 | 采纳为正史 / 保存为分支 |
-| `adopted` | 已采纳 | 已写入时间线 |
-| `branched` | 已分支 | 已保存为独立分支 |
-| `discarded` | 已废弃 | 预留状态 |
+## 当前版本路线
+
+| 版本 | 目标 | 状态 |
+|------|------|------|
+| v1.7.5 | 模块分组与二级导航 | ✅ |
+| **v1.7.6** | **阶段性整理、文档体系重整与 EXE 验证** | **✅ 当前** |
+| v1.7.7 | 桌面端窗口大小控制、响应式 UI 与 2K 适配 | 待开始 |
+| v1.7.8 | 导出文件位置选择与导出体验优化 | 待开始 |
+| v1.7.9 | 设定库 AI 推演基础版 | 待开始 |
+| v1.7.10 | 候选设定采纳与测试补齐 | 待开始 |
+| v1.8.0 | 基于主线方案的分卷大纲生成 | 待开始 |
+| v1.9.0 | 章节大纲生成 | 待开始 |
+| v2.0.0 | 正文初稿生成基础闭环 | 待开始 |
+
+> 完整路线：[docs/project/version-roadmap.md](docs/project/version-roadmap.md)
+> 版本历史：[CHANGELOG.md](CHANGELOG.md)
 
 ---
 
-## 数据库说明
+## 项目结构
 
-| 项目 | 说明 |
+``
+app/                    # 应用代码
+  main.py               # FastAPI 入口
+  config.py             # 配置管理
+  database.py           # 数据库连接
+  models.py             # 数据模型
+  routes/               # 16 个路由模块
+  services/             # 18 个服务模块
+  templates/            # HTML 模板
+  static/               # CSS / JS
+tests/                  # 测试（706 个）
+scripts/                # 工具脚本
+docs/                   # 文档
+  user/                 # 用户文档
+  project/              # 项目文档
+  technical/            # 技术文档
+  design/               # 设计文档
+packaging/              # 打包脚本
+``
+
+---
+
+## 技术栈
+
+| 层面 | 技术 |
 |------|------|
-| 数据库 | SQLite |
-| 默认文件 | `ai_world_engine.db`（项目根目录） |
-| Git 提交 | 不提交（已加入 `.gitignore`） |
-| 迁移工具 | 当前版本暂未引入 Alembic |
-| 开发阶段 | 模型字段变更后可删除 `.db` 文件，重启项目自动重建 |
-| 生产建议 | 后续版本建议加入数据库迁移工具 |
-
-### 数据备份
-
-每个稳定版本在 `.project_backups/` 目录下有对应的 ZIP 备份包：
-
-```
-.project_backups/
-  v0.1.0-20260509-0000.zip
-  v0.2.0-20260509-0000.zip
-  ...
-  v1.0.0-20260509-0000.zip
-```
-
-> `.project_backups/` 已加入 `.gitignore`，不会被提交到 Git。
+| 后端框架 | Python / FastAPI |
+| 数据库 | SQLite (SQLAlchemy ORM) |
+| 模板引擎 | Jinja2 |
+| 前端 | HTML / CSS / JavaScript (原生) |
+| AI 调用 | OpenAI-compatible API + Mock 模式 |
+| 测试 | pytest (706 个测试) |
 
 ---
 
-## AI API 配置
+## 测试与构建
 
-AI World Engine 支持两种 AI 模式：
+``bash
+python -m compileall .               # 语法检查
+pytest tests/ -v                     # 运行测试（706 个）
+python scripts/check_encoding.py     # 编码检查
+python scripts/verify_desktop_build.py --all  # 桌面构建验证
+powershell -ExecutionPolicy Bypass -File packaging/build_exe.ps1  # 打包 EXE
+``
 
-| 模式 | 说明 |
-|------|------|
-| **Mock AI** | 无需 API Key，适合本地演示和测试 |
-| **OpenAI-compatible API** | 支持 DeepSeek、MiMo Token Plan、Ollama、本地模型等兼容接口 |
-
-### 页面配置
-
-启动项目后打开：`/settings/ai`
-
-可配置：Base URL、Model、API Key、Temperature、Max Tokens、Timeout、以及推演/检查/总结各任务的专用模型。
-
-### 示例配置
-
-| 提供商 | Base URL | Model |
-|--------|----------|-------|
-| DeepSeek | `https://api.deepseek.com/v1` | 根据实际模型填写 |
-| 小米 MiMo Token Plan | `https://token-plan-cn.xiaomimimo.com/v1` | 根据实际模型填写 |
-| Ollama（本地） | `http://127.0.0.1:11434/v1` | 本地模型名 |
-
-> **安全提醒**: 不要在 README、dev-log 或测试文件中写真实 API Key。API Key 已在页面上自动脱敏显示。
+> 测试体系说明：[docs/technical/testing.md](docs/technical/testing.md)
 
 ---
 
-## Windows 桌面端
+## 当前限制
 
-AI World Engine 支持打包为 Windows 桌面 EXE，双击即可启动。
-
-### Windows EXE 分发说明
-
-> ⚠️ **重要**：不能只复制 `AIWorldEngine.exe`！必须分发整个 `dist/AIWorldEngine/` 文件夹。
-
-- **启动程序**: `dist/AIWorldEngine/AIWorldEngine.exe`
-- **分发方式**：将整个 `dist/AIWorldEngine/` 文件夹压缩为 ZIP，分发给使用者
-- **数据位置**: `C:\Users\<用户名>\AppData\Local\AIWorldEngine\ai_world_engine.db`
-  - 用户数据、推演记录、分支记录均保存在此 SQLite 数据库中
-  - 卸载 EXE 不会自动删除数据库（如需清理可手动删除该目录）
-- **EXE 结构**：`dist/AIWorldEngine/` 目录包含 EXE、DLL、Python 运行时、模板、静态资源等
-  - 缺少任何文件都可能导致启动失败
-
-### 桌面模式运行
-
-```bash
-python desktop_launcher.py
-```
-
-### 打包为 EXE
-
-```bash
-# 使用干净 venv
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-
-# 执行打包
-powershell -ExecutionPolicy Bypass -File packaging/build_exe.ps1
-
-# 输出位置：dist/AIWorldEngine/AIWorldEngine.exe
-```
-
-### 桌面端数据库位置
-
-```
-C:\Users\<用户名>\AppData\Local\AIWorldEngine\ai_world_engine.db
-```
-
-> 详见 [docs/desktop-build.md](docs/desktop-build.md)
-
----
-
-## Docker / 正式使用准备
-
-当前版本为本地开发版。如需部署到生产环境：
-
-1. 使用 Gunicorn + Uvicorn workers 替代 `uvicorn --reload`
-2. 配置反向代理（Nginx / Caddy）
-3. 迁移到 PostgreSQL（修改 `DATABASE_URL`）
-4. 引入 Alembic 管理数据库迁移
-5. 添加用户认证和权限系统
-6. 配置真实的 AI API Key
-
----
-
-## 已完成版本记录
-
-| 版本 | 内容 | 测试数 |
-|------|------|--------|
-| v0.1.0 | 项目骨架、首页、数据库初始化 | 18 |
-| v0.2.0 | 世界管理 CRUD | 36 |
-| v0.3.0 | 角色、势力、地点、规则 CRUD | 80 |
-| v0.4.0 | 历史事件、时间线管理 | 99 |
-| v0.5.0 | AI 推演、推演记录 | 116 |
-| v0.6.0 | 采纳为正史、分支记录 | 141 |
-| v0.7.0 | 设定矛盾检查、角色行为检查 | 166 |
-| v0.8.0 | 页面优化、错误处理、测试完善 | 210 |
-| v1.0.0 | 稳定展示版 | 210 |
-| v1.2.0 | 桌面端 EXE 打包 | 226 |
-| v1.2.1 | EXE 打包修复与验证 | 226 |
-| v1.2.2 | 文档整理、版本号统一、发布说明完善 | 226 |
-| v1.3.0 | AI API 接入、设置页面、模型路由、错误处理增强 | 303 |
-| v1.3.1 | EXE 桌面端稳定化、启动自检、日志系统、分发包完善 | 347 |
-| v1.3.2 | EXE 首页 AI 设置入口、AI 状态显示 | 357 |
-| v1.3.3 | EXE 构建同步修复、打包后验证、构建脚本增强 | 357 |
-| v1.3.4 | EXE 后端启动修复、server.log 增强、headless 模式 | 357 |
-| v1.3.5 | EXE uvicorn logging 崩溃修复、ASCII 日志 | 368 |
-| v1.4.0 | 小说工程模式基础版、全书演化方向推演 | 403 |
-| v1.7.0 | 全书演化推演增强版 | 500+ |
-| v1.7.1 | 规范整理版 | 500+ |
-| v1.7.2 | 统一应用壳布局（base.html + app-shell.css） | 550+ |
-| v1.7.3 | 主工作台首页升级 | 600+ |
-| v1.7.4 | 世界控制台（数据概览/创作进度/推荐下一步） | 664 |
-| **v1.7.5** | **模块分组与二级导航** | **706** |
-
----
-
-## 演示流程
-
-1. 启动项目 → 打开 `http://127.0.0.1:8000`
-2. 首页展示系统简介 → 点击「进入世界列表」
-3. 创建世界项目（如「艾泽拉斯」奇幻世界）
-4. 进入世界详情 → 创建角色、势力、地点、规则
-5. 创建历史事件 → 标记为正史
-6. 查看时间线 → 正史事件按时间排列
-7. 进入 AI 推演 → 输入推演问题
-8. 查看推演结果 → 推演记录列表
-9. 将推演记录「采纳为正史」→ 时间线新增事件
-10. 将另一条推演记录「保存为分支」→ 分支独立保存
-11. 进入检查中心 → 运行设定矛盾检查
-12. 运行角色行为合理性检查
-13. 进入小说工程模式 → 填写主角与主线 → 生成全书演化方向
-14. 将小说工程推演结果采纳为正史或保存为分支
-
----
-
-## 已知限制 / 当前限制
-
-- **暂不支持多用户和权限系统**：当前为单人本地应用，无登录/注册功能
-- **暂不支持云端同步**：所有数据存储在本地 SQLite，无法跨设备同步
+- 暂不支持多用户和权限系统（单人本地应用）
+- 暂不支持云端同步（本地 SQLite 存储）
 - 无数据库迁移工具，模型变更需手动重建数据库
-- AI 推演默认使用 Mock 模式，需配置 API Key 才能接入真实 AI
+- AI 推演默认使用 Mock 模式，需配置 API Key 接入真实 AI
 - 检查功能使用规则式关键词匹配，非 NLP 深度分析
 - Windows EXE 仅支持 Windows 平台
-- **v1.4.0 暂不支持**：正文生成、章节大纲、参考小说分析、复杂小说项目管理
 
 ---
 
-## 后续规划
+## 文档索引
 
-1. 多用户登录与权限管理
-2. Alembic 数据库迁移
-3. 正式 AI API 深度接入
-4. 分支对比和分支合并
-5. 角色关系图谱
-6. 时间线可视化
-7. Flutter App / 桌面端
-8. 本地大模型接入
-9. 数据导出功能
+| 分类 | 入口 |
+|------|------|
+| 📖 用户文档 | [docs/user/](docs/user/) — 快速开始、桌面使用、AI 配置、数据导入导出、创作流程 |
+| 📋 项目文档 | [docs/project/](docs/project/) — 版本路线、模块边界、UI 架构、开发规范 |
+| ⚙️ 技术文档 | [docs/technical/](docs/technical/) — 架构、构建、部署、数据库、测试、API |
+| 🎨 设计文档 | [docs/design/](docs/design/) — 小说工程、上下文资产、设定建议、交互式故事 |
+| 📝 文档索引 | [docs/README.md](docs/README.md) |
