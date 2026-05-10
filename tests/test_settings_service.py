@@ -183,3 +183,40 @@ def test_updated_at_changes_on_update(db):
     db.refresh(row1)
     # The update hook should have set a new timestamp
     assert row1.value == "openai_compatible"
+
+
+def test_get_ai_summary_mock_mode(db):
+    """get_ai_summary should return Mock mode when not configured."""
+    SettingsService.init_defaults(db)
+    summary = SettingsService.get_ai_summary(db)
+    assert summary["mode_label"] == "Mock AI"
+    assert summary["is_functional"] is False
+    assert summary["has_api_key"] is False
+
+
+def test_get_ai_summary_live_mode(db):
+    """get_ai_summary should report OpenAI-compatible when fully configured."""
+    SettingsService.set(db, "ai_enable_live", "true")
+    SettingsService.set(db, "ai_provider", "openai_compatible")
+    SettingsService.set(db, "ai_api_key", "sk-testkey-12345", is_secret=True)
+    SettingsService.set(db, "ai_base_url", "https://api.deepseek.com/v1")
+    SettingsService.set(db, "ai_model", "deepseek-chat")
+    summary = SettingsService.get_ai_summary(db)
+    assert summary["mode_label"] == "OpenAI-compatible"
+    assert summary["is_functional"] is True
+    assert summary["model"] == "deepseek-chat"
+    assert summary["has_api_key"] is True
+    assert "sk-tes****345" == summary["masked_api_key"] or "****" in summary["masked_api_key"]
+    # Full key must not be returned
+    assert "sk-testkey-12345" not in str(summary)
+
+
+def test_get_ai_summary_incomplete_config(db):
+    """get_ai_summary should report incomplete when live is on but fields missing."""
+    SettingsService.set(db, "ai_enable_live", "true")
+    SettingsService.set(db, "ai_provider", "openai_compatible")
+    SettingsService.set(db, "ai_api_key", "sk-test")
+    # Missing base_url and model
+    summary = SettingsService.get_ai_summary(db)
+    assert summary["mode_label"] == "配置不完整"
+    assert summary["is_functional"] is False

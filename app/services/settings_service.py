@@ -178,3 +178,43 @@ class SettingsService:
         """Restore to mock AI mode."""
         SettingsService.set(db, "ai_enable_live", "false")
         SettingsService.set(db, "ai_provider", "mock")
+
+    @staticmethod
+    def get_ai_summary(db: Session) -> Dict[str, Any]:
+        """
+        Get a safe summary of AI configuration for display on pages.
+        Never returns the full API key.
+        """
+        provider = SettingsService.get(db, "ai_provider")
+        enable_live = SettingsService.get_bool(db, "ai_enable_live")
+        base_url = SettingsService.get(db, "ai_base_url")
+        model = SettingsService.get(db, "ai_model")
+        api_key = SettingsService.get(db, "ai_api_key")
+
+        # Determine if live is actually functional
+        is_functional = False
+        if enable_live and provider == "openai_compatible":
+            is_functional = bool(api_key and base_url and model)
+        if enable_live and provider != "openai_compatible" and provider != "mock":
+            is_functional = bool(api_key and base_url and model)
+
+        if is_functional:
+            mode_label = "OpenAI-compatible"
+        elif enable_live and provider == "openai_compatible" and not is_functional:
+            mode_label = "配置不完整"
+        else:
+            mode_label = "Mock AI"
+
+        has_key = bool(api_key)
+        masked_key = SettingsService.mask_secret(api_key) if api_key else ""
+
+        return {
+            "provider": provider,
+            "enable_live": enable_live,
+            "base_url": base_url or "",
+            "model": model or "",
+            "has_api_key": has_key,
+            "masked_api_key": masked_key,
+            "is_functional": is_functional,
+            "mode_label": mode_label,
+        }

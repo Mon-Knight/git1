@@ -1,5 +1,22 @@
 # Changelog
 
+## [v1.3.2] — 2026-05-11
+
+### Fixed
+- 修复 EXE 端首页缺少 AI 设置入口的问题
+- 首页新增"AI 模型设置"卡片，含显著"⚙️ 配置 AI"按钮指向 /settings/ai
+- 首页 AI 状态显示不泄露完整 API Key
+
+### Added
+- 首页显示当前 AI 模式（Mock AI / OpenAI-compatible / 配置不完整）
+- 首页显示当前模型名称和 API Key 已设置/未设置状态
+- SettingsService.get_ai_summary() 安全摘要方法（不返回完整 API Key）
+- 新增 10 个首页 AI 入口和 get_ai_summary 测试
+
+### Changed
+- 首页路由传入 ai_summary，提供安全的 AI 配置摘要
+- 完善首页 AI 配置引导文案
+
 ## [v1.3.1] — 2026-05-11
 
 ### Added
