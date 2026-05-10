@@ -11,6 +11,17 @@ AI World Engine 支持打包为 Windows 桌面端 EXE，使用户可以双击启
 - **打包工具**: PyInstaller（onedir 模式）
 - **数据库**: SQLite（保存到 `%LOCALAPPDATA%\AIWorldEngine\ai_world_engine.db`）
 
+## 窗口配置 (v1.7.7+)
+
+| 参数 | 值 | 说明 |
+|------|-----|------|
+| 默认宽度 | 1280px | 舒适的单屏工作宽度 |
+| 默认高度 | 820px | 显示更多内容区域 |
+| 最小宽度 | 1024px | 保证应用壳布局可用 |
+| 最小高度 | 700px | 保证主要功能区可见 |
+| 可调整大小 | true | 允许用户最大化或调整窗口 |
+| 全屏 | false | 不默认全屏，避免突兀 |
+
 ## 环境要求
 
 - Windows 10/11

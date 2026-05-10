@@ -179,6 +179,26 @@
     overflow-y: auto;
     min-height: calc(100vh - 48px);
     width: 100%;
+    min-width: 0; /* prevent flex overflow */
+    box-sizing: border-box;
+}
+
+/* Inner wrapper for content max-width control */
+.app-main-inner {
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Page-type max-width rules */
+.page-dashboard .app-main-inner,
+.page-list .app-main-inner {
+    max-width: 1440px;
+}
+
+.page-form .app-main-inner,
+.page-reading .app-main-inner,
+.page-novel .app-main-inner {
+    max-width: 960px;
 }
 
 /* Preserve existing container styles but adapt them */
@@ -189,15 +209,46 @@
     min-height: auto;
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
+/* ===== Responsive Breakpoints ===== */
+
+/* 2K / Large Screen (>= 1920px) */
+@media (min-width: 1920px) {
+    .main-content {
+        padding: 2rem 3rem;
+    }
+
+    /* Dashboard cards: allow more columns */
+    .overview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+
+    .module-groups {
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    }
+
+    .world-cards {
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    }
+}
+
+/* Large Window (1440px – 1919px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+    .main-content {
+        padding: 1.5rem 2.5rem;
+    }
+}
+
+/* Normal Window (1024px – 1439px) — default styles above */
+
+/* Small Window (< 1024px) */
+@media (max-width: 1023px) {
     .app-shell-body {
         padding-left: 0;
     }
 
     .sidebar {
-        width: 180px;
-        transform: translateX(-180px);
+        width: 200px;
+        transform: translateX(-200px);
         transition: transform 0.2s;
     }
 
@@ -206,7 +257,7 @@
     }
 
     .main-content {
-        padding: 1rem;
+        padding: 1rem 1.25rem;
     }
 
     .topbar-center {
@@ -220,8 +271,32 @@
     .topbar-version {
         display: none;
     }
+
+    /* Dashboard cards: fewer columns */
+    .overview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .module-groups {
+        grid-template-columns: 1fr;
+    }
+
+    .world-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-subnav {
+        gap: 0.2rem;
+        padding: 0.4rem 0;
+    }
+
+    .subnav-item {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.72rem;
+    }
 }
 
+/* Tiny Window (< 480px) — mobile fallback */
 @media (max-width: 480px) {
     .topbar-right .topbar-btn {
         width: 28px;

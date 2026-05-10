@@ -551,8 +551,8 @@ def main():
             title="AI World Engine",
             url=url,
             width=1280,
-            height=800,
-            min_size=(800, 600),
+            height=820,
+            min_size=(1024, 700),
             resizable=True,
         )
         webview.start()

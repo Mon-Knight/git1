@@ -1,5 +1,28 @@
 # Changelog
 
+## [v1.7.7] — 2026-05-11
+
+### Added
+- 新增响应式断点系统（<1024 / 1024–1439 / 1440–1919 / >=1920）
+- 新增 app-main-inner 内容宽度控制容器
+- 新增 page-dashboard / page-list / page-form / page-novel 页面类型样式
+- 新增 2K 大屏卡片列数优化
+- 新增 test_responsive_layout.py（23 个测试）
+- 新增 test_desktop_window.py（7 个测试）
+
+### Changed
+- desktop_launcher.py 默认窗口 1280×820，最小窗口 1024×700
+- app-shell.css 重写响应式断点为四档
+- dashboard.css 最大宽度 1200px → 1440px
+- base.html / index.html / worlds/detail.html / novel/evolution_form.html 增加 page_class
+- 小窗口下侧栏隐藏、卡片单列
+
+### Notes
+- 本版本不新增业务功能、不修改数据库
+- 不开发分卷、章节、正文
+- 不开发设定库 AI 推演
+- 导出位置选择留到 v1.7.8
+
 ## [v1.7.6] — 2026-05-11
 
 ### Added
