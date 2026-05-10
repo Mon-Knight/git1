@@ -22,12 +22,21 @@ from app.routes.simulation import router as simulation_router
 from app.routes.records import router as records_router
 from app.routes.branches import router as branches_router
 from app.routes.checks import router as checks_router
+from app.routes.settings import router as settings_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize database on application startup."""
+    from app.database import SessionLocal
+    from app.services.settings_service import SettingsService
     init_db()
+    # Seed default settings
+    db = SessionLocal()
+    try:
+        SettingsService.init_defaults(db)
+    finally:
+        db.close()
     yield
 
 
@@ -57,6 +66,7 @@ app.include_router(simulation_router)
 app.include_router(records_router)
 app.include_router(branches_router)
 app.include_router(checks_router)
+app.include_router(settings_router)
 
 
 @app.get("/health")

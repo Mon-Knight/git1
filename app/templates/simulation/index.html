@@ -25,6 +25,12 @@
 
 <div class="alert-info">⚠️ AI 推演结果不会自动写入正史。推演记录保存后，你可以在后续版本中选择采纳为正史或保留为分支。</div>
 
+{% if ai_mode_info %}
+<div style="background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.2);border-radius:8px;padding:0.6rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:var(--color-text-muted)">
+    {{ ai_mode_info }}
+</div>
+{% endif %}
+
 {% if errors.submit %}<div class="alert-info" style="background:rgba(231,76,60,0.1);border-color:rgba(231,76,60,0.3);color:#e74c3c">{{ errors.submit }}</div>{% endif %}
 
 {% if result %}
@@ -36,6 +42,7 @@
         <div class="result-meta">
             <span>状态: {{ result.status }}</span>
             <span>模式: {{ 'Mock AI' if result.is_mock else 'Live AI' }}</span>
+            {% if result.ai_model %}<span>模型: {{ result.ai_model }}</span>{% endif %}
             <span>{{ result.created_at }}</span>
         </div>
         <p style="margin-top:0.75rem"><a href="/worlds/{{ world.id }}/records/{{ result.id }}" class="btn-sm">查看完整记录 →</a></p>

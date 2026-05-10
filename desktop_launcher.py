@@ -81,6 +81,16 @@ def _ensure_pyinstaller_imports():
     import app.services.consistency_service  # noqa: F401
     import app.services.behavior_service  # noqa: F401
     import app.services.world_context_service  # noqa: F401
+    import app.services.settings_service  # noqa: F401
+    import app.services.ai  # noqa: F401
+    import app.services.ai.base  # noqa: F401
+    import app.services.ai.errors  # noqa: F401
+    import app.services.ai.mock_client  # noqa: F401
+    import app.services.ai.openai_compatible_client  # noqa: F401
+    import app.services.ai.model_router  # noqa: F401
+    import app.services.ai.prompt_builder  # noqa: F401
+    import app.services.ai.response_parser  # noqa: F401
+    import app.routes.settings  # noqa: F401
 
 
 def main():

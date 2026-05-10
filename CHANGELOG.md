@@ -1,5 +1,39 @@
 # Changelog
 
+## [v1.3.0] — 2026-05-11
+
+### Added
+- 新增 AI 设置页面(/settings/ai)：配置 AI 提供商、Base URL、API Key、模型、Temperature、Max Tokens、Timeout
+- 新增 app_settings 配置表（数据库存储运行时配置，优先级：DB > .env > 默认值）
+- 新增 OpenAI-compatible API 客户端，支持 DeepSeek、MiMo Token Plan、Ollama 等兼容接口
+- 新增 Mock AI / 真实 AI 模式切换
+- 新增模型路由(ModelRouter)：支持按任务类型（推演/检查/总结）选择不同模型
+- 新增 PromptBuilder：集中构建推演和检查提示词
+- 新增 ResponseParser：格式化 AI 输出为页面展示可用结构
+- 新增 AI 连接测试功能（POST /settings/ai/test）
+- 推演页面支持真实 AI + 显示当前 AI 模式和模型信息
+- 检查中心支持规则式检查 + 可选 AI 补充分析
+- 新增 AI 配置与错误处理测试（77 个新测试）
+- 新增 app/services/ai/ 模块化 AI 服务层
+
+### Changed
+- 重构 AI 服务层(ai_service.py)，保留旧 Mock AI 兼容入口并委托新模块
+- SimulationService 使用 ModelRouter 进行 AI 调用，失败时不创建空推演记录
+- CheckService 使用 ModelRouter 进行 AI 调用，失败时优雅降级保留规则式检查结果
+- 检查中心在 AI 不可用时显示回退提示
+- PyInstaller 打包脚本新增 AI 服务模块 hidden imports
+
+### Fixed
+- AI 请求失败时不再导致页面 500
+- API Key 页面显示脱敏（前 4 + **** + 后 4）
+- Live AI 失败时不创建空推演记录
+- 检查中心 AI 失败不影响规则式检查结果展示
+
+### Notes
+- 不新增多用户、权限系统、PostgreSQL、Alembic、云部署
+- 推演记录不会自动写入正史，必须手动采纳或保存为分支
+- 检查中心只读，不修改数据库
+
 ## [v1.2.2] — 2026-05-11
 
 ### Changed

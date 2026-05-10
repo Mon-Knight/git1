@@ -70,26 +70,37 @@ class SimulationService:
         """
         Run an AI simulation and save the result.
 
-        Args:
-            db: Database session
-            world_id: World ID
-            question: User's simulation question
-            simulation_type: Type of simulation
-            context: World context dict from WorldContextService
-
-        Returns:
-            A SimulationRecord with status 'pending'
+        Uses ModelRouter to select the appropriate AI client.
+        If live AI fails, does NOT create an empty record — raises an exception.
         """
         from app.services.world_context_service import WorldContextService
-        from app.services.ai_service import ai_service
+        from app.services.ai.model_router import ModelRouter
+        from app.services.ai.prompt_builder import PromptBuilder
+        from app.services.settings_service import SettingsService
 
         if context is None:
             context = WorldContextService.build_world_context(db, world_id)
 
         context_snapshot = WorldContextService.build_context_snapshot(context)
 
-        # Generate AI response
-        ai_response = ai_service.generate_simulation(context, question)
+        # Get the AI client for simulation task
+        client = ModelRouter.get_client(db, "simulation")
+        messages = PromptBuilder.build_simulation_prompt(context, question)
+        config = SettingsService.get_effective_config(db)
+        options = {
+            "temperature": config.get("ai_temperature", 0.7),
+            "max_tokens": config.get("ai_max_tokens", 2000),
+            "timeout": config.get("ai_timeout", 60),
+        }
+        result = client.generate(messages, options)
+
+        if not result.get("success"):
+            error = result.get("error", {})
+            raise RuntimeError(error.get("message", "AI 调用失败，请检查 AI 设置配置。"))
+
+        ai_response = result["content"]
+        ai_model = result.get("model", "mock")
+        is_mock = result.get("provider") == "mock"
 
         # Create record
         record = SimulationService.create_simulation_record(
@@ -99,8 +110,8 @@ class SimulationService:
             simulation_type=simulation_type,
             context_snapshot=context_snapshot,
             ai_response=ai_response,
-            ai_model=settings.AI_MODEL if not settings.is_mock_ai else "mock",
-            is_mock=settings.is_mock_ai,
+            ai_model=ai_model,
+            is_mock=is_mock,
         )
 
         return record

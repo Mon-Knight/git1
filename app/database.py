@@ -42,5 +42,6 @@ def init_db():
         HistoricalEvent,
         SimulationRecord,
         Branch,
+        AppSetting,
     )
     Base.metadata.create_all(bind=engine)

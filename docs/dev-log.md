@@ -1,5 +1,78 @@
 # Development Log — AI World Engine
 
+## 2026-05-11 — v1.3.0: 正式 AI API 接入 + AI 设置页面 + 模型路由
+
+### 完成内容
+- 新增 app_settings 配置表（数据库优先级高于 .env）
+- 新增 app/services/settings_service.py 配置管理
+- 新增 app/services/ai/ 模块化 AI 服务层
+  - base.py（统一 AIClient 接口）
+  - errors.py（HTTP/异常错误映射）
+  - mock_client.py（Mock AI 实现）
+  - openai_compatible_client.py（OpenAI-compatible API 客户端）
+  - model_router.py（任务类型路由 + 模型选择）
+  - prompt_builder.py（推演/检查提示词构建）
+  - response_parser.py（AI 输出解析与格式化）
+- 新增 AI 设置页面 /settings/ai（配置 AI 提供商、连接测试、API Key 脱敏）
+- 推演页面显示当前 AI 模式，改造为使用 ModelRouter
+- 检查中心显示 AI 可用性提示，改造为使用 ModelRouter
+- 重构 ai_service.py 为兼容入口，委托新 AI 模块
+- desktop_launcher.py 补充新模块 PyInstaller 导入
+- packaging/AIWorldEngine.spec、build_exe.ps1 补充 hidden imports
+- 77 个新测试全部通过
+- 版本号统一更新为 1.3.0
+- README.md 新增 AI API 配置章节
+
+### 修改文件
+- `app/models.py` — 新增 AppSetting 模型
+- `app/database.py` — 注册 AppSetting
+- `app/config.py` — VERSION → 1.3.0
+- `app/main.py` — 注册 settings_router、启动时初始化默认配置
+- `app/services/settings_service.py` — 新建
+- `app/services/ai/__init__.py` — 新建
+- `app/services/ai/base.py` — 新建
+- `app/services/ai/errors.py` — 新建
+- `app/services/ai/mock_client.py` — 新建
+- `app/services/ai/openai_compatible_client.py` — 新建
+- `app/services/ai/model_router.py` — 新建
+- `app/services/ai/prompt_builder.py` — 新建
+- `app/services/ai/response_parser.py` — 新建
+- `app/services/ai_service.py` — 重构为兼容入口
+- `app/services/simulation_service.py` — 使用 ModelRouter
+- `app/services/check_service.py` — 使用 ModelRouter
+- `app/routes/settings.py` — 新建
+- `app/routes/simulation.py` — 显示 AI 模式、使用 ModelRouter
+- `app/routes/checks.py` — 显示 AI 提示
+- `app/templates/settings/ai.html` — 新建
+- `app/templates/simulation/index.html` — AI 模式显示
+- `app/templates/index.html` — AI 设置入口链接
+- `desktop_launcher.py` — 新增模块 imports
+- `packaging/AIWorldEngine.spec` — hidden imports
+- `packaging/build_exe.ps1` — hidden imports
+- `tests/test_desktop.py` — 版本号断言更新
+- `tests/test_main.py` — 版本号断言更新
+- `tests/test_settings_service.py` — 新建（22 个测试）
+- `tests/test_ai_client.py` — 新建（17 个测试）
+- `tests/test_model_router.py` — 新建（22 个测试）
+- `tests/test_ai_settings_routes.py` — 新建（10 个测试）
+- `tests/test_ai_integration.py` — 新建（10 个测试）
+- `README.md` — 版本号、AI 配置章节
+- `CHANGELOG.md` — v1.3.0 条目
+- `docs/dev-log.md` — 本条记录
+
+### 测试命令 / 结果
+- python -m compileall . ✅
+- pytest tests/ -v ✅ (303 passed, 0 failed)
+- python scripts/check_encoding.py ✅
+
+### 备份 / commit / tag / push
+- 待定（feature 分支合并后）
+
+### 已知问题
+- 无
+
+---
+
 ## 2026-05-11 — v1.2.2: 发布整理版（文档统一 + 版本号统一）
 
 ### 完成内容

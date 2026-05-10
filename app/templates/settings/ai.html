@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 设置 — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<style>
+.settings-grid{display:grid;gap:1rem}
+.form-row{display:grid;grid-template-columns:150px 1fr;gap:0.75rem;align-items:start}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}}
+.form-row label{padding-top:0.55rem;font-weight:600;font-size:0.9rem;color:var(--color-text)}
+.form-row input,.form-row select,.form-row textarea{padding:0.6rem 0.8rem;border:1px solid var(--color-border);border-radius:var(--radius);background:var(--color-surface);color:var(--color-text);font-size:0.9rem;width:100%;box-sizing:border-box}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{outline:none;border-color:var(--color-primary);box-shadow:0 0 0 2px rgba(108,99,255,0.2)}
+.field-hint{font-size:0.78rem;color:var(--color-text-muted);margin-top:0.25rem}
+.field-error{font-size:0.8rem;color:#e74c3c;margin-top:0.25rem}
+.section-title{font-size:1rem;font-weight:700;margin:1rem 0 0.5rem;padding-bottom:0.3rem;border-bottom:1px solid var(--color-border);color:var(--color-primary)}
+.status-box{padding:1rem;border-radius:var(--radius);margin-bottom:1rem;font-size:0.9rem}
+.status-mock{background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.3);color:var(--color-primary)}
+.status-live{background:rgba(0,212,170,0.08);border:1px solid rgba(0,212,170,0.3);color:var(--color-accent)}
+.status-error{background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.3);color:#e74c3c}
+.test-result{margin-top:0.75rem;padding:0.75rem 1rem;border-radius:var(--radius);font-size:0.9rem}
+.test-success{background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.3);color:var(--color-accent)}
+.test-fail{background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c}
+.btn-group{display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap}
+.btn-sm{font-size:0.82rem;padding:0.45rem 0.9rem}
+.btn-secondary{background:var(--color-surface);border:1px solid var(--color-border);color:var(--color-text);padding:0.6rem 1.2rem;border-radius:var(--radius);cursor:pointer;font-size:0.9rem}
+.btn-secondary:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.preset-list{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.3rem}
+.preset-link{font-size:0.78rem;padding:0.3rem 0.7rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:4px;cursor:pointer;color:var(--color-primary);text-decoration:none}
+.preset-link:hover{background:var(--color-primary);color:white}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">⚙️ AI 设置</h1><p class="subtitle">配置 AI 模型与 API 连接</p></header>
+<nav class="nav"><a href="/" class="nav-link">← 返回首页</a></nav>
+<main class="main">
+
+<!-- Status indicator -->
+{% if not is_live %}
+<div class="status-box status-mock">
+    🔵 当前为 <strong>Mock AI 模式</strong>，可用于本地测试和演示，但推演质量有限。
+    可在下方开启 OpenAI-compatible API 模式。
+</div>
+{% else %}
+<div class="status-box status-live">
+    🟢 当前已启用 <strong>真实 AI</strong>，模型：<code>{{ config.ai_model or '未指定' }}</code>
+    ，Base URL：<code>{{ config.ai_base_url or '未指定' }}</code>
+</div>
+{% endif %}
+
+{% if success %}<div class="alert-info" style="background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.3);color:var(--color-accent)">✅ {{ success }}</div>{% endif %}
+
+{% if errors.submit %}<div class="alert-info" style="background:rgba(231,76,60,0.1);border-color:rgba(231,76,60,0.3);color:#e74c3c">{{ errors.submit }}</div>{% endif %}
+
+{% if test_result %}
+<div class="test-result {{ 'test-success' if test_result.success else 'test-fail' }}">
+    {% if test_result.success %}✅{% else %}❌{% endif %}
+    {{ test_result.message }}
+    <span style="margin-left:0.5rem;font-size:0.8rem;color:var(--color-text-muted)">( {{ test_result.provider }} / {{ test_result.model }} )</span>
+</div>
+{% endif %}
+
+<form action="/settings/ai" method="post" class="world-form" id="settings-form">
+    <!-- Provider and enable -->
+    <div class="section-title">🔧 AI 模式</div>
+    <div class="form-row">
+        <label>AI 提供商</label>
+        <div>
+            <select name="ai_provider" id="ai_provider">
+                <option value="mock" {% if current.get('ai_provider','') == 'mock' %}selected{% endif %}>Mock AI（仅本地演示）</option>
+                <option value="openai_compatible" {% if current.get('ai_provider','') == 'openai_compatible' %}selected{% endif %}>OpenAI-compatible API</option>
+            </select>
+            <div class="field-hint">支持 OpenAI 兼容接口：DeepSeek、MiMo Token Plan、Ollama、本地模型等</div>
+        </div>
+    </div>
+    <div class="form-row">
+        <label>启用真实 AI</label>
+        <div>
+            <label style="padding:0;display:inline-flex;align-items:center;gap:0.5rem;cursor:pointer">
+                <input type="checkbox" name="ai_enable_live" value="true" style="width:auto" id="ai_enable_live"
+                    {% if current.get('ai_enable_live','false') == 'true' %}checked{% endif %}>
+                <span>开启后将使用上述 API 进行推演和检查</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Connection -->
+    <div class="section-title">🔌 API 连接</div>
+    <div class="form-row" id="base_url_row">
+        <label>Base URL</label>
+        <div>
+            <input type="text" name="ai_base_url" value="{{ form_data.ai_base_url if form_data else current.get('ai_base_url','') }}" placeholder="https://api.deepseek.com/v1">
+            <div class="field-hint">常见示例（点击自动填写）：
+                <div class="preset-list">
+                    <a class="preset-link" onclick="document.querySelector('[name=ai_base_url]').value='https://api.openai.com/v1'">OpenAI</a>
+                    <a class="preset-link" onclick="document.querySelector('[name=ai_base_url]').value='https://api.deepseek.com/v1'">DeepSeek</a>
+                    <a class="preset-link" onclick="document.querySelector('[name=ai_base_url]').value='https://token-plan-cn.xiaomimimo.com/v1'">小米 MiMo</a>
+                    <a class="preset-link" onclick="document.querySelector('[name=ai_base_url]').value='http://127.0.0.1:11434/v1'">Ollama</a>
+                </div>
+            </div>
+            {% if errors.ai_base_url %}<div class="field-error">{{ errors.ai_base_url }}</div>{% endif %}
+        </div>
+    </div>
+    <div class="form-row" id="model_row">
+        <label>Model</label>
+        <div>
+            <input type="text" name="ai_model" value="{{ form_data.ai_model if form_data else current.get('ai_model','') }}" placeholder="gpt-4o / deepseek-chat / qwen2...">
+            {% if errors.ai_model %}<div class="field-error">{{ errors.ai_model }}</div>{% endif %}
+        </div>
+    </div>
+    <div class="form-row" id="api_key_row">
+        <label>API Key</label>
+        <div>
+            <input type="password" name="ai_api_key" autocomplete="off"
+                placeholder="{% if current.get('ai_api_key','') %}已设置（{{ current.ai_api_key }}），留空保持不变{% else %}sk-...{% endif %}">
+            <div class="field-hint">已设置时显示脱敏结果，完整 Key 不会显示在页面上</div>
+            {% if errors.ai_api_key %}<div class="field-error">{{ errors.ai_api_key }}</div>{% endif %}
+        </div>
+    </div>
+
+    <!-- Tune -->
+    <div class="section-title">🎛️ 生成参数</div>
+    <div class="form-row">
+        <label>Temperature</label>
+        <div>
+            <input type="number" name="ai_temperature" step="0.1" min="0" max="2"
+                value="{{ form_data.ai_temperature if form_data else current.get('ai_temperature','0.7') }}">
+            <div class="field-hint">越大越随机/创造性，越小越确定/保守（0~2，默认 0.7）</div>
+            {% if errors.ai_temperature %}<div class="field-error">{{ errors.ai_temperature }}</div>{% endif %}
+        </div>
+    </div>
+    <div class="form-row">
+        <label>Max Tokens</label>
+        <div>
+            <input type="number" name="ai_max_tokens" min="256" max="32000"
+                value="{{ form_data.ai_max_tokens if form_data else current.get('ai_max_tokens','2000') }}">
+            <div class="field-hint">最大输出长度（256~32000，默认 2000）</div>
+            {% if errors.ai_max_tokens %}<div class="field-error">{{ errors.ai_max_tokens }}</div>{% endif %}
+        </div>
+    </div>
+    <div class="form-row">
+        <label>Timeout (秒)</label>
+        <div>
+            <input type="number" name="ai_timeout" min="5" max="600"
+                value="{{ form_data.ai_timeout if form_data else current.get('ai_timeout','60') }}">
+            <div class="field-hint">单次请求超时时间（5~600，默认 60）</div>
+            {% if errors.ai_timeout %}<div class="field-error">{{ errors.ai_timeout }}</div>{% endif %}
+        </div>
+    </div>
+
+    <!-- Per-task models -->
+    <div class="section-title">🧠 任务专用模型（可选）</div>
+    <div class="form-row">
+        <label>推演模型</label>
+        <div>
+            <input type="text" name="ai_simulation_model" value="{{ current.get('ai_simulation_model','') }}" placeholder="为空时使用默认 Model">
+            <div class="field-hint">AI 推演使用此模型，为空时使用上方 Model</div>
+        </div>
+    </div>
+    <div class="form-row">
+        <label>检查模型</label>
+        <div>
+            <input type="text" name="ai_check_model" value="{{ current.get('ai_check_model','') }}" placeholder="为空时使用默认 Model">
+            <div class="field-hint">设定矛盾检查和角色行为检查使用此模型</div>
+        </div>
+    </div>
+    <div class="form-row">
+        <label>总结模型</label>
+        <div>
+            <input type="text" name="ai_summary_model" value="{{ current.get('ai_summary_model','') }}" placeholder="为空时使用默认 Model">
+            <div class="field-hint">世界观总结使用此模型</div>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button type="submit" name="action" value="save" class="btn-primary">💾 保存配置</button>
+        <a href="/settings/ai/test" class="btn-secondary" onclick="event.preventDefault(); document.getElementById('test-form').submit();">🔍 测试连接</a>
+        <button type="submit" name="action" value="restore_mock" class="btn-secondary">🔄 恢复 Mock 模式</button>
+    </div>
+</form>
+
+<form id="test-form" action="/settings/ai/test" method="post" style="display:none"></form>
+
+<div class="info-card" style="margin-top:1.5rem;background:rgba(255,193,7,0.05);border-color:rgba(255,193,7,0.2)">
+    <h3>ℹ️ 说明</h3>
+    <ul style="margin:0.5rem 0;padding-left:1.2rem;font-size:0.85rem;color:var(--color-text-muted);line-height:1.8">
+        <li>页面保存的配置优先级高于 <code>.env</code> 文件。</li>
+        <li>API Key 不会完整显示在页面上，也不会写入 Git 仓库。</li>
+        <li>未启用真实 AI 时，系统自动使用 Mock AI，无需网络。</li>
+        <li>推演结果不会自动写入正史，需手动采纳或保存为分支。</li>
+    </ul>
+</div>
+
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div>
+</body>
+</html>

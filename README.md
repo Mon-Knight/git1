@@ -2,7 +2,7 @@
 
 AI 小说世界观推演系统 — 帮助作者构建小说世界观，通过 AI 推演世界发展。
 
-> **当前版本**: v1.2.2 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
+> **当前版本**: v1.3.0 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
 
 ---
 
@@ -157,8 +157,10 @@ python scripts/check_encoding.py
 
 | 模式 | 条件 | 说明 |
 |------|------|------|
-| **Mock AI** | `AI_API_KEY` 为空 | 使用规则式推演，适合本地测试和演示 |
-| **Live API** | 已配置 `AI_API_KEY` | 调用 OpenAI-compatible API 进行真实推演 |
+| **Mock AI** | 未启用真实 AI | 使用规则式推演，适合本地测试和演示 |
+| **OpenAI-compatible API** | 已在 /settings/ai 配置并启用 | 调用兼容 API 进行真实推演 |
+
+> 自 v1.3.0 起，所有 AI 配置通过 **AI 设置页面** 管理（优先级：数据库 > .env），而不仅仅是 .env 文件。
 
 ### 核心规则
 
@@ -202,6 +204,33 @@ python scripts/check_encoding.py
 ```
 
 > `.project_backups/` 已加入 `.gitignore`，不会被提交到 Git。
+
+---
+
+## AI API 配置
+
+AI World Engine 支持两种 AI 模式：
+
+| 模式 | 说明 |
+|------|------|
+| **Mock AI** | 无需 API Key，适合本地演示和测试 |
+| **OpenAI-compatible API** | 支持 DeepSeek、MiMo Token Plan、Ollama、本地模型等兼容接口 |
+
+### 页面配置
+
+启动项目后打开：`/settings/ai`
+
+可配置：Base URL、Model、API Key、Temperature、Max Tokens、Timeout、以及推演/检查/总结各任务的专用模型。
+
+### 示例配置
+
+| 提供商 | Base URL | Model |
+|--------|----------|-------|
+| DeepSeek | `https://api.deepseek.com/v1` | 根据实际模型填写 |
+| 小米 MiMo Token Plan | `https://token-plan-cn.xiaomimimo.com/v1` | 根据实际模型填写 |
+| Ollama（本地） | `http://127.0.0.1:11434/v1` | 本地模型名 |
+
+> **安全提醒**: 不要在 README、dev-log 或测试文件中写真实 API Key。API Key 已在页面上自动脱敏显示。
 
 ---
 
@@ -280,6 +309,7 @@ C:\Users\<用户名>\AppData\Local\AIWorldEngine\ai_world_engine.db
 | v1.2.0 | 桌面端 EXE 打包 | 226 |
 | v1.2.1 | EXE 打包修复与验证 | 226 |
 | v1.2.2 | 文档整理、版本号统一、发布说明完善 | 226 |
+| v1.3.0 | AI API 接入、设置页面、模型路由、错误处理增强 | 303 |
 
 ---
 

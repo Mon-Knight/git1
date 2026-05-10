@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 
 from app.services.consistency_service import ConsistencyService
 from app.services.behavior_service import BehaviorService
-from app.services.ai_service import ai_service
 
 
 class CheckService:
@@ -24,10 +23,11 @@ class CheckService:
     ) -> dict:
         """
         Run a setting conflict check.
-
+        Always runs rule-based check first.
+        Optionally adds AI supplement analysis.
         Returns a dict with results suitable for template rendering.
         """
-        # Run rule-based check
+        # Run rule-based check (always runs, never fails)
         result = ConsistencyService.check_setting_conflicts(
             db, world_id, content, check_types
         )
@@ -35,19 +35,30 @@ class CheckService:
         # Optionally enhance with AI analysis
         if use_ai:
             try:
-                ai_context = {
-                    "world_name": f"world_{world_id}",
-                    "check_content": content,
-                    "rule_based_result": result,
+                from app.services.world_context_service import WorldContextService
+                from app.services.ai.model_router import ModelRouter
+                from app.services.ai.prompt_builder import PromptBuilder
+                from app.services.settings_service import SettingsService
+
+                world_context = WorldContextService.build_world_context(db, world_id)
+                client = ModelRouter.get_client(db, "conflict_check")
+                messages = PromptBuilder.build_conflict_check_prompt(world_context, result)
+                config = SettingsService.get_effective_config(db)
+                options = {
+                    "temperature": config.get("ai_temperature", 0.7),
+                    "max_tokens": config.get("ai_max_tokens", 2000),
+                    "timeout": config.get("ai_timeout", 60),
                 }
-                ai_analysis = ai_service.generate_simulation(
-                    ai_context,
-                    f"请分析以下设定的矛盾风险：{content[:200]}"
-                )
-                result["ai_analysis"] = ai_analysis
-                result["ai_used"] = True
-            except Exception:
-                result["ai_analysis"] = "AI 辅助分析暂时不可用"
+                ai_result = client.generate(messages, options)
+                if ai_result.get("success"):
+                    result["ai_analysis"] = ai_result["content"]
+                    result["ai_used"] = True
+                else:
+                    err = ai_result.get("error", {})
+                    result["ai_analysis"] = f"AI 辅助分析失败: {err.get('message', '未知错误')}"
+                    result["ai_used"] = False
+            except Exception as e:
+                result["ai_analysis"] = f"AI 辅助分析暂时不可用: {str(e)}"
                 result["ai_used"] = False
         else:
             result["ai_used"] = False
@@ -65,8 +76,8 @@ class CheckService:
     ) -> dict:
         """
         Run a character behavior reasonableness check.
-
-        Returns a dict with results suitable for template rendering.
+        Always runs rule-based check first.
+        Optionally adds AI supplement analysis.
         """
         result = BehaviorService.check_character_behavior(
             db, character_id, world_id, behavior, context
@@ -78,20 +89,41 @@ class CheckService:
         # Optionally enhance with AI analysis
         if use_ai:
             try:
-                ai_context = {
-                    "character_name": result.get("character_name", ""),
-                    "behavior": behavior,
-                    "context": context,
-                    "rule_based_result": result,
+                from app.services.world_context_service import WorldContextService
+                from app.services.character_service import CharacterService
+                from app.services.ai.model_router import ModelRouter
+                from app.services.ai.prompt_builder import PromptBuilder
+                from app.services.settings_service import SettingsService
+
+                world_context = WorldContextService.build_world_context(db, world_id)
+                character = CharacterService.get_character(db, character_id)
+                character_info = {
+                    "name": character.name if character else "",
+                    "personality": result.get("character_personality", ""),
+                    "goal": result.get("character_goal", ""),
+                    "abilities": result.get("character_abilities", ""),
+                    "current_status": result.get("character_status", ""),
                 }
-                ai_analysis = ai_service.generate_simulation(
-                    ai_context,
-                    f"请分析角色行为的合理性：{behavior[:200]}"
+                client = ModelRouter.get_client(db, "behavior_check")
+                messages = PromptBuilder.build_behavior_check_prompt(
+                    world_context, character_info, result
                 )
-                result["ai_analysis"] = ai_analysis
-                result["ai_used"] = True
-            except Exception:
-                result["ai_analysis"] = "AI 辅助分析暂时不可用"
+                config = SettingsService.get_effective_config(db)
+                options = {
+                    "temperature": config.get("ai_temperature", 0.7),
+                    "max_tokens": config.get("ai_max_tokens", 2000),
+                    "timeout": config.get("ai_timeout", 60),
+                }
+                ai_result = client.generate(messages, options)
+                if ai_result.get("success"):
+                    result["ai_analysis"] = ai_result["content"]
+                    result["ai_used"] = True
+                else:
+                    err = ai_result.get("error", {})
+                    result["ai_analysis"] = f"AI 辅助分析失败: {err.get('message', '未知错误')}"
+                    result["ai_used"] = False
+            except Exception as e:
+                result["ai_analysis"] = f"AI 辅助分析暂时不可用: {str(e)}"
                 result["ai_used"] = False
         else:
             result["ai_used"] = False
