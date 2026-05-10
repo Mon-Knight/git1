@@ -97,6 +97,71 @@ def _setup_server_file_logger(log_dir: str) -> logging.Logger:
     return srv
 
 
+# ── Stdio safety & uvicorn log config ──────────────────────────────────────
+
+def ensure_stdio_available():
+    """
+    Ensure sys.stdout and sys.stderr are not None.
+    In PyInstaller --windowed EXEs, they can be None, and any library that
+    calls .isatty() on them (e.g. uvicorn's DefaultFormatter) will crash
+    with AttributeError: 'NoneType' object has no attribute 'isatty'.
+    """
+    import os as _os
+    import sys as _sys
+    if _sys.stdout is None:
+        _sys.stdout = open(_os.devnull, "w", encoding="utf-8")
+    if _sys.stderr is None:
+        _sys.stderr = open(_os.devnull, "w", encoding="utf-8")
+
+
+def build_uvicorn_log_config(server_log_path: str) -> dict:
+    """
+    Build a safe uvicorn logging config that writes to a file only.
+    Uses plain logging.Formatter — NOT uvicorn.logging.DefaultFormatter
+    or AccessFormatter, which call isatty() and crash in PyInstaller EXEs.
+    """
+    return {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "default": {
+                "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+                "datefmt": "%H:%M:%S",
+            },
+            "access": {
+                "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+                "datefmt": "%H:%M:%S",
+            },
+        },
+        "handlers": {
+            "server_file": {
+                "class": "logging.FileHandler",
+                "filename": server_log_path,
+                "mode": "a",
+                "encoding": "utf-8",
+                "formatter": "default",
+            }
+        },
+        "loggers": {
+            "uvicorn": {
+                "handlers": ["server_file"],
+                "level": "INFO",
+                "propagate": False,
+            },
+            "uvicorn.error": {
+                "handlers": ["server_file"],
+                "level": "INFO",
+                "propagate": False,
+            },
+            "uvicorn.access": {
+                "handlers": ["server_file"],
+                "level": "INFO",
+                "propagate": False,
+            },
+        },
+    }
+
+
 # ── Self-check ──────────────────────────────────────────────────────────────
 
 def run_self_check(logger: logging.Logger) -> dict:
@@ -132,27 +197,27 @@ def run_self_check(logger: logging.Logger) -> dict:
     template_ok = os.path.isdir(tpl)
     if not template_ok:
         issues.append(f"Templates directory missing: {tpl}")
-        logger.error(f"❌ Templates: MISSING ({tpl})")
+        logger.error(f"[ERROR] Templates: MISSING ({tpl})")
     else:
-        logger.info(f"✅ Templates: {tpl}")
+        logger.info(f"[OK] Templates: {tpl}")
 
     # 2. Static check
     static = resource_path("app/static")
     static_ok = os.path.isdir(static)
     if not static_ok:
         issues.append(f"Static directory missing: {static}")
-        logger.error(f"❌ Static: MISSING ({static})")
+        logger.error(f"[ERROR] Static: MISSING ({static})")
     else:
-        logger.info(f"✅ Static: {static}")
+        logger.info(f"[OK] Static: {static}")
 
     # 3. AI settings template
     ai_tpl = resource_path("app/templates/settings/ai.html")
     ai_template_ok = os.path.isfile(ai_tpl)
     if not ai_template_ok:
         issues.append(f"AI settings template missing: {ai_tpl}")
-        logger.error(f"❌ AI settings template: MISSING ({ai_tpl})")
+        logger.error(f"[ERROR] AI settings template: MISSING ({ai_tpl})")
     else:
-        logger.info(f"✅ AI settings template: {ai_tpl}")
+        logger.info(f"[OK] AI settings template: {ai_tpl}")
 
     # 4. AI modules importable
     ai_modules_ok = True
@@ -170,9 +235,9 @@ def run_self_check(logger: logging.Logger) -> dict:
         except ImportError as e:
             ai_modules_ok = False
             issues.append(f"Cannot import {mod_name}: {e}")
-            logger.error(f"❌ AI module: {mod_name} — {e}")
+            logger.error(f"[ERROR] AI module: {mod_name} - {e}")
     if ai_modules_ok:
-        logger.info("✅ AI modules: all importable")
+        logger.info("[OK] AI modules: all importable")
 
     # 5. Database directory
     db_dir_ok = False
@@ -188,21 +253,32 @@ def run_self_check(logger: logging.Logger) -> dict:
                     db_dir_ok = True
                 except Exception as e:
                     issues.append(f"Cannot create DB directory {db_dir}: {e}")
-                    logger.error(f"❌ DB directory: cannot create {db_dir} — {e}")
+                    logger.error(f"[ERROR] DB directory: cannot create {db_dir} - {e}")
+            if db_dir_ok:
+                try:
+                    test_file = os.path.join(db_dir, ".write_test")
+                    with open(test_file, "w") as f:
+                        f.write("test")
+                    os.remove(test_file)
+                    db_dir_writable = True
+                    logger.info(f"[OK] DB directory: {db_dir} (writable)")
+                except Exception as e:
+                    issues.append(f"DB directory not writable: {e}")
+                    logger.error(f"[ERROR] DB directory: not writable - {e}")
         else:
             issues.append("LOCALAPPDATA not set; DB directory unknown")
-            logger.warning("⚠️ LOCALAPPDATA not set")
+            logger.warning("[WARN] LOCALAPPDATA not set")
 
     # 6. Port
     try:
         port = find_free_port()
-        logger.info(f"✅ Port available: {port}")
+        logger.info(f"[OK] Port available: {port}")
         port_ok = True
     except RuntimeError as e:
         port = None
         port_ok = False
         issues.append(f"No free port found: {e}")
-        logger.error(f"❌ Port: {e}")
+        logger.error(f"[ERROR] Port: {e}")
 
     # Log AI config (without key)
     logger.info(f"AI base_url: {settings.AI_BASE_URL}")
@@ -212,7 +288,7 @@ def run_self_check(logger: logging.Logger) -> dict:
     if issues:
         logger.warning(f"Self-check found {len(issues)} issue(s)")
     else:
-        logger.info("✅ Self-check passed — no issues")
+        logger.info("[OK] Self-check passed - no issues")
 
     return {
         "version": version,
@@ -290,22 +366,11 @@ def start_server(host: str, port: int, log_dir: str, logger: logging.Logger):
     logger.info(f"Backend: starting uvicorn on {host}:{port}...")
     import uvicorn
 
-    # Build uvicorn log config that writes to server.log
-    log_config = uvicorn.config.LOGGING_CONFIG
-    if SERVER_LOG_PATH:
-        log_config["handlers"]["file"] = {
-            "class": "logging.FileHandler",
-            "filename": SERVER_LOG_PATH,
-            "mode": "a",
-            "encoding": "utf-8",
-            "formatter": "default",
-        }
-        log_config["loggers"]["uvicorn"]["handlers"] = ["file"]
-        log_config["loggers"]["uvicorn.error"]["handlers"] = ["file"]
-        log_config["loggers"]["uvicorn.access"]["handlers"] = ["file"]
-        # Also keep console handler for debugging
-        log_config["loggers"]["uvicorn"]["handlers"].append("console")
-        log_config["loggers"]["uvicorn.error"]["handlers"].append("console")
+    # Safety: ensure stdio is available (PyInstaller --windowed may have None)
+    ensure_stdio_available()
+
+    # Build safe uvicorn log config (no DefaultFormatter, no use_colors, no isatty())
+    log_config = build_uvicorn_log_config(SERVER_LOG_PATH) if SERVER_LOG_PATH else None
 
     try:
         uvicorn.run(
@@ -398,7 +463,10 @@ def _show_error_dialog(message: str, log_dir: str):
 
 def main():
     """Main entry point for the desktop launcher."""
-    # 0. Check for headless mode (for automated verification)
+    # 0a. Safety: ensure stdio is available (PyInstaller --windowed may set them to None)
+    ensure_stdio_available()
+
+    # 0b. Check for headless mode (for automated verification)
     headless = os.getenv("AIWORLDENGINE_HEADLESS", "0") in ("1", "true", "True", "yes")
 
     # 1. Setup logging
