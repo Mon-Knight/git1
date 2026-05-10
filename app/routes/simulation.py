@@ -13,11 +13,33 @@ from app.database import get_db
 from app.services.world_service import WorldService
 from app.services.simulation_service import SimulationService
 from app.services.world_context_service import WorldContextService
+from app.services.settings_service import SettingsService
+from app.services.ai.model_router import ModelRouter
 
 router = APIRouter(prefix="/worlds/{world_id}/simulation")
 
 templates_dir = Path(__file__).parent.parent / "templates"
 templates = Jinja2Templates(directory=str(templates_dir))
+
+
+def _get_ai_mode_info(db: Session) -> str:
+    """Return a human-readable description of the current AI mode."""
+    config = SettingsService.get_effective_config(db)
+    if not config["ai_enable_live"] or config["ai_provider"] == "mock":
+        return "🔵 当前使用 Mock AI，适合测试和演示。前往 <a href=\"/settings/ai\">AI 设置</a> 配置真实 AI。"
+    model = config.get("ai_model", "未指定")
+    base_url = config.get("ai_base_url", "未指定")
+    return f"🟢 当前模型: {model} | Base URL: {base_url}"
+
+
+def _render_template(request, template, db=None, status_code=200, **kwargs):
+    """Helper to always pass ai_mode_info."""
+    db = db or kwargs.pop("db")
+    defaults = {
+        "ai_mode_info": _get_ai_mode_info(db),
+    }
+    defaults.update(kwargs)
+    return templates.TemplateResponse(request, template, defaults, status_code=status_code)
 
 
 @router.get("", response_class=HTMLResponse)
@@ -32,12 +54,12 @@ async def simulation_page(request: Request, world_id: int, db: Session = Depends
     context = WorldContextService.build_world_context(db, world_id)
     context_snapshot = WorldContextService.build_context_snapshot(context)
 
-    return templates.TemplateResponse(request, "simulation/index.html", {
-        "world": world,
-        "context_snapshot": context_snapshot,
-        "errors": {},
-        "result": None,
-    })
+    return _render_template(request, "simulation/index.html", db=db,
+        world=world,
+        context_snapshot=context_snapshot,
+        errors={},
+        result=None,
+    )
 
 
 @router.post("", response_class=HTMLResponse)
@@ -64,14 +86,16 @@ async def run_simulation(
     if errors:
         context = WorldContextService.build_world_context(db, world_id)
         context_snapshot = WorldContextService.build_context_snapshot(context)
-        return templates.TemplateResponse(request, "simulation/index.html", {
-            "world": world,
-            "context_snapshot": context_snapshot,
-            "errors": errors,
-            "form_data": {"question": question, "simulation_type": simulation_type},
-            "result": None,
-        }, status_code=422)
+        return _render_template(request, "simulation/index.html", db=db,
+            world=world,
+            context_snapshot=context_snapshot,
+            errors=errors,
+            form_data={"question": question, "simulation_type": simulation_type},
+            result=None,
+            status_code=422,
+        )
 
+    # Attempt simulation - uses ModelRouter; failure = no record created
     try:
         record = SimulationService.run_simulation(
             db=db,
@@ -83,27 +107,29 @@ async def run_simulation(
         context = WorldContextService.build_world_context(db, world_id)
         context_snapshot = WorldContextService.build_context_snapshot(context)
 
-        return templates.TemplateResponse(request, "simulation/index.html", {
-            "world": world,
-            "context_snapshot": context_snapshot,
-            "errors": {},
-            "result": {
+        return _render_template(request, "simulation/index.html", db=db,
+            world=world,
+            context_snapshot=context_snapshot,
+            errors={},
+            result={
                 "id": record.id,
                 "question": record.question,
                 "simulation_type": record.simulation_type,
                 "ai_response": record.ai_response,
                 "status": record.status,
                 "is_mock": record.is_mock,
+                "ai_model": record.ai_model or ("Mock" if record.is_mock else "unknown"),
                 "created_at": record.created_at.strftime("%Y-%m-%d %H:%M"),
             },
-        })
+        )
     except Exception as e:
         context = WorldContextService.build_world_context(db, world_id)
         context_snapshot = WorldContextService.build_context_snapshot(context)
-        return templates.TemplateResponse(request, "simulation/index.html", {
-            "world": world,
-            "context_snapshot": context_snapshot,
-            "errors": {"submit": f"AI 推演出错: {str(e)}"},
-            "form_data": {"question": question, "simulation_type": simulation_type},
-            "result": None,
-        }, status_code=500)
+        error_msg = str(e)
+        return _render_template(request, "simulation/index.html", db=db,
+            world=world,
+            context_snapshot=context_snapshot,
+            errors={"submit": f"推演失败: {error_msg}"},
+            form_data={"question": question, "simulation_type": simulation_type},
+            result=None,
+        )

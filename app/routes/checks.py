@@ -13,11 +13,29 @@ from app.database import get_db
 from app.services.world_service import WorldService
 from app.services.character_service import CharacterService
 from app.services.check_service import CheckService
+from app.services.settings_service import SettingsService
 
 router = APIRouter(prefix="/worlds/{world_id}/checks")
 
 templates_dir = Path(__file__).parent.parent / "templates"
 templates = Jinja2Templates(directory=str(templates_dir))
+
+
+def _get_ai_hint(db: Session) -> str:
+    """Return a hint about AI availability for the checks page."""
+    config = SettingsService.get_effective_config(db)
+    if config.get("ai_enable_live") and config.get("ai_provider") != "mock":
+        missing = []
+        if not config.get("ai_api_key"):
+            missing.append("API Key")
+        if not config.get("ai_base_url"):
+            missing.append("Base URL")
+        if not config.get("ai_model"):
+            missing.append("Model")
+        if missing:
+            return f"AI 配置不完整（缺少 {', '.join(missing)}），AI 补充分析不可用。"
+        return "真实 AI 已配置，可在运行规则式检查的同时获得 AI 补充分析。"
+    return "当前为 Mock 模式。如需 AI 补充分析，请先前往 <a href=\"/settings/ai\">AI 设置</a> 配置真实 AI。"
 
 
 @router.get("", response_class=HTMLResponse)
@@ -28,7 +46,10 @@ async def checks_index(request: Request, world_id: int, db: Session = Depends(ge
         return templates.TemplateResponse(
             request, "worlds/404.html", {"world_id": world_id}, status_code=404
         )
-    return templates.TemplateResponse(request, "checks/index.html", {"world": world})
+    return templates.TemplateResponse(request, "checks/index.html", {
+        "world": world,
+        "ai_hint": _get_ai_hint(db),
+    })
 
 
 @router.get("/conflicts", response_class=HTMLResponse)
@@ -40,7 +61,8 @@ async def conflict_check_form(request: Request, world_id: int, db: Session = Dep
             request, "worlds/404.html", {"world_id": world_id}, status_code=404
         )
     return templates.TemplateResponse(request, "checks/conflicts.html", {
-        "world": world, "errors": {}, "result": None
+        "world": world, "errors": {}, "result": None,
+        "ai_hint": _get_ai_hint(db),
     })
 
 
@@ -73,6 +95,7 @@ async def run_conflict_check(
         return templates.TemplateResponse(request, "checks/conflicts.html", {
             "world": world, "errors": errors,
             "form_data": {"content": content},
+            "ai_hint": _get_ai_hint(db),
         }, status_code=422)
 
     # Build check types
@@ -92,11 +115,13 @@ async def run_conflict_check(
         return templates.TemplateResponse(request, "checks/conflicts.html", {
             "world": world, "errors": {}, "result": result,
             "form_data": {"content": content},
+            "ai_hint": _get_ai_hint(db),
         })
     except Exception as e:
         return templates.TemplateResponse(request, "checks/conflicts.html", {
             "world": world, "errors": {"submit": f"检查出错: {str(e)}"},
             "form_data": {"content": content}, "result": None,
+            "ai_hint": _get_ai_hint(db),
         }, status_code=500)
 
 
@@ -110,7 +135,8 @@ async def behavior_check_form(request: Request, world_id: int, db: Session = Dep
         )
     characters = CharacterService.list_characters(db, world_id)
     return templates.TemplateResponse(request, "checks/behavior.html", {
-        "world": world, "characters": characters, "errors": {}, "result": None
+        "world": world, "characters": characters, "errors": {}, "result": None,
+        "ai_hint": _get_ai_hint(db),
     })
 
 
@@ -144,6 +170,7 @@ async def run_behavior_check(
         return templates.TemplateResponse(request, "checks/behavior.html", {
             "world": world, "characters": characters, "errors": errors,
             "form_data": {"character_id": character_id, "behavior": behavior, "context": context},
+            "ai_hint": _get_ai_hint(db),
         }, status_code=422)
 
     cid = int(character_id)
@@ -154,10 +181,12 @@ async def run_behavior_check(
         return templates.TemplateResponse(request, "checks/behavior.html", {
             "world": world, "characters": characters, "errors": {}, "result": result,
             "form_data": {"character_id": character_id, "behavior": behavior, "context": context},
+            "ai_hint": _get_ai_hint(db),
         })
     except Exception as e:
         return templates.TemplateResponse(request, "checks/behavior.html", {
             "world": world, "characters": characters, "errors": {"submit": f"检查出错: {str(e)}"},
             "form_data": {"character_id": character_id, "behavior": behavior, "context": context},
             "result": None,
-        }, status_code=500)
+            "ai_hint": _get_ai_hint(db),
+        })
