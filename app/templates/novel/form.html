@@ -183,6 +183,27 @@
         </div>
     </div>
 
+    <div class="form-section" style="border:1px dashed rgba(0,212,170,0.4);background:rgba(0,212,170,0.02)">
+        <h3>📦 创作上下文包 <span style="font-size:0.75rem;font-weight:normal;color:var(--color-text-muted)">（可选）</span></h3>
+        <div class="form-row">
+            <label>选择上下文包</label>
+            <div>
+                <select name="context_package_id" style="width:100%">
+                    <option value="">— 不使用上下文包（手动填写） —</option>
+                    {% for cp in context_packages %}
+                    <option value="{{ cp.id }}" {% if selected_package_id == cp.id %}selected{% endif %}>
+                        {{ cp.name }}{% if cp.is_default %} [默认]{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                <div class="field-hint">
+                    选择已保存的创作上下文包，AI 将基于上下文包中的推演方案、风格方案、剧情时间点进行生成。
+                    <a href="/worlds/{{ world.id }}/context/packages">管理上下文包 →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="form-section">
         <h3>🚫 约束与补充</h3>
 

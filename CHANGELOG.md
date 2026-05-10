@@ -1,5 +1,42 @@
 # Changelog
 
+## [v1.6.0] — 2026-05-11
+
+### Added
+- 新增创作上下文资产库基础版
+- 新增 StyleProfile 写作风格方案管理（创建/编辑/删除/全局风格）
+- 新增 PlotAnchor 剧情时间点管理（创建/编辑/删除/跨世界隔离）
+- 新增 ContextPackage 创作上下文包（组合推演方案/风格/时间点）
+- 新增小说生成页面上下文包下拉选择
+- 上下文包选中后自动加载推演方案/风格/剧情时间点到生成 Prompt
+- simulation_records 新增 context_snapshot 包含上下文包信息
+- 新增 3 个服务文件：style_profile_service / plot_anchor_service / context_package_service
+- 新增 context 路由（14 个端点）
+- 新增 8 个 context 模板页面
+- 世界详情页新增「创作上下文」入口卡片
+- 导出/导入兼容 StyleProfile / PlotAnchor / ContextPackage
+- 导入自动 ID 映射（sim_record / style / anchor / context_package）
+- 导出自动包含被引用的全局风格方案
+- 备份服务 metadata 新增 context 表计数
+- 新增 29 个服务测试 + 26 个路由测试 + 5 个导出/导入测试
+- build_exe.ps1 / AIWorldEngine.spec 新增 context 路由和模板
+- verify_desktop_build.py 新增 context 模板检查
+
+### Design Principles
+- AI 生成内容不自动成为正史
+- 风格方案只是写作约束，不改变剧情事实
+- 剧情时间点只是进度记录，不自动改写历史
+- 上下文包只是引用组合，不复制重复内容
+- 跨世界数据完全隔离
+- 删除被引用资产时有安全保护（提示先移除引用）
+
+### Notes
+- v1.6.0 不做正文生成完整流水线
+- v1.6.0 不做分卷大纲/章节大纲
+- v1.6.0 不做参考小说导入和自动风格分析
+- v1.6.0 不做风格一致性评分和复杂小说项目管理
+- 本版本只是创作上下文资产库基础版
+
 ## [v1.5.0] — 2026-05-11
 
 ### Added

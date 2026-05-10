@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创作上下文包 — {{ world.name }} — AI World Engine</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">📦 创作上下文包</h1>
+            <p class="subtitle">{{ world.name }}</p>
+        </header>
+
+        <nav class="nav">
+            <a href="/worlds/{{ world.id }}/context" class="nav-link">← 返回创作上下文</a>
+            <a href="/worlds/{{ world.id }}/context/packages/new" class="btn-primary btn-sm">+ 新建上下文包</a>
+        </nav>
+
+        <main class="main">
+            {% if packages %}
+            <div class="module-grid">
+                {% for p in packages %}
+                <div class="module-card" style="text-align:left;padding:1rem 1.25rem">
+                    <div style="display:flex;justify-content:space-between;align-items:start">
+                        <h3 style="margin:0 0 0.3rem 0;font-size:1rem">{{ p.name }}</h3>
+                        {% if p.is_default %}<span class="badge" style="background:rgba(108,99,255,0.15);color:var(--color-primary)">默认</span>{% endif %}
+                    </div>
+                    {% if p.description %}
+                    <p style="font-size:0.82rem;color:var(--color-text-muted);margin:0.3rem 0">{{ p.description[:100] }}{% if p.description|length > 100 %}...{% endif %}</p>
+                    {% endif %}
+                    <p style="font-size:0.78rem;color:var(--color-text-muted);margin:0.3rem 0">
+                        {% if p.simulation_record_id %}📋 推演记录 · {% endif %}
+                        {% if p.style_profile_id %}✏️ 风格方案 · {% endif %}
+                        {% if p.plot_anchor_id %}📍 剧情时间点{% endif %}
+                        {% if not p.simulation_record_id and not p.style_profile_id and not p.plot_anchor_id %}
+                        <span style="color:var(--color-text-muted)">未选择引用资产</span>
+                        {% endif %}
+                    </p>
+                    <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap">
+                        <a href="/worlds/{{ world.id }}/context/packages/{{ p.id }}" class="btn-sm">详情</a>
+                        <a href="/worlds/{{ world.id }}/context/packages/{{ p.id }}/edit" class="btn-sm">编辑</a>
+                        <form action="/worlds/{{ world.id }}/context/packages/{{ p.id }}/delete" method="post" onsubmit="return confirm('确定要删除上下文包「{{ p.name }}」吗？')" style="display:inline">
+                            <button type="submit" class="btn-sm btn-danger">删除</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="info-card">
+                <p style="text-align:center;color:var(--color-text-muted)">
+                    暂无创作上下文包。<a href="/worlds/{{ world.id }}/context/packages/new">新建一个</a>
+                </p>
+            </div>
+            {% endif %}
+        </main>
+
+        <footer class="footer">
+            <p>AI World Engine | <a href="/">返回首页</a></p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -71,10 +71,13 @@ def create_backup(db: Session = None, reason: str = "manual") -> Dict[str, Any]:
         "backup_filename": db_name,
     }
     if db:
-        from app.models import World, SimulationRecord, Branch
+        from app.models import World, SimulationRecord, Branch, StyleProfile, PlotAnchor, ContextPackage
         metadata["world_count"] = db.query(World).count()
         metadata["simulation_record_count"] = db.query(SimulationRecord).count()
         metadata["branch_count"] = db.query(Branch).count()
+        metadata["style_profile_count"] = db.query(StyleProfile).count()
+        metadata["plot_anchor_count"] = db.query(PlotAnchor).count()
+        metadata["context_package_count"] = db.query(ContextPackage).count()
 
     # Write metadata JSON
     meta_name = dst_path.stem + ".json"

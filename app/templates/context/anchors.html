@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>剧情时间点 — {{ world.name }} — AI World Engine</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">📍 剧情时间点</h1>
+            <p class="subtitle">{{ world.name }}</p>
+        </header>
+
+        <nav class="nav">
+            <a href="/worlds/{{ world.id }}/context" class="nav-link">← 返回创作上下文</a>
+            <a href="/worlds/{{ world.id }}/context/anchors/new" class="btn-primary btn-sm">+ 新建剧情时间点</a>
+        </nav>
+
+        <main class="main">
+            {% if error %}
+            <div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:#e74c3c">
+                ❌ {{ error }}
+            </div>
+            {% endif %}
+
+            {% if anchors %}
+            <div class="module-grid">
+                {% for a in anchors %}
+                <div class="module-card" style="text-align:left;padding:1rem 1.25rem">
+                    <div style="display:flex;justify-content:space-between;align-items:start">
+                        <h3 style="margin:0 0 0.3rem 0;font-size:1rem">{{ a.name }}</h3>
+                        {% if a.is_locked %}<span class="badge" style="background:rgba(231,76,60,0.15);color:#e74c3c">🔒 已锁定</span>{% endif %}
+                    </div>
+                    <p style="font-size:0.82rem;color:var(--color-text-muted);margin:0.3rem 0">
+                        {% if a.stage %}阶段: {{ a.stage }} · {% endif %}
+                        {% if a.current_location %}地点: {{ a.current_location }}{% endif %}
+                    </p>
+                    {% if a.current_conflict %}
+                    <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0.2rem 0">
+                        当前矛盾: {{ a.current_conflict[:100] }}{% if a.current_conflict|length > 100 %}...{% endif %}
+                    </p>
+                    {% endif %}
+                    <p style="font-size:0.78rem;color:var(--color-text-muted);margin:0.3rem 0">
+                        更新: {{ a.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                    </p>
+                    <div style="margin-top:0.5rem;display:flex;gap:0.5rem">
+                        <a href="/worlds/{{ world.id }}/context/anchors/{{ a.id }}/edit" class="btn-sm">编辑</a>
+                        <form action="/worlds/{{ world.id }}/context/anchors/{{ a.id }}/delete" method="post" onsubmit="return confirm('确定要删除剧情时间点「{{ a.name }}」吗？')" style="display:inline">
+                            <button type="submit" class="btn-sm btn-danger">删除</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="info-card">
+                <p style="text-align:center;color:var(--color-text-muted)">
+                    暂无剧情时间点。<a href="/worlds/{{ world.id }}/context/anchors/new">新建一个</a>
+                </p>
+            </div>
+            {% endif %}
+        </main>
+
+        <footer class="footer">
+            <p>AI World Engine | <a href="/">返回首页</a></p>
+        </footer>
+    </div>
+</body>
+</html>

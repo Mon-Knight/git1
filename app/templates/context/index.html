@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创作上下文 — {{ world.name }} — AI World Engine</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">📦 创作上下文资产库</h1>
+            <p class="subtitle">{{ world.name }}</p>
+        </header>
+
+        <nav class="nav">
+            <a href="/worlds/{{ world.id }}" class="nav-link">← 返回世界详情</a>
+        </nav>
+
+        <main class="main">
+            <section class="module-nav">
+                <h2>📦 创作上下文资产</h2>
+                <p style="color:var(--color-text-muted);margin-bottom:1rem;font-size:0.88rem">
+                    保存并选择推演方案、写作风格、剧情时间点，用于后续小说推演和生成。在这里创建的可复用资产可以在小说生成时直接选择，减少重复填写。
+                </p>
+
+                <div class="module-grid">
+                    <a href="/worlds/{{ world.id }}/context/styles" class="module-card">
+                        <div class="module-icon">✏️</div>
+                        <h3>写作风格方案</h3>
+                        <p>保存和管理小说写作风格、叙事节奏、描写偏好等</p>
+                        <span class="badge">{{ style_count }} 个方案</span>
+                    </a>
+                    <a href="/worlds/{{ world.id }}/context/anchors" class="module-card">
+                        <div class="module-icon">📍</div>
+                        <h3>剧情时间点</h3>
+                        <p>记录当前故事推进阶段、主角状态、矛盾冲突等</p>
+                        <span class="badge">{{ anchor_count }} 个锚点</span>
+                    </a>
+                    <a href="/worlds/{{ world.id }}/context/packages" class="module-card" style="border:1px dashed rgba(108,99,255,0.4);background:rgba(108,99,255,0.03)">
+                        <div class="module-icon">📦</div>
+                        <h3>创作上下文包</h3>
+                        <p>组合推演方案、风格方案、剧情时间点，一键用于小说生成</p>
+                        <span class="badge">{{ package_count }} 个包</span>
+                    </a>
+                </div>
+            </section>
+
+            <section class="world-info" style="margin-top:1.5rem">
+                <div class="info-card" style="background:rgba(108,99,255,0.03);border:1px solid rgba(108,99,255,0.15)">
+                    <h3>💡 使用说明</h3>
+                    <ol style="line-height:1.8;padding-left:1.5rem;color:var(--color-text-muted);font-size:0.88rem">
+                        <li><strong>创建写作风格方案</strong>：定义你希望小说使用的写作风格、叙事节奏、描写偏好等。</li>
+                        <li><strong>创建剧情时间点</strong>：记录当前故事已经推进到哪个阶段，主角状态如何。</li>
+                        <li><strong>创建创作上下文包</strong>：将推演方案、风格方案、剧情时间点组合起来。</li>
+                        <li><strong>在小说生成中选择上下文包</strong>：AI 将基于你保存的上下文进行推演和生成。</li>
+                    </ol>
+                    <p style="color:var(--color-text-muted);font-size:0.82rem;margin-top:0.5rem">
+                        ⚠️ 重要提示：上下文包只是生成输入的组合引用，不会自动改写正史。生成结果仍需在推演记录中审核后决定是否采纳。
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>AI World Engine | <a href="/">返回首页</a></p>
+        </footer>
+    </div>
+</body>
+</html>

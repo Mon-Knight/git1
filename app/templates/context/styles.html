@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>写作风格方案 — {{ world.name }} — AI World Engine</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">✏️ 写作风格方案</h1>
+            <p class="subtitle">{{ world.name }}</p>
+        </header>
+
+        <nav class="nav">
+            <a href="/worlds/{{ world.id }}/context" class="nav-link">← 返回创作上下文</a>
+            <a href="/worlds/{{ world.id }}/context/styles/new" class="btn-primary btn-sm">+ 新建风格方案</a>
+        </nav>
+
+        <main class="main">
+            {% if error %}
+            <div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:#e74c3c">
+                ❌ {{ error }}
+            </div>
+            {% endif %}
+
+            {% if profiles %}
+            <div class="module-grid">
+                {% for p in profiles %}
+                <div class="module-card" style="text-align:left;padding:1rem 1.25rem">
+                    <div style="display:flex;justify-content:space-between;align-items:start">
+                        <h3 style="margin:0 0 0.3rem 0;font-size:1rem">{{ p.name }}</h3>
+                        {% if p.world_id is none %}<span class="badge" style="background:rgba(0,212,170,0.15);color:#00d4aa">全局</span>{% endif %}
+                    </div>
+                    <p style="font-size:0.82rem;color:var(--color-text-muted);margin:0.3rem 0">
+                        {% if p.genre %}题材: {{ p.genre }} · {% endif %}
+                        {% if p.narrative_pov %}{{ p.narrative_pov }} · {% endif %}
+                        {% if p.pacing %}节奏: {{ p.pacing }}{% endif %}
+                    </p>
+                    <p style="font-size:0.78rem;color:var(--color-text-muted);margin:0.3rem 0">
+                        更新: {{ p.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                    </p>
+                    <div style="margin-top:0.5rem;display:flex;gap:0.5rem">
+                        <a href="/worlds/{{ world.id }}/context/styles/{{ p.id }}/edit" class="btn-sm">编辑</a>
+                        <form action="/worlds/{{ world.id }}/context/styles/{{ p.id }}/delete" method="post" onsubmit="return confirm('确定要删除风格方案「{{ p.name }}」吗？\\n\\n如果该方案正被上下文包引用则无法删除。')" style="display:inline">
+                            <button type="submit" class="btn-sm btn-danger">删除</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="info-card">
+                <p style="text-align:center;color:var(--color-text-muted)">
+                    暂无风格方案。<a href="/worlds/{{ world.id }}/context/styles/new">新建一个</a>
+                </p>
+            </div>
+            {% endif %}
+        </main>
+
+        <footer class="footer">
+            <p>AI World Engine | <a href="/">返回首页</a></p>
+        </footer>
+    </div>
+</body>
+</html>

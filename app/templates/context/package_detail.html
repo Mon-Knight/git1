@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ pkg.name }} — 上下文包详情 — AI World Engine</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">📦 {{ pkg.name }}</h1>
+            <p class="subtitle">{{ world.name }}</p>
+        </header>
+
+        <nav class="nav">
+            <a href="/worlds/{{ world.id }}/context/packages" class="nav-link">← 返回上下文包列表</a>
+            <a href="/worlds/{{ world.id }}/context/packages/{{ pkg.id }}/edit" class="btn-sm">编辑</a>
+        </nav>
+
+        <main class="main">
+            <div class="alert-info" style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:var(--color-primary)">
+                ⚠️ 该上下文包只是生成输入的组合引用，<strong>不会自动改写正史</strong>。AI 生成结果仍需在推演记录中审核后决定是否采纳。
+            </div>
+
+            <!-- Package Info -->
+            <section class="world-info" style="margin-bottom:1.5rem">
+                <div class="info-card">
+                    <h3>📋 基本信息</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">名称</span>
+                            <span class="info-value">{{ pkg.name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">描述</span>
+                            <span class="info-value">{{ pkg.description or '未填写' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">生成类型</span>
+                            <span class="info-value">{{ pkg.generation_type or '未指定' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">目标字数</span>
+                            <span class="info-value">{{ pkg.target_words or '未指定' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">严格正史</span>
+                            <span class="info-value">{{ '✅ 是' if pkg.strict_canon else '❌ 否' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">严格风格</span>
+                            <span class="info-value">{{ '✅ 是' if pkg.strict_style else '❌ 否' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">包含分支</span>
+                            <span class="info-value">{{ '✅ 是' if pkg.include_branches else '❌ 否' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">包含非正史</span>
+                            <span class="info-value">{{ '✅ 是' if pkg.include_non_canon else '❌ 否' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">默认包</span>
+                            <span class="info-value">{{ '✅ 是' if pkg.is_default else '❌ 否' }}</span>
+                        </div>
+                    </div>
+                    {% if pkg.extra_requirements %}
+                    <div style="margin-top:0.75rem">
+                        <strong>补充要求：</strong>
+                        <p style="white-space:pre-wrap;color:var(--color-text-muted);font-size:0.85rem">{{ pkg.extra_requirements }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Referenced Assets -->
+            <section class="module-nav" style="margin-bottom:1.5rem">
+                <h2>🔗 引用的资产</h2>
+                <div class="module-grid">
+                    {% if preview.simulation_record %}
+                    <div class="module-card" style="text-align:left;padding:1rem 1.25rem">
+                        <h3>📋 推演记录</h3>
+                        <p style="font-size:0.85rem;color:var(--color-text-muted)">
+                            类型: {{ preview.simulation_record.simulation_type }} · 状态: {{ preview.simulation_record.status }}
+                        </p>
+                        <p style="font-size:0.82rem;color:var(--color-text-muted);margin-top:0.3rem">
+                            {{ preview.simulation_record.question }}
+                        </p>
+                        {% if preview.simulation_record.ai_response %}
+                        <details style="margin-top:0.5rem">
+                            <summary style="cursor:pointer;font-size:0.85rem;color:var(--color-primary)">查看 AI 回复（前 500 字）</summary>
+                            <div style="white-space:pre-wrap;font-size:0.8rem;color:var(--color-text-muted);margin-top:0.5rem;max-height:200px;overflow-y:auto;border:1px solid var(--color-border);border-radius:var(--radius);padding:0.5rem">
+                                {{ preview.simulation_record.ai_response }}
+                            </div>
+                        </details>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="module-card" style="text-align:center;opacity:0.5">
+                        <h3>📋 推演记录</h3>
+                        <p>未选择</p>
+                    </div>
+                    {% endif %}
+
+                    {% if preview.style_profile %}
+                    <div class="module-card" style="text-align:left;padding:1rem 1.25rem">
+                        <h3>✏️ 风格方案</h3>
+                        <p style="font-size:0.85rem">
+                            <strong>{{ preview.style_profile.name }}</strong>
+                        </p>
+                        <p style="font-size:0.82rem;color:var(--color-text-muted);margin-top:0.3rem">
+                            {% if preview.style_profile.genre %}题材: {{ preview.style_profile.genre }} · {% endif %}
+                            {% if preview.style_profile.narrative_pov %}{{ preview.style_profile.narrative_pov }} · {% endif %}
+                            {% if preview.style_profile.pacing %}节奏: {{ preview.style_profile.pacing }}{% endif %}
+                        </p>
+                        {% if preview.style_profile.description %}
+                        <p style="font-size:0.8rem;color:var(--color-text-muted);margin-top:0.3rem">{{ preview.style_profile.description }}</p>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="module-card" style="text-align:center;opacity:0.5">
+                        <h3>✏️ 风格方案</h3>
+                        <p>未选择</p>
+                    </div>
+                    {% endif %}
+
+                    {% if preview.plot_anchor %}
+                    <div class="module-card" style="text-align:left;padding:1rem 1.25rem">
+                        <h3>📍 剧情时间点</h3>
+                        <p style="font-size:0.85rem">
+                            <strong>{{ preview.plot_anchor.name }}</strong>
+                        </p>
+                        <p style="font-size:0.82rem;color:var(--color-text-muted);margin-top:0.3rem">
+                            {% if preview.plot_anchor.stage %}阶段: {{ preview.plot_anchor.stage }} · {% endif %}
+                            {% if preview.plot_anchor.current_location %}地点: {{ preview.plot_anchor.current_location }}{% endif %}
+                        </p>
+                        {% if preview.plot_anchor.current_conflict %}
+                        <p style="font-size:0.8rem;color:var(--color-text-muted);margin-top:0.3rem">
+                            当前矛盾: {{ preview.plot_anchor.current_conflict[:100] }}{% if preview.plot_anchor.current_conflict|length > 100 %}...{% endif %}
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="module-card" style="text-align:center;opacity:0.5">
+                        <h3>📍 剧情时间点</h3>
+                        <p>未选择</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Actions -->
+            <section style="margin-bottom:1.5rem">
+                <div style="display:flex;gap:1rem;flex-wrap:wrap">
+                    <a href="/worlds/{{ world.id }}/novel" class="btn-primary">📖 使用此上下文包生成小说</a>
+                    <a href="/worlds/{{ world.id }}/context/packages/{{ pkg.id }}/edit" class="btn-sm">✏️ 编辑</a>
+                    <form action="/worlds/{{ world.id }}/context/packages/{{ pkg.id }}/delete" method="post" onsubmit="return confirm('确定要删除上下文包「{{ pkg.name }}」吗？')" style="display:inline">
+                        <button type="submit" class="btn-sm" style="background:#e74c3c;color:#fff;border-color:#e74c3c">🗑️ 删除</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>AI World Engine | <a href="/">返回首页</a></p>
+        </footer>
+    </div>
+</body>
+</html>

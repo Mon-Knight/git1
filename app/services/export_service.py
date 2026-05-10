@@ -40,6 +40,7 @@ def export_world_to_dict(db: Session, world_id: int) -> Dict[str, Any]:
     from app.models import (
         World, Character, Faction, Location, WorldRule,
         HistoricalEvent, SimulationRecord, Branch,
+        StyleProfile, PlotAnchor, ContextPackage,
     )
 
     world = db.query(World).filter(World.id == world_id).first()
@@ -53,6 +54,26 @@ def export_world_to_dict(db: Session, world_id: int) -> Dict[str, Any]:
     events = db.query(HistoricalEvent).filter(HistoricalEvent.world_id == world_id).all()
     records = db.query(SimulationRecord).filter(SimulationRecord.world_id == world_id).all()
     branches = db.query(Branch).filter(Branch.world_id == world_id).all()
+    plot_anchors = db.query(PlotAnchor).filter(PlotAnchor.world_id == world_id).all()
+    context_packages = db.query(ContextPackage).filter(ContextPackage.world_id == world_id).all()
+
+    # Collect style profiles: world-specific + global ones referenced by this world's packages
+    world_style_ids = {sp.id for sp in db.query(StyleProfile).filter(
+        (StyleProfile.world_id == world_id) | (StyleProfile.world_id.is_(None))
+    ).all()}
+    # Only include global profiles that are referenced by this world's context packages
+    referenced_global_style_ids = set()
+    for cp in context_packages:
+        if cp.style_profile_id:
+            style = db.query(StyleProfile).filter(StyleProfile.id == cp.style_profile_id).first()
+            if style and style.world_id is None:
+                referenced_global_style_ids.add(style.id)
+    # Get all relevant style profiles
+    style_profiles = []
+    for sid in world_style_ids:
+        sp = db.query(StyleProfile).filter(StyleProfile.id == sid).first()
+        if sp and (sp.world_id == world_id or sp.id in referenced_global_style_ids):
+            style_profiles.append(sp)
 
     has_novel_evolution = any(r.simulation_type == "novel_evolution" for r in records)
 
@@ -75,6 +96,9 @@ def export_world_to_dict(db: Session, world_id: int) -> Dict[str, Any]:
             "historical_events": [_row_to_dict(e) for e in events],
             "simulation_records": [_row_to_dict(r) for r in records],
             "branches": [_row_to_dict(b) for b in branches],
+            "style_profiles": [_row_to_dict(s) for s in style_profiles],
+            "plot_anchors": [_row_to_dict(a) for a in plot_anchors],
+            "context_packages": [_row_to_dict(cp) for cp in context_packages],
         },
         "metadata": {
             "counts": {
@@ -85,6 +109,9 @@ def export_world_to_dict(db: Session, world_id: int) -> Dict[str, Any]:
                 "historical_events": len(events),
                 "simulation_records": len(records),
                 "branches": len(branches),
+                "style_profiles": len(style_profiles),
+                "plot_anchors": len(plot_anchors),
+                "context_packages": len(context_packages),
             },
             "contains_novel_evolution": has_novel_evolution,
             "contains_branches": len(branches) > 0,

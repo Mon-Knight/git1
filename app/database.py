@@ -43,5 +43,8 @@ def init_db():
         SimulationRecord,
         Branch,
         AppSetting,
+        StyleProfile,
+        PlotAnchor,
+        ContextPackage,
     )
     Base.metadata.create_all(bind=engine)

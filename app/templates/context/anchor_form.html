@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if is_edit %}编辑{% else %}新建{% endif %}剧情时间点 — {{ world.name }} — AI World Engine</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">📍 {% if is_edit %}编辑剧情时间点{% else %}新建剧情时间点{% endif %}</h1>
+            <p class="subtitle">{{ world.name }}</p>
+        </header>
+
+        <nav class="nav">
+            <a href="/worlds/{{ world.id }}/context/anchors" class="nav-link">← 返回剧情时间点列表</a>
+        </nav>
+
+        <main class="main">
+            <form action="{% if is_edit %}/worlds/{{ world.id }}/context/anchors/{{ anchor.id }}/edit{% else %}/worlds/{{ world.id }}/context/anchors/new{% endif %}" method="post" class="world-form">
+                <div class="form-section">
+                    <h3>基本信息</h3>
+                    <div class="form-row">
+                        <label class="field-required">名称</label>
+                        <div>
+                            <input type="text" name="name" maxlength="200" required
+                                value="{% if form_data.name %}{{ form_data.name }}{% elif anchor %}{{ anchor.name }}{% endif %}"
+                                placeholder="如：第一卷开篇·边境小镇">
+                            {% if errors.name %}<span class="error-msg">{{ errors.name }}</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>所属阶段</label>
+                        <div>
+                            <input type="text" name="stage" maxlength="100" placeholder="如：第一卷·初入学院"
+                                value="{% if form_data.stage %}{{ form_data.stage }}{% elif anchor %}{{ anchor.stage }}{% endif %}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>所属卷</label>
+                        <div>
+                            <input type="text" name="volume_name" maxlength="200" placeholder="如：第一卷·觉醒之章"
+                                value="{% if form_data.volume_name %}{{ form_data.volume_name }}{% elif anchor %}{{ anchor.volume_name }}{% endif %}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>主角年龄</label>
+                        <div>
+                            <input type="text" name="protagonist_age" maxlength="50" placeholder="如：16岁"
+                                value="{% if form_data.protagonist_age %}{{ form_data.protagonist_age }}{% elif anchor %}{{ anchor.protagonist_age }}{% endif %}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>当前地点</label>
+                        <div>
+                            <input type="text" name="current_location" maxlength="200" placeholder="如：魔法学院·主教学楼"
+                                value="{% if form_data.current_location %}{{ form_data.current_location }}{% elif anchor %}{{ anchor.current_location }}{% endif %}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>剧情状态</h3>
+                    <div class="form-row">
+                        <label>已发生事件</label>
+                        <div>
+                            <textarea name="occurred_events" rows="3" maxlength="2000" placeholder="描述已经发生的关键事件">{% if form_data.occurred_events %}{{ form_data.occurred_events }}{% elif anchor %}{{ anchor.occurred_events }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>未公开秘密</label>
+                        <div>
+                            <textarea name="hidden_secrets" rows="3" maxlength="2000" placeholder="当前尚未被主角/读者知道的隐藏信息">{% if form_data.hidden_secrets %}{{ form_data.hidden_secrets }}{% elif anchor %}{{ anchor.hidden_secrets }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>当前矛盾</label>
+                        <div>
+                            <textarea name="current_conflict" rows="2" maxlength="1000" placeholder="当前故事的核心矛盾或冲突">{% if form_data.current_conflict %}{{ form_data.current_conflict }}{% elif anchor %}{{ anchor.current_conflict }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>人物状态</label>
+                        <div>
+                            <textarea name="character_states" rows="2" maxlength="1000" placeholder="当前各主要角色的状态和关系">{% if form_data.character_states %}{{ form_data.character_states }}{% elif anchor %}{{ anchor.character_states }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>势力状态</label>
+                        <div>
+                            <textarea name="faction_states" rows="2" maxlength="1000" placeholder="当前各势力的状态和关系">{% if form_data.faction_states %}{{ form_data.faction_states }}{% elif anchor %}{{ anchor.faction_states }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>方向与约束</h3>
+                    <div class="form-row">
+                        <label>当前目标</label>
+                        <div>
+                            <textarea name="current_goal" rows="2" maxlength="500" placeholder="当前阶段的推进目标">{% if form_data.current_goal %}{{ form_data.current_goal }}{% elif anchor %}{{ anchor.current_goal }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>下一步目标</label>
+                        <div>
+                            <textarea name="next_goal" rows="2" maxlength="500" placeholder="下一阶段的计划目标">{% if form_data.next_goal %}{{ form_data.next_goal }}{% elif anchor %}{{ anchor.next_goal }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>禁止提前发生</label>
+                        <div>
+                            <textarea name="forbidden_events" rows="2" maxlength="1000" placeholder="在当前阶段不允许发生的事件">{% if form_data.forbidden_events %}{{ form_data.forbidden_events }}{% elif anchor %}{{ anchor.forbidden_events }}{% endif %}</textarea>
+                            <div class="field-hint">列出在当前时间点不应该发生的剧情，避免 AI 推演过于跳跃</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>备注</label>
+                        <div>
+                            <textarea name="notes" rows="2" maxlength="1000" placeholder="其他备注">{% if form_data.notes %}{{ form_data.notes }}{% elif anchor %}{{ anchor.notes }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">{% if is_edit %}保存修改{% else %}创建剧情时间点{% endif %}</button>
+            </form>
+        </main>
+
+        <footer class="footer">
+            <p>AI World Engine | <a href="/">返回首页</a></p>
+        </footer>
+    </div>
+</body>
+</html>

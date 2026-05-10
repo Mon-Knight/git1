@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if is_edit %}编辑{% else %}新建{% endif %}风格方案 — {{ world.name }} — AI World Engine</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">✏️ {% if is_edit %}编辑风格方案{% else %}新建风格方案{% endif %}</h1>
+            <p class="subtitle">{{ world.name }}</p>
+        </header>
+
+        <nav class="nav">
+            <a href="/worlds/{{ world.id }}/context/styles" class="nav-link">← 返回风格方案列表</a>
+        </nav>
+
+        <main class="main">
+            {% if errors.submit %}
+            <div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:#e74c3c">
+                ❌ {{ errors.submit }}
+            </div>
+            {% endif %}
+
+            <form action="{% if is_edit %}/worlds/{{ world.id }}/context/styles/{{ profile.id }}/edit{% else %}/worlds/{{ world.id }}/context/styles/new{% endif %}" method="post" class="world-form">
+                <div class="form-section">
+                    <h3>基本信息</h3>
+                    <div class="form-row">
+                        <label class="field-required">名称</label>
+                        <div>
+                            <input type="text" name="name" maxlength="200" required
+                                value="{% if form_data.name %}{{ form_data.name }}{% elif profile %}{{ profile.name }}{% endif %}"
+                                placeholder="如：理性克制风格">
+                            {% if errors.name %}<span class="error-msg">{{ errors.name }}</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>描述</label>
+                        <div>
+                            <textarea name="description" rows="2" maxlength="500" placeholder="简要描述该风格方案的适用场景">{% if form_data.description %}{{ form_data.description }}{% elif profile %}{{ profile.description }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>题材</label>
+                        <div>
+                            <input type="text" name="genre" maxlength="200" placeholder="如：西方奇幻、学院流"
+                                value="{% if form_data.genre %}{{ form_data.genre }}{% elif profile %}{{ profile.genre }}{% endif %}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>叙事人称</label>
+                        <div>
+                            <select name="narrative_pov">
+                                <option value="">— 不指定 —</option>
+                                {% set pov_val = form_data.narrative_pov if form_data else (profile.narrative_pov if profile else '') %}
+                                <option value="第一人称" {% if pov_val == '第一人称' %}selected{% endif %}>第一人称</option>
+                                <option value="第三人称有限" {% if pov_val == '第三人称有限' %}selected{% endif %}>第三人称有限</option>
+                                <option value="第三人称全知" {% if pov_val == '第三人称全知' %}selected{% endif %}>第三人称全知</option>
+                                <option value="多视角" {% if pov_val == '多视角' %}selected{% endif %}>多视角</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>节奏</label>
+                        <div>
+                            <select name="pacing">
+                                <option value="">— 不指定 —</option>
+                                {% set pace_val = form_data.pacing if form_data else (profile.pacing if profile else '') %}
+                                <option value="快速推进" {% if pace_val == '快速推进' %}selected{% endif %}>快速推进</option>
+                                <option value="中等节奏" {% if pace_val == '中等节奏' %}selected{% endif %}>中等节奏</option>
+                                <option value="慢热展开" {% if pace_val == '慢热展开' %}selected{% endif %}>慢热展开</option>
+                                <option value="张弛有度" {% if pace_val == '张弛有度' %}selected{% endif %}>张弛有度</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>写作风格控制</h3>
+                    <div class="form-row">
+                        <label>对话风格</label>
+                        <div>
+                            <textarea name="dialogue_style" rows="2" maxlength="500" placeholder="如：对话简洁有力，不拖泥带水">{% if form_data.dialogue_style %}{{ form_data.dialogue_style }}{% elif profile %}{{ profile.dialogue_style }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>冲突推进</label>
+                        <div>
+                            <textarea name="conflict_style" rows="2" maxlength="500" placeholder="如：冲突逐渐升级，每卷解决一个核心矛盾">{% if form_data.conflict_style %}{{ form_data.conflict_style }}{% elif profile %}{{ profile.conflict_style }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>禁用写法</label>
+                        <div>
+                            <textarea name="forbidden_patterns" rows="2" maxlength="500" placeholder="如：禁止机械降神、禁止主角无理由变强">{% if form_data.forbidden_patterns %}{{ form_data.forbidden_patterns }}{% elif profile %}{{ profile.forbidden_patterns }}{% endif %}</textarea>
+                            <div class="field-hint">列出希望在生成中避免的写作模式</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>补充要求</label>
+                        <div>
+                            <textarea name="extra_instructions" rows="3" maxlength="1000" placeholder="其他需要 AI 注意的写作要求">{% if form_data.extra_instructions %}{{ form_data.extra_instructions }}{% elif profile %}{{ profile.extra_instructions }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>作用范围</h3>
+                    <div class="form-row">
+                        <label>设为全局方案</label>
+                        <div>
+                            {% set global_checked = (form_data.is_global == '1') if form_data else (profile and profile.world_id is none) %}
+                            <label style="font-weight:normal;display:flex;align-items:center;gap:0.5rem">
+                                <input type="checkbox" name="is_global" value="1" {% if global_checked %}checked{% endif %}>
+                                勾选后，该风格方案可在所有世界中使用
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">{% if is_edit %}保存修改{% else %}创建风格方案{% endif %}</button>
+            </form>
+        </main>
+
+        <footer class="footer">
+            <p>AI World Engine | <a href="/">返回首页</a></p>
+        </footer>
+    </div>
+</body>
+</html>

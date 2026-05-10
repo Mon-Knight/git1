@@ -215,3 +215,102 @@ class AppSetting(Base):
 
     def __repr__(self):
         return f"<AppSetting key='{self.key}'>"
+
+
+class StyleProfile(Base):
+    """A saved writing style profile. Can be global (world_id=None) or world-scoped."""
+    __tablename__ = "style_profiles"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    world_id = Column(Integer, ForeignKey("worlds.id"), nullable=True)
+    name = Column(String(200), nullable=False)
+    description = Column(Text, default="")
+    genre = Column(String(200), default="")
+    narrative_pov = Column(String(100), default="")
+    pacing = Column(String(100), default="")
+    sentence_style = Column(Text, default="")
+    paragraph_style = Column(Text, default="")
+    description_ratio = Column(String(50), default="")
+    dialogue_style = Column(Text, default="")
+    action_style = Column(Text, default="")
+    psychology_style = Column(Text, default="")
+    info_release_style = Column(Text, default="")
+    conflict_style = Column(Text, default="")
+    character_style = Column(Text, default="")
+    battle_style = Column(Text, default="")
+    emotion_style = Column(Text, default="")
+    opening_style = Column(Text, default="")
+    ending_hook_style = Column(Text, default="")
+    forbidden_patterns = Column(Text, default="")
+    extra_instructions = Column(Text, default="")
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+    world = relationship("World", foreign_keys=[world_id])
+
+    def __repr__(self):
+        return f"<StyleProfile id={self.id} name='{self.name}'>"
+
+
+class PlotAnchor(Base):
+    """A plot anchor recording current story progress within a world."""
+    __tablename__ = "plot_anchors"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    world_id = Column(Integer, ForeignKey("worlds.id"), nullable=False)
+    name = Column(String(200), nullable=False)
+    stage = Column(String(100), default="")
+    volume_name = Column(String(200), default="")
+    chapter_range = Column(String(100), default="")
+    protagonist_age = Column(String(50), default="")
+    current_time = Column(String(200), default="")
+    current_location = Column(String(200), default="")
+    occurred_events = Column(Text, default="")
+    hidden_secrets = Column(Text, default="")
+    current_conflict = Column(Text, default="")
+    character_states = Column(Text, default="")
+    faction_states = Column(Text, default="")
+    current_goal = Column(Text, default="")
+    next_goal = Column(Text, default="")
+    forbidden_events = Column(Text, default="")
+    notes = Column(Text, default="")
+    is_locked = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+    world = relationship("World", foreign_keys=[world_id])
+
+    def __repr__(self):
+        return f"<PlotAnchor id={self.id} name='{self.name}'>"
+
+
+class ContextPackage(Base):
+    """A creative context package combining simulation records, style profiles, and plot anchors."""
+    __tablename__ = "context_packages"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    world_id = Column(Integer, ForeignKey("worlds.id"), nullable=False)
+    name = Column(String(200), nullable=False)
+    description = Column(Text, default="")
+    simulation_record_id = Column(Integer, ForeignKey("simulation_records.id"), nullable=True)
+    style_profile_id = Column(Integer, ForeignKey("style_profiles.id"), nullable=True)
+    plot_anchor_id = Column(Integer, ForeignKey("plot_anchors.id"), nullable=True)
+    generation_type = Column(String(50), default="")
+    strict_canon = Column(Boolean, default=True)
+    strict_style = Column(Boolean, default=True)
+    include_branches = Column(Boolean, default=False)
+    include_non_canon = Column(Boolean, default=False)
+    target_words = Column(String(50), default="")
+    extra_requirements = Column(Text, default="")
+    is_default = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+    world = relationship("World", foreign_keys=[world_id])
+    simulation_record = relationship("SimulationRecord", foreign_keys=[simulation_record_id])
+    style_profile = relationship("StyleProfile", foreign_keys=[style_profile_id])
+    plot_anchor = relationship("PlotAnchor", foreign_keys=[plot_anchor_id])
+
+    def __repr__(self):
+        return f"<ContextPackage id={self.id} name='{self.name}'>"

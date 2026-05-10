@@ -39,7 +39,12 @@ def _get_ai_mode_info(db: Session) -> str:
 
 
 @router.get("", response_class=HTMLResponse)
-async def novel_form_page(request: Request, world_id: int, db: Session = Depends(get_db)):
+async def novel_form_page(
+    request: Request,
+    world_id: int,
+    context_package_id: int = None,
+    db: Session = Depends(get_db),
+):
     """Show the novel engineering form."""
     world = WorldService.get_world(db, world_id)
     if not world:
@@ -50,6 +55,10 @@ async def novel_form_page(request: Request, world_id: int, db: Session = Depends
     context = WorldContextService.build_world_context(db, world_id)
     context_snapshot = WorldContextService.build_context_snapshot(context)
 
+    # Load available context packages for this world
+    from app.services.context_package_service import ContextPackageService
+    context_packages = ContextPackageService.list_context_packages_by_world(db, world_id)
+
     return templates.TemplateResponse(request, "novel/form.html", {
         "world": world,
         "context_snapshot": context_snapshot,
@@ -57,6 +66,8 @@ async def novel_form_page(request: Request, world_id: int, db: Session = Depends
         "errors": {},
         "form_data": {},
         "result": None,
+        "context_packages": context_packages,
+        "selected_package_id": context_package_id,
     })
 
 
@@ -65,6 +76,7 @@ async def run_novel_evolution(
     request: Request,
     world_id: int,
     db: Session = Depends(get_db),
+    context_package_id: str = Form(default=""),
     protagonist_name: str = Form(default=""),
     protagonist_identity: str = Form(default=""),
     protagonist_power: str = Form(default=""),
@@ -119,6 +131,31 @@ async def run_novel_evolution(
     context = WorldContextService.build_world_context(db, world_id)
     context_snapshot = WorldContextService.build_context_snapshot(context)
 
+    # Load available context packages
+    from app.services.context_package_service import ContextPackageService
+    context_packages = ContextPackageService.list_context_packages_by_world(db, world_id)
+
+    # Load selected context package
+    selected_package_id = None
+    pkg_context = None
+    if context_package_id and context_package_id.strip():
+        try:
+            pkg_id = int(context_package_id)
+            selected_package_id = pkg_id
+            pkg_context = ContextPackageService.build_context_for_generation(db, pkg_id)
+            if "error" in pkg_context:
+                pkg_context = None
+            else:
+                # Augment context_snapshot with context package info
+                import json
+                pkg_snapshot = json.dumps(pkg_context, ensure_ascii=False, indent=2)
+                context_snapshot = (
+                    "【创作上下文包信息】\n" + pkg_snapshot +
+                    "\n\n【世界设定快照】\n" + context_snapshot
+                )
+        except (ValueError, Exception):
+            pass
+
     if errors:
         return templates.TemplateResponse(request, "novel/form.html", {
             "world": world,
@@ -127,6 +164,8 @@ async def run_novel_evolution(
             "errors": errors,
             "form_data": novel_form,
             "result": None,
+            "context_packages": context_packages,
+            "selected_package_id": selected_package_id,
         }, status_code=422)
 
     # Build prompt and run AI
@@ -152,6 +191,8 @@ async def run_novel_evolution(
         if novel_form["protagonist_name"]:
             question_parts.append("主角:" + novel_form["protagonist_name"])
         question_parts.append("主线:" + novel_form["main_story_direction"][:100])
+        if selected_package_id:
+            question_parts.append(f"上下文包ID:{selected_package_id}")
         question_summary = " | ".join(question_parts)
 
         # Save to simulation_records
@@ -181,6 +222,8 @@ async def run_novel_evolution(
                 "ai_model": record.ai_model or ("Mock" if record.is_mock else "unknown"),
                 "created_at": record.created_at.strftime("%Y-%m-%d %H:%M"),
             },
+            "context_packages": context_packages,
+            "selected_package_id": selected_package_id,
         })
 
     except Exception as e:
@@ -191,4 +234,6 @@ async def run_novel_evolution(
             "errors": {"submit": "推演失败: {}".format(str(e))},
             "form_data": novel_form,
             "result": None,
+            "context_packages": context_packages,
+            "selected_package_id": selected_package_id,
         })

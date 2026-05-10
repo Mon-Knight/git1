@@ -34,6 +34,14 @@ REQUIRED_TEMPLATES = [
     "app/templates/data/import.html",
     "app/templates/data/backups.html",
     "app/templates/data/export_result.html",
+    "app/templates/context/index.html",
+    "app/templates/context/styles.html",
+    "app/templates/context/style_form.html",
+    "app/templates/context/anchors.html",
+    "app/templates/context/anchor_form.html",
+    "app/templates/context/packages.html",
+    "app/templates/context/package_form.html",
+    "app/templates/context/package_detail.html",
 ]
 
 # Required hidden import modules
@@ -81,6 +89,11 @@ def check_source_templates():
         else:
             print("  FAIL: world detail page missing novel engineering entry")
             errors.append("World detail missing /novel entry")
+        if "/context" in detail_html and "创作上下文" in detail_html:
+            print("  OK: world detail page has creative context entry")
+        else:
+            print("  FAIL: world detail page missing creative context entry")
+            errors.append("World detail missing /context entry")
 
     return errors
 
