@@ -439,6 +439,7 @@ def _ensure_pyinstaller_imports():
     import app.services.ai.prompt_builder  # noqa: F401
     import app.services.ai.response_parser  # noqa: F401
     import app.routes.settings  # noqa: F401
+    import app.routes.novel  # noqa: F401
 
 
 # ── Main ────────────────────────────────────────────────────────────────────

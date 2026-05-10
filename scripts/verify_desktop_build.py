@@ -29,6 +29,7 @@ REQUIRED_TEMPLATES = [
     "app/templates/index.html",
     "app/templates/settings/ai.html",
     "app/templates/simulation/index.html",
+    "app/templates/novel/form.html",
 ]
 
 # Required hidden import modules
@@ -65,6 +66,17 @@ def check_source_templates():
         else:
             print(f"  FAIL: {tpl} missing")
             errors.append(f"Missing source template: {tpl}")
+
+    # Check world detail page has novel entry
+    detail_path = os.path.join(PROJECT_ROOT, "app", "templates", "worlds", "detail.html")
+    if os.path.isfile(detail_path):
+        with open(detail_path, "r", encoding="utf-8") as f:
+            detail_html = f.read()
+        if "/novel" in detail_html and "小说工程模式" in detail_html:
+            print("  OK: world detail page has novel engineering entry")
+        else:
+            print("  FAIL: world detail page missing novel engineering entry")
+            errors.append("World detail missing /novel entry")
 
     return errors
 

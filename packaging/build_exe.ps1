@@ -72,6 +72,8 @@ $envPath = "C:/Users/17735/anaconda3/envs/aiworldengine"
     --hidden-import app.services.ai.prompt_builder `
     --hidden-import app.services.ai.response_parser `
     --hidden-import app.services.settings_service `
+    --hidden-import app.constants `
+    --hidden-import app.routes.novel `
     desktop_launcher.py
 
 if ($LASTEXITCODE -ne 0) {

@@ -2,7 +2,7 @@
 
 AI 小说世界观推演系统 — 帮助作者构建小说世界观，通过 AI 推演世界发展。
 
-> **当前版本**: v1.3.5 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
+> **当前版本**: v1.4.0 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
 
 ---
 
@@ -35,6 +35,7 @@ AI 小说世界观推演系统 — 帮助作者构建小说世界观，通过 AI
 | 推演记录 | 查看推演历史，采纳为正史 / 保存为分支 |
 | 分支记录 | 查看独立分支世界线，不影响正史 |
 | 检查中心 | 设定矛盾检查 + 角色行为合理性检查 |
+| 小说工程模式 | 基于已有世界观生成长篇小说全书演化方向 |
 
 ---
 
@@ -45,7 +46,7 @@ AI 小说世界观推演系统 — 帮助作者构建小说世界观，通过 AI
 | `/` | 首页 |
 | `/worlds` | 世界列表 |
 | `/worlds/new` | 创建世界 |
-| `/worlds/{id}` | 世界详情（10 个模块入口） |
+| `/worlds/{id}` | 世界详情（11 个模块入口） |
 | `/worlds/{id}/edit` | 编辑世界 |
 | `/worlds/{id}/characters` | 角色管理 |
 | `/worlds/{id}/factions` | 势力管理 |
@@ -57,6 +58,7 @@ AI 小说世界观推演系统 — 帮助作者构建小说世界观，通过 AI
 | `/worlds/{id}/records` | 推演记录 |
 | `/worlds/{id}/branches` | 分支记录 |
 | `/worlds/{id}/checks` | 检查中心 |
+| `/worlds/{id}/novel` | 小说工程模式（全书演化方向推演） |
 | `/worlds/{id}/checks/conflicts` | 设定矛盾检查 |
 | `/worlds/{id}/checks/behavior` | 角色行为合理性检查 |
 | `/health` | 健康检查 |
@@ -314,7 +316,8 @@ C:\Users\<用户名>\AppData\Local\AIWorldEngine\ai_world_engine.db
 | v1.3.2 | EXE 首页 AI 设置入口、AI 状态显示 | 357 |
 | v1.3.3 | EXE 构建同步修复、打包后验证、构建脚本增强 | 357 |
 | v1.3.4 | EXE 后端启动修复、server.log 增强、headless 模式 | 357 |
-| v1.3.5 | EXE uvicorn logging 崩溃修复、ASCII 日志 | — |
+| v1.3.5 | EXE uvicorn logging 崩溃修复、ASCII 日志 | 368 |
+| v1.4.0 | 小说工程模式基础版、全书演化方向推演 | 403 |
 
 ---
 
@@ -332,6 +335,8 @@ C:\Users\<用户名>\AppData\Local\AIWorldEngine\ai_world_engine.db
 10. 将另一条推演记录「保存为分支」→ 分支独立保存
 11. 进入检查中心 → 运行设定矛盾检查
 12. 运行角色行为合理性检查
+13. 进入小说工程模式 → 填写主角与主线 → 生成全书演化方向
+14. 将小说工程推演结果采纳为正史或保存为分支
 
 ---
 
@@ -343,6 +348,7 @@ C:\Users\<用户名>\AppData\Local\AIWorldEngine\ai_world_engine.db
 - AI 推演默认使用 Mock 模式，需配置 API Key 才能接入真实 AI
 - 检查功能使用规则式关键词匹配，非 NLP 深度分析
 - Windows EXE 仅支持 Windows 平台
+- **v1.4.0 暂不支持**：正文生成、章节大纲、参考小说分析、复杂小说项目管理
 
 ---
 

@@ -25,7 +25,7 @@ def test_home_page_contains_title(client):
 def test_home_page_contains_version(client):
     """Test that the home page contains the version number."""
     response = client.get("/")
-    assert "v1.3.5" in response.text
+    assert "v1.4.0" in response.text
 
 
 def test_health_check(client):

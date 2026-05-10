@@ -13,7 +13,7 @@
 <section class="world-info">
     <div class="info-grid">
         <div class="info-item"><span class="info-label">所属世界</span><span class="info-value">{{ world.name }}</span></div>
-        <div class="info-item"><span class="info-label">推演类型</span><span class="info-value">{{ record.simulation_type or '未分类' }}</span></div>
+        <div class="info-item"><span class="info-label">推演类型</span><span class="info-value">{{ get_type_label(record.simulation_type) }}</span></div>
         <div class="info-item"><span class="info-label">状态</span><span class="info-value status-{{ record.status }}">{{ record.status }}</span></div>
         <div class="info-item"><span class="info-label">AI 模式</span><span class="info-value">{{ 'Mock' if record.is_mock else record.ai_model }}</span></div>
         <div class="info-item"><span class="info-label">创建时间</span><span class="info-value">{{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>

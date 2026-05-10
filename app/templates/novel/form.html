@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小说工程模式 — {{ world.name }} — AI World Engine</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<style>
+.novel-form{display:grid;gap:0.75rem}
+.form-section{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.25rem}
+.form-section h3{font-size:0.95rem;margin-bottom:0.5rem;color:var(--color-primary)}
+.form-row{display:grid;grid-template-columns:140px 1fr;gap:0.5rem;align-items:start}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}}
+.form-row label{padding-top:0.45rem;font-size:0.88rem;font-weight:600;color:var(--color-text)}
+.form-row input,.form-row textarea,.form-row select{padding:0.5rem 0.7rem;border:1px solid var(--color-border);border-radius:var(--radius);background:var(--color-bg);color:var(--color-text);font-size:0.88rem;width:100%;box-sizing:border-box}
+.form-row textarea{min-height:60px;resize:vertical}
+.field-hint{font-size:0.78rem;color:var(--color-text-muted);margin-top:0.15rem}
+.field-required::after{content:" *";color:#e74c3c}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header"><h1 class="logo">📖 {{ world.name }}</h1><p class="subtitle">小说工程模式</p></header>
+<nav class="nav">
+    <a href="/worlds/{{ world.id }}" class="nav-link">← 返回世界详情</a>
+    <a href="/worlds/{{ world.id }}/records" class="btn-sm">📋 推演记录</a>
+</nav>
+<main class="main">
+
+<div class="alert-info" style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:var(--color-primary)">
+    💡 小说工程模式会基于当前世界观生成长篇小说的全书演化方向。生成结果不会自动写入正史，你可以在推演记录中审核后选择「采纳为正史」或「保存为分支」。
+</div>
+
+{{ ai_mode_info|safe }}
+
+{% if errors.submit %}
+<div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:#e74c3c">
+    ❌ {{ errors.submit }}
+</div>
+{% endif %}
+
+{% if result %}
+<section class="world-info" style="margin-bottom:1.5rem">
+    <div class="info-card" style="background:var(--color-surface)">
+        <h3>📖 全书演化方向推演结果</h3>
+        <div style="white-space:pre-wrap;line-height:1.7;color:var(--color-text);margin-top:0.75rem;max-height:600px;overflow-y:auto;border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem">{{ result.ai_response }}</div>
+        <div style="display:flex;gap:1rem;margin-top:0.75rem;font-size:0.8rem;color:var(--color-text-muted)">
+            <span>状态: {{ result.status }}</span>
+            <span>{{ 'Mock AI' if result.is_mock else 'Live AI' }}</span>
+            {% if result.ai_model %}<span>模型: {{ result.ai_model }}</span>{% endif %}
+            <span>{{ result.created_at }}</span>
+        </div>
+        <p style="margin-top:0.75rem">
+            <a href="/worlds/{{ world.id }}/records/{{ result.id }}" class="btn-primary btn-sm">📋 查看完整记录 →</a>
+            <a href="/worlds/{{ world.id }}/simulation" class="btn-sm" style="margin-left:0.5rem">🤖 普通推演</a>
+        </p>
+    </div>
+</section>
+{% endif %}
+
+<form action="/worlds/{{ world.id }}/novel" method="post" class="novel-form world-form">
+
+    <div class="form-section">
+        <h3>👤 主角设定</h3>
+
+        <div class="form-row">
+            <label>主角姓名</label>
+            <div>
+                <input type="text" name="protagonist_name" value="{{ form_data.protagonist_name if form_data else '' }}" placeholder="如：林楚" maxlength="100">
+                <div class="field-hint">主角姓名或代号</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>主角身份</label>
+            <div>
+                <input type="text" name="protagonist_identity" value="{{ form_data.protagonist_identity if form_data else '' }}" placeholder="如：穿越者、领主之子、魔法学院新生" maxlength="200">
+                <div class="field-hint">主角在世界中的身份或角色定位</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>特殊能力</label>
+            <div>
+                <textarea name="protagonist_power" rows="2" placeholder="如：携带 AI 系统，可辅助魔法运算与释放" maxlength="500">{{ form_data.protagonist_power if form_data else '' }}</textarea>
+                <div class="field-hint">主角的核心能力或金手指</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>初始处境</label>
+            <div>
+                <textarea name="protagonist_start" rows="2" placeholder="如：出生在边境领地，身体运动天赋较弱，无法成为骑士" maxlength="500">{{ form_data.protagonist_start if form_data else '' }}</textarea>
+                <div class="field-hint">主角出场时的处境或困难</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3>🎯 主线与冲突</h3>
+
+        <div class="form-row">
+            <label class="field-required">主线方向</label>
+            <div>
+                <textarea name="main_story_direction" rows="3" placeholder="如：主角进入魔法学院后逐渐揭开 AI 系统与世界法则的关系" maxlength="1000" required>{{ form_data.main_story_direction if form_data else '' }}</textarea>
+                {% if errors.main_story_direction %}<span class="error-msg">{{ errors.main_story_direction }}</span>{% endif %}
+                <div class="field-hint">全书主线推进的核心方向（必填）</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>核心冲突</label>
+            <div>
+                <textarea name="core_conflict" rows="2" placeholder="如：传统法师体系与 AI 辅助魔法之间的冲突" maxlength="500">{{ form_data.core_conflict if form_data else '' }}</textarea>
+                <div class="field-hint">推动主线前进的核心矛盾</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>题材类型</label>
+            <div>
+                <input type="text" name="genre" value="{{ form_data.genre if form_data else '' }}" placeholder="如：西方奇幻、学院流、领主建设、战争史诗" maxlength="200">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>目标字数</label>
+            <div>
+                <input type="text" name="target_word_count" value="{{ form_data.target_word_count if form_data else '' }}" placeholder="如：100万字" maxlength="50">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>预计卷数</label>
+            <div>
+                <input type="text" name="volume_count" value="{{ form_data.volume_count if form_data else '' }}" placeholder="如：5卷" maxlength="50">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3>✏️ 写作风格控制</h3>
+
+        <div class="form-row">
+            <label>写作风格</label>
+            <div>
+                <textarea name="writing_style" rows="2" placeholder="如：理性克制、设定严谨、冲突推进强、信息逐步释放" maxlength="300">{{ form_data.writing_style if form_data else '' }}</textarea>
+                <div class="field-hint">整体叙事基调与风格（不要求模仿具体某本小说）</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>节奏偏好</label>
+            <div>
+                <textarea name="pacing_preference" rows="2" placeholder="如：前期学院成长，中期势力扩张，后期世界战争和法则真相" maxlength="300">{{ form_data.pacing_preference if form_data else '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>冲突密度</label>
+            <div>
+                <input type="text" name="conflict_density" value="{{ form_data.conflict_density if form_data else '' }}" placeholder="如：中高冲突密度，每卷至少一个主线矛盾爆发点" maxlength="200">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>对话比例</label>
+            <div>
+                <input type="text" name="dialogue_ratio" value="{{ form_data.dialogue_ratio if form_data else '' }}" placeholder="如：中等对话比例，重点情节使用对话推动人物关系" maxlength="200">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>描写密度</label>
+            <div>
+                <input type="text" name="description_density" value="{{ form_data.description_density if form_data else '' }}" placeholder="如：世界设定描写适中，不堆设定" maxlength="200">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>信息释放方式</label>
+            <div>
+                <textarea name="information_release" rows="2" placeholder="如：通过学院课程、历史遗迹、势力冲突逐步揭示世界真相" maxlength="300">{{ form_data.information_release if form_data else '' }}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3>🚫 约束与补充</h3>
+
+        <div class="form-row">
+            <label>禁用写法</label>
+            <div>
+                <textarea name="banned_patterns" rows="2" placeholder="如：不要无脑爽文、不要系统直接替主角解决所有问题、不要主角无代价变强" maxlength="500">{{ form_data.banned_patterns if form_data else '' }}</textarea>
+                <div class="field-hint">明确的禁用写法或套路</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>补充要求</label>
+            <div>
+                <textarea name="extra_requirements" rows="3" placeholder="如：需要保留法师阶层神秘感，AI 能力前期不能完全暴露" maxlength="500">{{ form_data.extra_requirements if form_data else '' }}</textarea>
+                <div class="field-hint">其他特殊要求</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:1rem;margin-top:0.5rem">
+        <button type="submit" class="btn-primary">📝 生成全书演化方向</button>
+        <span style="font-size:0.8rem;color:var(--color-text-muted)">将使用当前世界设定和以上参数进行 AI 推演</span>
+    </div>
+</form>
+
+{% if not result %}
+<div style="margin-top:1.5rem;background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2);border-radius:var(--radius);padding:0.75rem 1rem">
+    <p style="font-size:0.82rem;color:var(--color-text-muted);margin:0">📋 <strong>当前世界设定摘要：</strong><br>
+    {{ context_snapshot[:300] }}{% if context_snapshot|length > 300 %}...{% endif %}</p>
+    <details style="margin-top:0.5rem"><summary style="font-size:0.8rem;cursor:pointer">展开完整设定快照</summary>
+    <pre style="font-size:0.75rem;color:var(--color-text-muted);white-space:pre-wrap;line-height:1.5;margin-top:0.5rem">{{ context_snapshot }}</pre>
+    </details>
+</div>
+{% endif %}
+
+</main>
+<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
+</div></body></html>

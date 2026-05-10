@@ -1,5 +1,32 @@
 # Changelog
 
+## [v1.4.0] — 2026-05-11
+
+### Added
+- 新增小说工程模式 /worlds/{id}/novel
+- 新增世界详情页"小说工程模式"入口卡片
+- 新增 novel_evolution 推演类型（app/constants.py）
+- 新增 PromptBuilder.build_novel_evolution_prompt 方法
+- 新增小说工程表单页面（app/templates/novel/form.html）
+- 新增小说工程路由（app/routes/novel.py）
+- Mock AI 支持小说工程推演（结构化 14 板块输出）
+- 推演记录列表显示"小说工程推演"类型标签
+- 推演记录 detail 页显示类型中文名称
+- 新增 3 个小说工程路由测试、14 个 PromptBuilder 测试、10 个集成测试
+- build_exe.ps1 和 AIWorldEngine.spec 同步更新 hidden imports（app.routes.novel）
+- desktop_launcher.py 同步更新 PyInstaller imports
+
+### Changed
+- ModelRouter TASK_MODEL_KEYS 新增 novel_evolution（使用 ai_simulation_model）
+- records 列表和详情页使用 Jinja2 全局函数 get_type_label 显示类型
+- 复用现有 AI 推演、推演记录、采纳正史和保存分支流程
+
+### Notes
+- v1.4.0 只实现"全书演化方向推演"
+- 不做正文生成、章节大纲、参考小说分析、复杂小说项目管理
+- 小说工程推演结果保存为 simulation_records，simulation_type=novel_evolution
+- 用户仍通过原有记录页面手动采纳或保存分支
+
 ## [v1.3.5] — 2026-05-11
 
 ### Fixed
