@@ -187,7 +187,6 @@ async def test_ai_connection(
     SettingsService.init_defaults(db)
 
     from app.services.ai.model_router import ModelRouter
-    from app.services.settings_service import SettingsService
 
     try:
         client = ModelRouter.get_client(db, "connection_test")
