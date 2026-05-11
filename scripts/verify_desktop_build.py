@@ -22,6 +22,7 @@ HOMEPAGE_KEYWORDS = [
     ("创作工作台", "Dashboard title"),
     ("数据概览", "Dashboard overview section"),
     ("/settings/ai", "AI settings link"),
+    ("toggleSidebarGroup", "Sidebar JS function"),
 ]
 
 # Required templates that must exist
@@ -54,6 +55,19 @@ REQUIRED_TEMPLATES = [
     "app/templates/setting_suggestions/new.html",
     "app/templates/setting_suggestions/detail.html",
     "app/templates/setting_suggestions/edit_adopt.html",
+]
+
+# Sidebar related checks (in base.html)
+SIDEBAR_CHECKS = [
+    ("sidebar-subnav-divider", "Sidebar subnav divider"),
+    ("showSettingsCategory", "Settings category JS function"),
+    ("onclick=\"showSettingsCategory", "Settings category onclick handler"),
+]
+
+# Settings page checks (in settings/ai.html)
+SETTINGS_PAGE_CHECKS = [
+    ("settings-cat-section", "Settings category section class"),
+    ("data-settings-cat", "Settings category data attributes"),
 ]
 
 # Required hidden import modules
@@ -130,6 +144,40 @@ def check_source_templates():
         else:
             print("  FAIL: world detail page missing creative context entry")
             errors.append("World detail missing /context entry")
+
+    # Check sidebar and settings features
+    base_path = os.path.join(PROJECT_ROOT, "app", "templates", "base.html")
+    if os.path.isfile(base_path):
+        with open(base_path, "r", encoding="utf-8") as f:
+            base_html = f.read()
+        for keyword, desc in SIDEBAR_CHECKS:
+            if keyword in base_html:
+                print(f"  OK: base.html has '{desc}'")
+            else:
+                print(f"  FAIL: base.html missing '{desc}'")
+                errors.append(f"base.html missing: {keyword}")
+
+    sidebar_js_path = os.path.join(PROJECT_ROOT, "app", "static", "js", "sidebar.js")
+    if os.path.isfile(sidebar_js_path):
+        with open(sidebar_js_path, "r", encoding="utf-8") as f:
+            sidebar_js = f.read()
+        if "showSettingsCategory" in sidebar_js:
+            print("  OK: sidebar.js has showSettingsCategory")
+        else:
+            print("  FAIL: sidebar.js missing showSettingsCategory")
+            errors.append("sidebar.js missing showSettingsCategory")
+
+    # Check settings page for category sections
+    settings_path = os.path.join(PROJECT_ROOT, "app", "templates", "settings", "ai.html")
+    if os.path.isfile(settings_path):
+        with open(settings_path, "r", encoding="utf-8") as f:
+            settings_html = f.read()
+        for keyword, desc in SETTINGS_PAGE_CHECKS:
+            if keyword in settings_html:
+                print(f"  OK: settings/ai.html has '{desc}'")
+            else:
+                print(f"  FAIL: settings/ai.html missing '{desc}'")
+                errors.append(f"settings/ai.html missing: {keyword}")
 
     return errors
 

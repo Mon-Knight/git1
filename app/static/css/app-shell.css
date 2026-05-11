@@ -261,6 +261,15 @@
     cursor: default;
 }
 
+/* ===== Sidebar Subnav Divider ===== */
+.sidebar-subnav-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 0.35rem 1rem 0.35rem 2rem;
+    list-style: none;
+    pointer-events: none;
+}
+
 /* ===== Sidebar Future Modules ===== */
 .sidebar-future {
     margin-top: auto;
@@ -322,6 +331,53 @@
     margin: 0;
     padding: 0;
     min-height: auto;
+}
+
+/* ===== Settings Category Sections ===== */
+.settings-cat-section {
+    animation: settingsFadeIn 0.2s ease;
+}
+
+@keyframes settingsFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.settings-cat-section .settings-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.settings-cat-section .settings-card h3 {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.settings-cat-section .future-item {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    opacity: 0.55;
+    padding: 0.15rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.settings-cat-section .future-item::before {
+    content: '⬜';
+    font-size: 0.7rem;
+}
+
+.settings-cat-section .info-row {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    padding: 0.15rem 0;
 }
 
 /* ===== Responsive Breakpoints ===== */

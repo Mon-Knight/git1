@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.services.settings_service import SettingsService
+from app.config import settings
 
 router = APIRouter(prefix="/settings")
 
@@ -50,6 +51,8 @@ async def ai_settings_page(request: Request, db: Session = Depends(get_db)):
         "errors": {},
         "success": None,
         "test_result": None,
+        "active_nav": "settings",
+        "app_version": settings.VERSION,
     })
 
 
@@ -85,6 +88,8 @@ async def save_ai_settings(
             "errors": {},
             "success": "已恢复 Mock AI 模式。",
             "test_result": None,
+            "active_nav": "settings",
+            "app_version": settings.VERSION,
         })
 
     # Validate
@@ -143,6 +148,8 @@ async def save_ai_settings(
             },
             "success": None,
             "test_result": None,
+            "active_nav": "settings",
+            "app_version": settings.VERSION,
         }, status_code=422)
 
     # Save settings
@@ -175,6 +182,8 @@ async def save_ai_settings(
         "errors": {},
         "success": "配置已保存。",
         "test_result": None,
+        "active_nav": "settings",
+        "app_version": settings.VERSION,
     })
 
 
@@ -215,4 +224,6 @@ async def test_ai_connection(
             "provider": result.get("provider", "unknown"),
             "model": result.get("model", "unknown"),
         },
+        "active_nav": "settings",
+        "app_version": settings.VERSION,
     })

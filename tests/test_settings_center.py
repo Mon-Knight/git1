@@ -24,7 +24,7 @@ class TestSettingsCenterPage:
 
     def test_page_has_desktop_section(self, client):
         resp = client.get("/settings/ai")
-        assert "桌面端设置" in resp.text
+        assert "桌面窗口" in resp.text
 
     def test_page_has_display_section(self, client):
         resp = client.get("/settings/ai")
@@ -32,11 +32,11 @@ class TestSettingsCenterPage:
 
     def test_page_has_storage_section(self, client):
         resp = client.get("/settings/ai")
-        assert "数据与存储" in resp.text
+        assert "路径与存储" in resp.text
 
     def test_page_has_export_section(self, client):
         resp = client.get("/settings/ai")
-        assert "导出设置" in resp.text
+        assert "数据与导出" in resp.text
 
     def test_page_has_diagnostics_section(self, client):
         resp = client.get("/settings/ai")
@@ -44,7 +44,7 @@ class TestSettingsCenterPage:
 
     def test_page_has_about_section(self, client):
         resp = client.get("/settings/ai")
-        assert "关于软件" in resp.text
+        assert "关于 AI World Engine" in resp.text
 
     def test_page_has_api_base_url_field(self, client):
         resp = client.get("/settings/ai")
@@ -64,7 +64,7 @@ class TestSettingsCenterPage:
 
     def test_page_has_version(self, client):
         resp = client.get("/settings/ai")
-        assert "v1.7.11" in resp.text
+        assert "v1.7.11.1" in resp.text
 
     def test_page_has_future_version_hint(self, client):
         resp = client.get("/settings/ai")

@@ -1,5 +1,32 @@
 # Development Log — AI World Engine
 
+## 2026-05-11 — v1.7.11.1: 左侧二级导航统一与设置中心折叠分类补丁
+
+### 修改内容
+
+- **base.html**: 左侧二级导航重构，世界子模块（控制台/AI推演/创作资产/小说工程/检查中心）始终可见，无世界时显示禁用态；设置中心新增7个折叠分类子导航；subnav-divider分隔管理项与核心模块
+- **sidebar.js**: 增强多组折叠支持，新增 showSettingsCategory() 处理设置分类即时切换，URL hash 无刷新更新
+- **settings/ai.html**: 重构为7个独立 data-settings-cat 分区，AI设置可编辑、其他分类只读
+- **app-shell.css**: 新增 sidebar-subnav-divider 和 settings-cat-section 样式
+- **dashboard.css**: 新增4级响应式断点（1920/1440/1024/<1024）、表格横向滚动
+- **settings.py**: 添加 app.config settings 导入，所有TemplateResponse补全 active_nav 和 app_version
+- **verify_desktop_build.py**: 新增侧边栏和设置页面专项检查
+- **测试**: 18个新测试 test_v1711_1_sidebar_settings.py 全部通过
+
+### 测试结果
+
+- pytest: 991 passed, 16 failed (pre-existing in test_checks.py/test_adopt_branch.py)
+- compileall: All OK
+- encoding check: All Markdown files passed
+- verify_desktop_build.py --all: ALL CHECKS PASSED
+- EXE: 10.5 MB built successfully
+
+### 下一步
+
+v1.8.0：基于主线全书演化方案的分卷大纲生成
+
+---
+
 ## 2026-05-11 — v1.7.7.1: 左侧边栏可用性更新
 
 ### 为什么在 v1.7.8 前插入 v1.7.7.1

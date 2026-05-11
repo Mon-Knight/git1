@@ -1,5 +1,23 @@
 # Changelog
 
+## [v1.7.11.1] — 2026-05-11
+
+### Changed
+- 左侧导航二级结构统一：世界项目子模块始终可见，无世界时显示禁用态
+- 设置中心左侧折叠分类：AI设置/界面显示/桌面窗口/路径与存储/数据与导出/日志与诊断/关于
+- 设置分类点击即时切换（JS），无需页面刷新
+- 世界控制台入口优化：自动检测最近世界作为默认目标
+- 侧边栏新增 subnav-divider 分隔管理项与核心模块
+- Dashboard CSS 新增多级响应式断点（1920/1440/1024/<1024）
+- 表格横向滚动防止撑爆页面
+- sidebar.js 增强多组折叠支持 + showSettingsCategory
+
+### Notes
+- 补丁版本，不新增业务逻辑、不改数据库
+- 991 tests passed (+18 new)
+- EXE 10.5 MB built
+- 16 pre-existing test failures unchanged (test_checks.py test_adopt_branch.py)
+
 ## [v1.7.11] — 2026-05-11
 
 ### Changed

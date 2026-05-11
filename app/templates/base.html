@@ -35,6 +35,7 @@
             {% set nav_world_id = current_world.id if current_world else None %}
             {% set active = active_nav or '' %}
             {% set is_world_page = active in ('worlds','novel','assets','simulation','checks') %}
+            {% set is_settings_page = active == 'settings' %}
             <li>
                 <a href="/" class="sidebar-link {% if active == 'dashboard' %}active{% endif %}" data-nav="dashboard">
                     <span class="sidebar-icon">🏠</span> 工作台
@@ -57,9 +58,9 @@
                     <li>
                         <a href="/worlds/new" class="sidebar-sublink">➕ 新建世界</a>
                     </li>
-                    {% if not nav_world_id and recent_world_id %}
+                    {% if recent_world_id %}
                     <li>
-                        <a href="/worlds/{{ recent_world_id }}" class="sidebar-sublink" data-nav="worlds">
+                        <a href="/worlds/{{ recent_world_id }}" class="sidebar-sublink {% if nav_world_id == recent_world_id and active == 'worlds' %}active{% endif %}" data-nav="worlds">
                             ⚡ 最近世界
                         </a>
                     </li>
@@ -68,32 +69,52 @@
                     <li class="sidebar-world-current">
                         <span class="sidebar-sublink world-label">📖 当前世界：{{ current_world.name }}</span>
                     </li>
+                    {% endif %}
+                    <!-- Divider between management and core modules -->
+                    <li class="sidebar-subnav-divider"></li>
+                    <!-- Core world modules: always visible, disabled if no world selected -->
+                    {% set has_world = nav_world_id or recent_world_id %}
+                    {% set target_world_id = nav_world_id or recent_world_id or 0 %}
                     <li>
-                        <a href="/worlds/{{ nav_world_id }}" class="sidebar-sublink {% if not active or active == 'worlds' %}active{% endif %}" data-nav="worlds">
+                        <a href="{% if has_world %}/worlds/{{ target_world_id }}{% else %}#{% endif %}"
+                           class="sidebar-sublink {% if has_world and active == 'worlds' %}active{% endif %} {% if not has_world %}disabled{% endif %}"
+                           data-nav="worlds"
+                           {% if not has_world %}onclick="return false" title="暂无可用世界，请先创建或选择世界"{% endif %}>
                             🎛️ 世界控制台
                         </a>
                     </li>
                     <li>
-                        <a href="/worlds/{{ nav_world_id }}/simulation" class="sidebar-sublink {% if active == 'simulation' %}active{% endif %}" data-nav="simulation">
+                        <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/simulation{% else %}#{% endif %}"
+                           class="sidebar-sublink {% if active == 'simulation' %}active{% endif %} {% if not nav_world_id %}disabled{% endif %}"
+                           data-nav="simulation"
+                           {% if not nav_world_id %}onclick="return false" title="请先进入世界"{% endif %}>
                             🤖 AI 推演
                         </a>
                     </li>
                     <li>
-                        <a href="/worlds/{{ nav_world_id }}/context" class="sidebar-sublink {% if active == 'assets' %}active{% endif %}" data-nav="assets">
+                        <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/context{% else %}#{% endif %}"
+                           class="sidebar-sublink {% if active == 'assets' %}active{% endif %} {% if not nav_world_id %}disabled{% endif %}"
+                           data-nav="assets"
+                           {% if not nav_world_id %}onclick="return false" title="请先进入世界"{% endif %}>
                             📦 创作资产
                         </a>
                     </li>
                     <li>
-                        <a href="/worlds/{{ nav_world_id }}/novel/evolution" class="sidebar-sublink {% if active == 'novel' %}active{% endif %}" data-nav="novel">
+                        <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/novel/evolution{% else %}#{% endif %}"
+                           class="sidebar-sublink {% if active == 'novel' %}active{% endif %} {% if not nav_world_id %}disabled{% endif %}"
+                           data-nav="novel"
+                           {% if not nav_world_id %}onclick="return false" title="请先进入世界"{% endif %}>
                             📖 小说工程
                         </a>
                     </li>
                     <li>
-                        <a href="/worlds/{{ nav_world_id }}/checks" class="sidebar-sublink {% if active == 'checks' %}active{% endif %}" data-nav="checks">
+                        <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/checks{% else %}#{% endif %}"
+                           class="sidebar-sublink {% if active == 'checks' %}active{% endif %} {% if not nav_world_id %}disabled{% endif %}"
+                           data-nav="checks"
+                           {% if not nav_world_id %}onclick="return false" title="请先进入世界"{% endif %}>
                             🔍 检查中心
                         </a>
                     </li>
-                    {% endif %}
                 </ul>
             </li>
             <li>
@@ -101,10 +122,44 @@
                     <span class="sidebar-icon">💾</span> 数据管理
                 </a>
             </li>
-            <li>
-                <a href="/settings/ai" class="sidebar-link {% if active == 'settings' %}active{% endif %}" data-nav="settings">
+            <li class="sidebar-group">
+                <a href="/settings/ai"
+                   class="sidebar-link sidebar-group-toggle {% if is_settings_page %}active{% endif %}"
+                   data-nav="settings"
+                   onclick="toggleSidebarGroup(event)">
                     <span class="sidebar-icon">⚙️</span> 设置
+                    <span class="sidebar-arrow {% if is_settings_page %}open{% endif %}">▾</span>
                 </a>
+                <ul class="sidebar-subnav {% if not is_settings_page %}collapsed{% endif %}">
+                    <li>
+                        <a href="/settings/ai" class="sidebar-sublink {% if active == 'settings' %}active{% endif %}" data-nav="settings"
+                           onclick="showSettingsCategory('ai', event); return false;">🤖 AI 设置</a>
+                    </li>
+                    <li>
+                        <a href="/settings/ai#display" class="sidebar-sublink" data-nav="settings"
+                           onclick="showSettingsCategory('display', event); return false;">🎨 界面显示</a>
+                    </li>
+                    <li>
+                        <a href="/settings/ai#desktop" class="sidebar-sublink" data-nav="settings"
+                           onclick="showSettingsCategory('desktop', event); return false;">🖥️ 桌面窗口</a>
+                    </li>
+                    <li>
+                        <a href="/settings/ai#storage" class="sidebar-sublink" data-nav="settings"
+                           onclick="showSettingsCategory('storage', event); return false;">📁 路径与存储</a>
+                    </li>
+                    <li>
+                        <a href="/settings/ai#export" class="sidebar-sublink" data-nav="settings"
+                           onclick="showSettingsCategory('export', event); return false;">📤 数据与导出</a>
+                    </li>
+                    <li>
+                        <a href="/settings/ai#diagnostics" class="sidebar-sublink" data-nav="settings"
+                           onclick="showSettingsCategory('diagnostics', event); return false;">📋 日志与诊断</a>
+                    </li>
+                    <li>
+                        <a href="/settings/ai#about" class="sidebar-sublink" data-nav="settings"
+                           onclick="showSettingsCategory('about', event); return false;">ℹ️ 关于</a>
+                    </li>
+                </ul>
             </li>
         </ul>
 
@@ -130,7 +185,7 @@
     // Auto-detect active sidebar item from current URL path
     (function() {
         var path = window.location.pathname;
-        var isWorldPage = /^\/worlds\/\d+/.test(path) || /^\/worlds$/.test(path);
+        var hash = window.location.hash;
         var links = document.querySelectorAll('.sidebar-link, .sidebar-sublink');
 
         // Priority-based matching
@@ -160,6 +215,18 @@
             links.forEach(function(link) {
                 link.classList.remove('active');
                 if (link.getAttribute('data-nav') === matched) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Settings page: highlight sub-category based on hash
+        if (matched === 'settings' && hash) {
+            var settingsLinks = document.querySelectorAll('.sidebar-sublink[data-nav="settings"]');
+            settingsLinks.forEach(function(link) {
+                link.classList.remove('active');
+                var onclick = link.getAttribute('onclick') || '';
+                if (onclick.indexOf(hash.replace('#','')) !== -1) {
                     link.classList.add('active');
                 }
             });

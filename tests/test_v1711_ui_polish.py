@@ -73,7 +73,7 @@ class TestSettingsCenter:
 
     def test_settings_has_desktop_section(self, client):
         resp = client.get("/settings/ai")
-        assert "桌面端设置" in resp.text
+        assert "桌面窗口" in resp.text
 
 
 class TestExistingFeatures:
@@ -85,4 +85,4 @@ class TestExistingFeatures:
 
     def test_version_in_homepage(self, client):
         resp = client.get("/")
-        assert "v1.7.11" in resp.text
+        assert "v1.7.11.1" in resp.text
