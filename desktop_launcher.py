@@ -485,6 +485,9 @@ def main():
     _configure_desktop_db(logger)
     logger.info(f"Database URL: {os.environ.get('DATABASE_URL', '(default)')}")
 
+    # Set desktop mode flag for the backend to detect
+    os.environ["AIWE_DESKTOP_MODE"] = "1"
+
     # 3. Run self-check
     check_result = run_self_check(logger)
     if check_result["issues"]:
@@ -547,6 +550,31 @@ def main():
 
     try:
         import webview
+
+        class DesktopExportApi:
+            """API exposed to the webview for desktop file operations."""
+
+            def choose_save_path(self, default_filename: str = "export.json",
+                                 file_types: list = None):
+                """Open a native save-file dialog. Returns dict with path or cancelled."""
+                try:
+                    if file_types is None:
+                        file_types = ["JSON 文件 (*.json)", "所有文件 (*.*)"]
+
+                    result = window.create_file_dialog(
+                        webview.SAVE_DIALOG,
+                        save_filename=default_filename,
+                        file_types=file_types,
+                    )
+                    if result:
+                        return {"ok": True, "path": result}
+                    else:
+                        return {"ok": False, "cancelled": True}
+                except Exception as e:
+                    return {"ok": False, "error": str(e)}
+
+        api = DesktopExportApi()
+
         window = webview.create_window(
             title="AI World Engine",
             url=url,
@@ -554,6 +582,7 @@ def main():
             height=820,
             min_size=(1024, 700),
             resizable=True,
+            js_api=api,
         )
         webview.start()
     except Exception as e:

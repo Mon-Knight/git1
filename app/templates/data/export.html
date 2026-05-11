@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}导出中心 — AI World Engine{% endblock %}
+{% block page_title %}导出中心{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:960px;margin:0 auto">
+    <h1 style="margin-bottom:0.5rem">📤 导出中心</h1>
+    <p style="color:var(--color-text-muted);margin-bottom:1.5rem">导出世界数据、创作资产或全量备份。EXE 桌面模式支持选择保存位置。</p>
+
+    {% if pre_selected_world %}
+    <div class="dcard" style="margin-bottom:1rem;background:rgba(0,212,170,0.08);border-color:var(--color-accent)">
+        <strong>已选择世界：</strong>{{ pre_selected_world.name }}
+    </div>
+    {% endif %}
+
+    <!-- Export Current World -->
+    <div class="dcard" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem">
+        <h3>🌍 导出当前世界</h3>
+        <p style="color:var(--color-text-muted);font-size:0.85rem">导出指定世界的角色、势力、地点、规则、历史事件、推演记录等完整数据。</p>
+        <div style="margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
+            <select id="world-select" style="padding:0.4rem 0.6rem;border-radius:6px;background:var(--color-bg);color:var(--color-text);border:1px solid var(--color-border)">
+                <option value="">请选择世界</option>
+                {% for w in worlds %}
+                <option value="{{ w.id }}" {% if pre_selected_world and pre_selected_world.id == w.id %}selected{% endif %}>{{ w.name }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn-primary" onclick="exportWorld()" id="btn-export-world">导出世界 JSON</button>
+            <span style="font-size:0.75rem;color:var(--color-text-muted)">（也支持直接访问 /worlds/{id}/export.json 下载）</span>
+        </div>
+    </div>
+
+    <!-- Export Full Backup -->
+    <div class="dcard" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem">
+        <h3>💾 全量备份导出</h3>
+        <p style="color:var(--color-text-muted);font-size:0.85rem">导出当前应用所有数据（所有世界、角色、势力、事件、推演记录等）。不含 API Key、.env、日志等敏感信息。</p>
+        <div style="margin-top:0.75rem">
+            <button class="btn-primary" onclick="exportBackup()" id="btn-export-backup">导出全量备份</button>
+        </div>
+    </div>
+
+    <!-- Export Context Assets -->
+    <div class="dcard" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem">
+        <h3>📦 创作资产导出</h3>
+        <p style="color:var(--color-text-muted);font-size:0.85rem">导出风格方案、剧情时间点、创作上下文包等。</p>
+        <div style="margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
+            <select id="asset-world-select" style="padding:0.4rem 0.6rem;border-radius:6px;background:var(--color-bg);color:var(--color-text);border:1px solid var(--color-border)">
+                <option value="">请选择世界</option>
+                {% for w in worlds %}
+                <option value="{{ w.id }}" {% if pre_selected_world and pre_selected_world.id == w.id %}selected{% endif %}>{{ w.name }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn-primary" onclick="exportAssets()" id="btn-export-assets">导出创作资产</button>
+        </div>
+    </div>
+
+    <!-- Export Result Area -->
+    <div id="export-result" style="display:none;margin-top:1rem;padding:1rem;border-radius:var(--radius);border:1px solid var(--color-border)"></div>
+
+    <!-- Export Mode Info -->
+    <div style="margin-top:1rem;padding:0.75rem;background:var(--color-bg);border-radius:8px;font-size:0.8rem;color:var(--color-text-muted)">
+        <strong>导出方式：</strong>
+        <span id="export-mode-indicator">浏览器下载</span>
+        <span style="margin-left:1rem">文件名示例：<code id="filename-preview">AIWorldEngine_world_Example_20260511_120000.json</code></span>
+    </div>
+</div>
+
+<script src="/static/js/export-center.js"></script>
+{% endblock %}

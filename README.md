@@ -2,7 +2,7 @@
 
 AI 小说世界观推演系统 — 帮助作者构建小说世界观，通过 AI 推演世界发展。
 
-> **当前版本**: v1.7.7.1 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
+> **当前版本**: v1.7.8 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
 >
 > **当前阶段**: 应用化阶段整理完成，进入桌面端窗口优化、响应式 UI 与 2K 适配（v1.7.7），后续为导出体验优化和设定库 AI 推演（v1.7.8–v1.7.10），以及分卷大纲（v1.8.0）。
 
@@ -126,8 +126,8 @@ AI 配置页面：/settings/ai（优先级：数据库 > .env）
 |------|------|------|
 | v1.7.5 | 模块分组与二级导航 | ✅ |
 | v1.7.6 | 阶段性整理、文档体系重整与 EXE 验证 | ✅ |
-| **v1.7.7.1** | **左侧边栏可用性更新** | **✅ 当前** |
-| v1.7.7 | 桌面端窗口大小控制、响应式 UI 与 2K 适配 | ✅ |
+| **v1.7.8** | **导出文件位置选择与导出体验优化** | **✅ 当前** |
+| v1.7.7.1 | 左侧边栏可用性更新 | ✅ |
 | v1.7.8 | 导出文件位置选择与导出体验优化 | 待开始 |
 | v1.7.9 | 设定库 AI 推演基础版 | 待开始 |
 | v1.7.10 | 候选设定采纳与测试补齐 | 待开始 |
@@ -173,7 +173,7 @@ packaging/              # 打包脚本
 | 模板引擎 | Jinja2 |
 | 前端 | HTML / CSS / JavaScript (原生) |
 | AI 调用 | OpenAI-compatible API + Mock 模式 |
-| 测试 | pytest (706 个测试) |
+| 测试 | pytest (816 个测试) |
 
 ---
 
@@ -181,7 +181,7 @@ packaging/              # 打包脚本
 
 ``bash
 python -m compileall .               # 语法检查
-pytest tests/ -v                     # 运行测试（706 个）
+pytest tests/ -v                     # 运行测试（816 个）
 python scripts/check_encoding.py     # 编码检查
 python scripts/verify_desktop_build.py --all  # 桌面构建验证
 powershell -ExecutionPolicy Bypass -File packaging/build_exe.ps1  # 打包 EXE

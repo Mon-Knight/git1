@@ -207,3 +207,177 @@ async def export_world_json_endpoint(world_id: int, db: Session = Depends(get_db
         media_type="application/json; charset=utf-8",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+# ── v1.7.8 Export Center ──────────────────────────────────────────────
+
+from app.services.export_file_service import ExportFileService
+from app.config import settings
+
+
+def _is_desktop_mode() -> bool:
+    """Check if running in desktop/EXE mode."""
+    return os.environ.get("AIWE_DESKTOP_MODE", "0") == "1"
+
+
+@router.get("/data/export", response_class=HTMLResponse)
+async def export_center(
+    request: Request,
+    world_id: int = None,
+    db: Session = Depends(get_db),
+):
+    """Export center page."""
+    worlds = WorldService.list_worlds(db)
+    pre_selected = None
+    if world_id:
+        pre_selected = WorldService.get_world(db, world_id)
+    return templates.TemplateResponse(request, "data/export.html", {
+        "worlds": worlds,
+        "pre_selected_world": pre_selected,
+        "active_nav": "data",
+    })
+
+
+@router.get("/data/export/backup")
+async def export_backup_download(db: Session = Depends(get_db)):
+    """Download a full backup JSON (web mode)."""
+    from app.services.backup_service import create_backup
+    try:
+        backup_path = create_backup()
+        with open(backup_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        filename = ExportFileService.build_export_filename("backup")
+        return Response(
+            content=content,
+            media_type="application/json; charset=utf-8",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+    except Exception as e:
+        return Response(
+            content=json.dumps({"error": str(e)}),
+            media_type="application/json",
+            status_code=500,
+        )
+
+
+@router.post("/data/export/backup")
+async def export_backup_desktop_save(
+    request: Request,
+    save_path: str = Form(default=""),
+    db: Session = Depends(get_db),
+):
+    """Desktop mode: save backup to user-chosen path."""
+    if not _is_desktop_mode():
+        return Response(
+            content=json.dumps({"error": "桌面模式不可用，请使用浏览器下载"}),
+            media_type="application/json",
+            status_code=403,
+        )
+
+    validation = ExportFileService.validate_desktop_export_path(save_path)
+    if not validation["ok"]:
+        return Response(
+            content=json.dumps({"error": validation["error"]}),
+            media_type="application/json",
+            status_code=400,
+        )
+
+    try:
+        from app.services.backup_service import create_backup
+        backup_path = create_backup()
+        with open(backup_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        result = ExportFileService.write_export_file(save_path, json.loads(content))
+        if result["ok"]:
+            return {"ok": True, "path": save_path, "export_type": "backup"}
+        else:
+            return Response(
+                content=json.dumps({"error": result["error"]}),
+                media_type="application/json",
+                status_code=500,
+            )
+    except Exception as e:
+        return Response(
+            content=json.dumps({"error": str(e)}),
+            media_type="application/json",
+            status_code=500,
+        )
+
+
+@router.post("/worlds/{world_id}/export.json")
+async def export_world_desktop_save(
+    world_id: int,
+    request: Request,
+    save_path: str = Form(default=""),
+    db: Session = Depends(get_db),
+):
+    """Desktop mode: save world export to user-chosen path."""
+    if not _is_desktop_mode():
+        return Response(
+            content=json.dumps({"error": "桌面模式不可用，请使用浏览器下载"}),
+            media_type="application/json",
+            status_code=403,
+        )
+
+    world = WorldService.get_world(db, world_id)
+    if not world:
+        return Response(
+            content=json.dumps({"error": "World not found"}),
+            media_type="application/json",
+            status_code=404,
+        )
+
+    validation = ExportFileService.validate_desktop_export_path(save_path)
+    if not validation["ok"]:
+        return Response(
+            content=json.dumps({"error": validation["error"]}),
+            media_type="application/json",
+            status_code=400,
+        )
+
+    try:
+        payload = ExportFileService.build_world_export_payload(db, world_id)
+        payload = ExportFileService.sanitize_payload_for_export(payload)
+        result = ExportFileService.write_export_file(save_path, payload)
+        if result["ok"]:
+            return {"ok": True, "path": save_path, "export_type": "world"}
+        else:
+            return Response(
+                content=json.dumps({"error": result["error"]}),
+                media_type="application/json",
+                status_code=500,
+            )
+    except Exception as e:
+        return Response(
+            content=json.dumps({"error": str(e)}),
+            media_type="application/json",
+            status_code=500,
+        )
+
+
+@router.get("/worlds/{world_id}/context/export")
+async def export_context_assets(world_id: int, db: Session = Depends(get_db)):
+    """Download context assets JSON (web mode)."""
+    world = WorldService.get_world(db, world_id)
+    if not world:
+        return Response(
+            content=json.dumps({"error": "World not found"}),
+            media_type="application/json",
+            status_code=404,
+        )
+    try:
+        payload = ExportFileService.build_context_assets_payload(db, world_id)
+        payload = ExportFileService.sanitize_payload_for_export(payload)
+        content = json.dumps(payload, ensure_ascii=False, indent=2, default=str)
+        filename = ExportFileService.build_export_filename("assets", world.name)
+        return Response(
+            content=content,
+            media_type="application/json; charset=utf-8",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+    except Exception as e:
+        return Response(
+            content=json.dumps({"error": str(e)}),
+            media_type="application/json",
+            status_code=500,
+        )
