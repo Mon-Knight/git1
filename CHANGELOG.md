@@ -1,5 +1,31 @@
 # Changelog
 
+## [v1.7.12] — 2026-05-11
+
+### Added
+- 新增全局导航可用性审计测试 (test_v1712_global_navigation_audit.py)
+- 新增世界模块页面审计测试 (test_v1712_world_module_audit.py)
+- 新增按钮和链接可用性审计测试 (test_v1712_button_link_audit.py)
+- 新增设置持久化回归测试 (test_v1712_settings_persistence.py)
+- 新增主流程端到端冒烟测试 (test_v1712_main_flow_smoke.py)
+- verify_desktop_build.py 增加页面审计检查项
+
+### Changed
+- 全局主入口全面审计：所有一级入口可达，无世界时模块禁用
+- 世界内 27 个核心模块页面全部可访问
+- 设置中心功能持久化验证通过
+- 导出中心 Web/EXE 模式稳定
+- 设定库 AI 推演 → 候选 → 采纳闭环验证通过
+- 创作资产与小说工程输入关系确认
+- 检查中心页面可用
+- 存量页面 /worlds/None、/worlds// 链接清零确认
+
+### Notes
+- 本版本不开发分卷大纲、章节大纲、正文生成
+- 本版本为 v1.8.0 提供稳定前置基础
+- 50+ 个旧模板保持独立 HTML 结构（向后兼容），完整适配计划列入 v1.9.0
+- v1.8.0 基于主线全书演化方案的分卷大纲生成
+
 ## [v1.7.11.3] — 2026-05-11
 
 ### Added
