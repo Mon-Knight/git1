@@ -57,6 +57,13 @@
                     <li>
                         <a href="/worlds/new" class="sidebar-sublink">➕ 新建世界</a>
                     </li>
+                    {% if not nav_world_id and recent_world_id %}
+                    <li>
+                        <a href="/worlds/{{ recent_world_id }}" class="sidebar-sublink" data-nav="worlds">
+                            ⚡ 最近世界
+                        </a>
+                    </li>
+                    {% endif %}
                     {% if nav_world_id %}
                     <li class="sidebar-world-current">
                         <span class="sidebar-sublink world-label">📖 当前世界：{{ current_world.name }}</span>

@@ -40,6 +40,7 @@ async def index(request: Request):
         pending_items = []
         recent_packages = []
         recent_evolutions = []
+        first_world_id = None
         quick_actions = DashboardService.get_quick_actions(None)
     finally:
         db.close()
@@ -59,5 +60,6 @@ async def index(request: Request):
             "recent_packages": recent_packages,
             "recent_evolutions": recent_evolutions,
             "quick_actions": quick_actions,
+            "recent_world_id": first_world_id,
         },
     )

@@ -5,6 +5,16 @@
     margin: 0 auto;
 }
 
+/* 2K+ wider dashboard */
+@media (min-width: 1920px) {
+    .dashboard {
+        max-width: 1600px;
+    }
+    .overview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+}
+
 /* Welcome */
 .dashboard-welcome {
     margin-bottom: 1.5rem;

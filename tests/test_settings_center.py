@@ -64,7 +64,7 @@ class TestSettingsCenterPage:
 
     def test_page_has_version(self, client):
         resp = client.get("/settings/ai")
-        assert "v1.7.10" in resp.text
+        assert "v1.7.11" in resp.text
 
     def test_page_has_future_version_hint(self, client):
         resp = client.get("/settings/ai")
