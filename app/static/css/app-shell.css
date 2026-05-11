@@ -4,7 +4,7 @@
     display: flex;
     min-height: 100vh;
     padding-top: 48px; /* topbar height */
-    padding-left: 220px; /* sidebar width */
+    padding-left: 240px; /* sidebar width */
 }
 
 /* ===== Topbar ===== */
@@ -102,14 +102,17 @@
     top: 48px;
     left: 0;
     bottom: 0;
-    width: 220px;
+    width: 240px;
     background: var(--color-surface);
     border-right: 1px solid var(--color-border);
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 90;
-    padding: 0.75rem 0;
+    padding: 0.5rem 0;
     display: flex;
     flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
 }
 
 .sidebar-nav {
@@ -121,25 +124,46 @@
 .sidebar-link {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1rem;
+    gap: 0.6rem;
+    padding: 0.55rem 1rem;
+    margin: 0.1rem 0.5rem;
+    border-radius: 8px;
     color: var(--color-text-muted);
     font-size: 0.88rem;
     text-decoration: none;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
     border-left: 3px solid transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sidebar-link:hover {
     background: var(--color-surface-hover);
     color: var(--color-text);
+    border-left-color: var(--color-border);
 }
 
 .sidebar-link.active {
-    background: rgba(108, 99, 255, 0.08);
+    background: rgba(108, 99, 255, 0.12);
     color: var(--color-primary);
     border-left-color: var(--color-primary);
     font-weight: 600;
+}
+
+.sidebar-link.active:hover {
+    background: rgba(108, 99, 255, 0.18);
+}
+
+/* Disabled sidebar link (no world selected, etc.) */
+.sidebar-link.disabled,
+.sidebar-link.disabled:hover {
+    opacity: 0.4;
+    cursor: default;
+    background: transparent;
+    border-left-color: transparent;
+    color: var(--color-text-muted);
+    pointer-events: none;
 }
 
 .sidebar-icon {
@@ -168,8 +192,10 @@
     display: block;
     font-size: 0.78rem;
     color: var(--color-text-muted);
-    padding: 0.2rem 0;
-    opacity: 0.5;
+    padding: 0.25rem 0 0.25rem 0.25rem;
+    opacity: 0.45;
+    cursor: default;
+    user-select: none;
 }
 
 /* ===== Main Content Area ===== */
@@ -247,8 +273,8 @@
     }
 
     .sidebar {
-        width: 200px;
-        transform: translateX(-200px);
+        width: 240px;
+        transform: translateX(-240px);
         transition: transform 0.2s;
     }
 

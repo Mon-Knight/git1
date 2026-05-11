@@ -35,46 +35,54 @@
             {% set nav_world_id = current_world.id if current_world else None %}
             {% set active = active_nav or '' %}
             <li>
-                <a href="/" class="sidebar-link {% if active == 'dashboard' %}active{% endif %}">
+                <a href="/" class="sidebar-link {% if active == 'dashboard' %}active{% endif %}" data-nav="dashboard">
                     <span class="sidebar-icon">🏠</span> 工作台
                 </a>
             </li>
             <li>
-                <a href="/worlds" class="sidebar-link {% if active == 'worlds' %}active{% endif %}">
+                <a href="/worlds" class="sidebar-link {% if active == 'worlds' %}active{% endif %}" data-nav="worlds">
                     <span class="sidebar-icon">🌍</span> 世界项目
                 </a>
             </li>
             <li>
-                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/novel/evolution{% else %}/worlds{% endif %}"
-                   class="sidebar-link {% if active == 'novel' %}active{% endif %}">
+                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/novel/evolution{% else %}#{% endif %}"
+                   class="sidebar-link {% if not nav_world_id %}disabled{% endif %} {% if active == 'novel' %}active{% endif %}"
+                   data-nav="novel"
+                   {% if not nav_world_id %}title="请先选择一个世界" onclick="return false;"{% endif %}>
                     <span class="sidebar-icon">📖</span> 小说工程
                 </a>
             </li>
             <li>
-                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/context{% else %}/worlds{% endif %}"
-                   class="sidebar-link {% if active == 'assets' %}active{% endif %}">
+                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/context{% else %}#{% endif %}"
+                   class="sidebar-link {% if not nav_world_id %}disabled{% endif %} {% if active == 'assets' %}active{% endif %}"
+                   data-nav="assets"
+                   {% if not nav_world_id %}title="请先选择一个世界" onclick="return false;"{% endif %}>
                     <span class="sidebar-icon">📦</span> 创作资产
                 </a>
             </li>
             <li>
-                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/simulation{% else %}/worlds{% endif %}"
-                   class="sidebar-link {% if active == 'simulation' %}active{% endif %}">
+                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/simulation{% else %}#{% endif %}"
+                   class="sidebar-link {% if not nav_world_id %}disabled{% endif %} {% if active == 'simulation' %}active{% endif %}"
+                   data-nav="simulation"
+                   {% if not nav_world_id %}title="请先选择一个世界" onclick="return false;"{% endif %}>
                     <span class="sidebar-icon">🤖</span> AI 推演
                 </a>
             </li>
             <li>
-                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/checks{% else %}/worlds{% endif %}"
-                   class="sidebar-link {% if active == 'checks' %}active{% endif %}">
+                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/checks{% else %}#{% endif %}"
+                   class="sidebar-link {% if not nav_world_id %}disabled{% endif %} {% if active == 'checks' %}active{% endif %}"
+                   data-nav="checks"
+                   {% if not nav_world_id %}title="请先选择一个世界" onclick="return false;"{% endif %}>
                     <span class="sidebar-icon">🔍</span> 检查中心
                 </a>
             </li>
             <li>
-                <a href="/data" class="sidebar-link {% if active == 'data' %}active{% endif %}">
+                <a href="/data" class="sidebar-link {% if active == 'data' %}active{% endif %}" data-nav="data">
                     <span class="sidebar-icon">💾</span> 数据管理
                 </a>
             </li>
             <li>
-                <a href="/settings/ai" class="sidebar-link {% if active == 'settings' %}active{% endif %}">
+                <a href="/settings/ai" class="sidebar-link {% if active == 'settings' %}active{% endif %}" data-nav="settings">
                     <span class="sidebar-icon">⚙️</span> 设置
                 </a>
             </li>
@@ -97,6 +105,46 @@
     </main>
 
     <!-- ===== Scripts ===== -->
+    <script>
+    // Auto-detect active sidebar item from current URL path
+    (function() {
+        var path = window.location.pathname;
+        var links = document.querySelectorAll('.sidebar-link');
+        var matched = null;
+
+        // Priority-based matching (more specific first)
+        var patterns = [
+            { test: /^\/worlds\/\d+\/novel/, nav: 'novel' },
+            { test: /^\/worlds\/\d+\/context/, nav: 'assets' },
+            { test: /^\/worlds\/\d+\/simulation/, nav: 'simulation' },
+            { test: /^\/worlds\/\d+\/records/, nav: 'simulation' },
+            { test: /^\/worlds\/\d+\/branches/, nav: 'simulation' },
+            { test: /^\/worlds\/\d+\/checks/, nav: 'checks' },
+            { test: /^\/worlds\/\d+/, nav: 'worlds' },
+            { test: /^\/worlds/, nav: 'worlds' },
+            { test: /^\/data/, nav: 'data' },
+            { test: /^\/settings/, nav: 'settings' },
+            { test: /^\/$/, nav: 'dashboard' }
+        ];
+
+        for (var i = 0; i < patterns.length; i++) {
+            if (patterns[i].test.test(path)) {
+                matched = patterns[i].nav;
+                break;
+            }
+        }
+
+        // Apply active class - supports both data-nav attribute and manual active class
+        if (matched) {
+            links.forEach(function(link) {
+                link.classList.remove('active');
+                if (link.getAttribute('data-nav') === matched) {
+                    link.classList.add('active');
+                }
+            });
+        }
+    })();
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

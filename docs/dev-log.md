@@ -1,5 +1,33 @@
 # Development Log — AI World Engine
 
+## 2026-05-11 — v1.7.7.1: 左侧边栏可用性更新
+
+### 为什么在 v1.7.8 前插入 v1.7.7.1
+
+v1.7.7 完成了响应式适配，但左侧边栏仍有可用性问题：
+1. active 高亮依赖手动传 active_nav，部分页面未覆盖
+2. 无 world_id 时世界级入口会生成 /worlds 链接，不够清晰
+3. hover/active/disabled 状态区分不够明显
+4. 小窗口下侧栏隐藏逻辑不完善
+
+### 优化内容
+
+- **auto-detect**: 新增 JS 自动检测 URL path 并高亮对应导航
+- **data-nav**: 每个导航项增加 data-nav 属性支持
+- **安全链接**: 无 world_id 时世界级入口使用 # 作为 href，添加 disabled 类和 onclick=false
+- **样式增强**: 侧栏 240px、圆角、hover 左边框、disabled 灰色不可点击
+- **小窗口**: <1024px 侧栏自动 translateX 隐藏
+
+### 旧路由保留
+
+是，所有旧路由保持不变。
+
+### 下一步
+
+v1.7.8：导出文件位置选择与导出体验优化。
+
+---
+
 ## 2026-05-11 — v1.7.7: 桌面端窗口大小控制、响应式 UI 与 2K 适配
 
 ### 目标
