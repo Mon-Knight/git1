@@ -314,3 +314,26 @@ class ContextPackage(Base):
 
     def __repr__(self):
         return f"<ContextPackage id={self.id} name='{self.name}'>"
+
+
+class SettingSuggestion(Base):
+    """AI-generated candidate setting suggestions for characters, factions, locations, rules."""
+    __tablename__ = "setting_suggestions"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    world_id = Column(Integer, ForeignKey("worlds.id"), nullable=False)
+    suggestion_type = Column(String(20), nullable=False)  # character/faction/location/rule
+    world_type = Column(String(50), default="")
+    reference_style = Column(String(50), default="")
+    generation_count = Column(Integer, default=3)
+    user_requirement = Column(Text, default="")
+    prompt = Column(Text, default="")
+    result_json = Column(Text, default="")
+    status = Column(String(20), default="pending")  # pending/adopted/edited_adopted/discarded
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+    world = relationship("World", foreign_keys=[world_id])
+
+    def __repr__(self):
+        return f"<SettingSuggestion id={self.id} type='{self.suggestion_type}'>"

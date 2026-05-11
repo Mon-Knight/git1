@@ -278,6 +278,7 @@ class WorldDashboardService:
                     {"label": "势力管理", "url": f"/worlds/{world_id}/factions", "disabled": False},
                     {"label": "地点管理", "url": f"/worlds/{world_id}/locations", "disabled": False},
                     {"label": "规则管理", "url": f"/worlds/{world_id}/rules", "disabled": False},
+                    {"label": "🤖 设定库 AI 推演", "url": f"/worlds/{world_id}/setting-suggestions", "disabled": False},
                 ],
             },
             {

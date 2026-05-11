@@ -72,7 +72,7 @@ def test_readme_contains_required_sections():
 
     required = [
         "AI World Engine",
-        "v1.7.8.2",
+        "v1.7.9",
         "技术栈",
         "当前核心能力",
         "快速开始",

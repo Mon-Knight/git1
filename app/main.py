@@ -26,6 +26,7 @@ from app.routes.settings import router as settings_router
 from app.routes.novel import router as novel_router
 from app.routes.data import router as data_router
 from app.routes.context import router as context_router
+from app.routes.setting_suggestions import router as setting_suggestions_router
 
 
 @asynccontextmanager
@@ -73,6 +74,7 @@ app.include_router(settings_router)
 app.include_router(novel_router)
 app.include_router(data_router)
 app.include_router(context_router)
+app.include_router(setting_suggestions_router)
 
 
 @app.get("/health")

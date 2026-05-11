@@ -50,6 +50,9 @@ REQUIRED_TEMPLATES = [
     "app/templates/context/packages.html",
     "app/templates/context/package_form.html",
     "app/templates/context/package_detail.html",
+    "app/templates/setting_suggestions/index.html",
+    "app/templates/setting_suggestions/new.html",
+    "app/templates/setting_suggestions/detail.html",
 ]
 
 # Required hidden import modules

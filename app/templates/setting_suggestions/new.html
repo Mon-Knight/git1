@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}新建候选生成 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}新建候选生成{% endblock %}
+
+{% block content %}
+<h1>🤖 新建设定库 AI 推演 — {{ world.name }}</h1>
+<p style="color:var(--color-text-muted);margin-bottom:1.5rem">选择生成类型和参考方向，AI 将基于当前世界资料生成候选设定。</p>
+
+{% if errors.submit %}<div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem;border-radius:var(--radius);margin-bottom:1rem">{{ errors.submit }}</div>{% endif %}
+
+<form action="/worlds/{{ world.id }}/setting-suggestions" method="post">
+    <div class="form-group">
+        <label for="suggestion_type">生成类型 *</label>
+        <select id="suggestion_type" name="suggestion_type" required>
+            <option value="character">👤 角色</option>
+            <option value="faction">🏛️ 势力</option>
+            <option value="location">🗺️ 地点</option>
+            <option value="rule">📜 规则</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="world_type">世界类型</label>
+        <select id="world_type" name="world_type">
+            {% for val, label in world_types %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="reference_style">参考方向</label>
+        <select id="reference_style" name="reference_style">
+            {% for val, label in reference_styles %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="generation_count">生成数量</label>
+        <input type="number" id="generation_count" name="generation_count" min="1" max="10" value="3">
+        <div class="field-hint" style="font-size:0.78rem;color:var(--color-text-muted)">建议 2~5 条</div>
+    </div>
+    <div class="form-group">
+        <label for="user_requirement">补充要求（可选）</label>
+        <textarea id="user_requirement" name="user_requirement" rows="3" placeholder="例如：需要一位与主角有复杂过往的导师角色" maxlength="500"></textarea>
+    </div>
+    <button type="submit" class="btn-primary">🤖 开始生成</button>
+</form>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% set page_class = 'page-list' %}
+{% block title %}设定库 AI 推演 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}设定库 AI 推演{% endblock %}
+
+{% block content %}
+<h1>🤖 设定库 AI 推演 — {{ world.name }}</h1>
+<p style="color:var(--color-text-muted);margin-bottom:1.5rem">根据当前世界资料生成角色、势力、地点、规则候选设定。候选不会自动写入正式设定，需要用户确认后采纳。</p>
+
+<div style="margin-bottom:1rem">
+    <a href="/worlds/{{ world.id }}/setting-suggestions/new" class="btn-primary">➕ 新建候选生成</a>
+</div>
+
+{% if suggestions %}
+<div class="item-list">
+{% for s in suggestions %}
+<div class="item-row" style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;padding:0.6rem 1rem;margin-bottom:0.4rem">
+    <div class="item-info" style="flex:1">
+        <div class="item-title" style="font-weight:500">
+            {% if s.suggestion_type == 'character' %}👤 角色{% elif s.suggestion_type == 'faction' %}🏛️ 势力{% elif s.suggestion_type == 'location' %}🗺️ 地点{% elif s.suggestion_type == 'rule' %}📜 规则{% endif %}
+            候选 × {{ s.generation_count }}
+        </div>
+        <div class="item-meta" style="font-size:0.75rem;color:var(--color-text-muted)">
+            {{ s.created_at }} · <span class="item-status status-{{ s.status }}">待确认</span>
+        </div>
+    </div>
+    <a href="/worlds/{{ world.id }}/setting-suggestions/{{ s.id }}" class="btn-sm">查看</a>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div style="text-align:center;padding:2rem;background:var(--color-surface);border:1px dashed var(--color-border);border-radius:var(--radius);color:var(--color-text-muted)">暂无候选记录，点击上方按钮开始生成。</div>
+{% endif %}
+
+<div style="margin-top:1.5rem;background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2);border-radius:var(--radius);padding:1rem">
+    <strong>⚠️ 重要提示</strong>
+    <ul style="margin:0.5rem 0 0 1rem;font-size:0.85rem;color:var(--color-text-muted);line-height:1.8">
+        <li>AI 生成的候选设定不会自动写入正式的角色、势力、地点、规则表。</li>
+        <li>所有候选内容均为原创，不会复制现有作品中的专有名称。</li>
+        <li>采纳功能将在 v1.7.10 开放。</li>
+    </ul>
+</div>
+{% endblock %}

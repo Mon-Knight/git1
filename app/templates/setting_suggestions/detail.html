@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard' %}
+{% block title %}候选详情 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}候选详情{% endblock %}
+
+{% block content %}
+<h1>
+    {% if suggestion.suggestion_type == 'character' %}👤 角色{% elif suggestion.suggestion_type == 'faction' %}🏛️ 势力{% elif suggestion.suggestion_type == 'location' %}🗺️ 地点{% elif suggestion.suggestion_type == 'rule' %}📜 规则{% endif %}
+    候选详情
+</h1>
+
+<div style="display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0;font-size:0.85rem;color:var(--color-text-muted)">
+    <span>世界：{{ world.name }}</span>
+    <span>状态：<span class="item-status status-pending">待确认</span></span>
+    <span>生成时间：{{ suggestion.created_at }}</span>
+    <span>生成数量：{{ suggestion.generation_count }}</span>
+</div>
+
+{% if result_data.parse_warning %}
+<div style="background:rgba(255,193,7,0.1);border:1px solid rgba(255,193,7,0.3);border-radius:8px;padding:0.75rem;margin-bottom:1rem;font-size:0.85rem">
+    ⚠️ {{ result_data.parse_warning }}
+</div>
+{% endif %}
+
+{% if result_data.parsed %}
+<div class="suggestion-results" style="display:grid;gap:0.75rem">
+{% for item in result_data.parsed %}
+<div class="suggestion-card" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem">
+    <h3 style="margin-bottom:0.5rem;color:var(--color-primary)">
+        {{ item.name or item.get('name','候选 ' + loop.index|string) }}
+    </h3>
+    <table style="width:100%;font-size:0.85rem;border-collapse:collapse">
+    {% for key, value in item.items() %}
+    {% if key != 'name' and value %}
+    <tr>
+        <td style="padding:0.3rem 0.5rem;color:var(--color-text-muted);width:120px;vertical-align:top;white-space:nowrap">{{ key }}</td>
+        <td style="padding:0.3rem 0.5rem;color:var(--color-text)">{{ value }}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+    </table>
+</div>
+{% endfor %}
+</div>
+{% elif result_data.raw %}
+<div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem;white-space:pre-wrap;line-height:1.7;font-size:0.9rem">{{ result_data.raw }}</div>
+{% else %}
+<div style="text-align:center;padding:2rem;background:var(--color-surface);border:1px dashed var(--color-border);border-radius:var(--radius);color:var(--color-text-muted)">暂无结果数据</div>
+{% endif %}
+
+<div style="margin-top:1.5rem;display:flex;gap:0.5rem;flex-wrap:wrap">
+    <a href="/worlds/{{ world.id }}/setting-suggestions" class="btn-sm">← 返回列表</a>
+    <a href="/worlds/{{ world.id }}/setting-suggestions/new" class="btn-primary">➕ 新建候选生成</a>
+</div>
+
+<div style="margin-top:1.5rem;background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2);border-radius:var(--radius);padding:1rem">
+    <strong>⚠️ 提示</strong>
+    <p style="font-size:0.85rem;color:var(--color-text-muted);margin-top:0.25rem">采纳功能将在 v1.7.10 开放。届时你可以将满意的候选设定采纳到正式的角色、势力、地点、规则中。</p>
+</div>
+{% endblock %}
