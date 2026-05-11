@@ -96,6 +96,44 @@
         {% endif %}
     </section>
 
+    <!-- Current World Quick Modules -->
+    {% if recent_world_id or (current_world and current_world.id) %}
+    {% set cw_id = current_world.id if current_world else recent_world_id %}
+    {% set cw_name = current_world.name if current_world else '' %}
+    <section class="dashboard-section" id="current-world-modules">
+        <h2>⚡ 当前世界快捷模块{% if cw_name %}：{{ cw_name }}{% endif %}</h2>
+        <div class="quick-actions" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem">
+            <a href="/worlds/{{ cw_id }}" class="quick-action-btn">
+                <span>🎛️</span> 世界控制台
+            </a>
+            <a href="/worlds/{{ cw_id }}/simulation" class="quick-action-btn">
+                <span>🤖</span> AI 推演
+            </a>
+            <a href="/worlds/{{ cw_id }}/context" class="quick-action-btn">
+                <span>📦</span> 创作资产
+            </a>
+            <a href="/worlds/{{ cw_id }}/novel/evolution" class="quick-action-btn">
+                <span>📖</span> 小说工程
+            </a>
+            <a href="/worlds/{{ cw_id }}/checks" class="quick-action-btn">
+                <span>🔍</span> 检查中心
+            </a>
+        </div>
+    </section>
+    {% else %}
+    <section class="dashboard-section">
+        <h2>⚡ 当前世界</h2>
+        <div class="empty-state-dash">
+            <div class="empty-icon">🌍</div>
+            <p>请先创建或选择一个世界项目。</p>
+            <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin-top:0.5rem">
+                <a href="/worlds" class="btn-primary">📋 世界列表</a>
+                <a href="/worlds/new" class="btn-secondary">➕ 新建世界</a>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
     <!-- Pending Items -->
     <section class="dashboard-section">
         <h2>⏳ 待处理事项</h2>

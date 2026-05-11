@@ -44,6 +44,10 @@ async def ai_settings_page(request: Request, db: Session = Depends(get_db)):
     config = SettingsService.get_effective_config(db)
     is_live = SettingsService.is_live_enabled(db)
 
+    from app.services.app_settings_service import AppSettingsService
+    app_settings = AppSettingsService.get_all(db)
+    is_desktop = AppSettingsService.is_desktop_mode()
+
     return templates.TemplateResponse(request, "settings/ai.html", {
         "current": current,
         "config": config,
@@ -53,6 +57,8 @@ async def ai_settings_page(request: Request, db: Session = Depends(get_db)):
         "test_result": None,
         "active_nav": "settings",
         "app_version": settings.VERSION,
+        "app_settings": app_settings,
+        "is_desktop_mode": is_desktop,
     })
 
 
@@ -226,4 +232,83 @@ async def test_ai_connection(
         },
         "active_nav": "settings",
         "app_version": settings.VERSION,
+    })
+
+
+@router.post("/app", response_class=HTMLResponse)
+async def save_app_settings(
+    request: Request,
+    db: Session = Depends(get_db),
+    sidebar_expanded: str = Form(default=""),
+    compact_mode: str = Form(default=""),
+    desktop_width: str = Form(default=""),
+    desktop_height: str = Form(default=""),
+    export_default_dir: str = Form(default=""),
+    settings_category: str = Form(default=""),
+):
+    """Save app-level settings (display, desktop, export)."""
+    from app.services.app_settings_service import AppSettingsService
+
+    success_msgs = []
+    errors_list = []
+
+    if sidebar_expanded:
+        try:
+            AppSettingsService.set(db, "ui_sidebar_default_expanded", sidebar_expanded)
+            success_msgs.append("侧边栏默认展开设置已保存。")
+        except Exception as e:
+            errors_list.append(f"侧边栏设置保存失败: {e}")
+
+    if compact_mode:
+        try:
+            AppSettingsService.set(db, "ui_compact_mode", compact_mode)
+            success_msgs.append("紧凑模式设置已保存。")
+        except Exception as e:
+            errors_list.append(f"紧凑模式设置保存失败: {e}")
+
+    if desktop_width or desktop_height:
+        width = desktop_width.strip() if desktop_width else "1280"
+        height = desktop_height.strip() if desktop_height else "820"
+        try:
+            w = int(width)
+            h = int(height)
+            if w < 1024 or w > 2560:
+                errors_list.append("窗口宽度必须在 1024-2560 之间。")
+            elif h < 700 or h > 1600:
+                errors_list.append("窗口高度必须在 700-1600 之间。")
+            else:
+                AppSettingsService.set(db, "desktop_default_width", str(w))
+                AppSettingsService.set(db, "desktop_default_height", str(h))
+                AppSettingsService.save_window_size(w, h)
+                success_msgs.append(f"窗口大小已保存为 {w}×{h}。将在下次启动时生效。")
+        except ValueError:
+            errors_list.append("窗口尺寸必须是有效数字。")
+
+    if export_default_dir:
+        dangerous = ["/etc", "/root", "C:\\Windows", "C:\\Windows\\System32", "/bin", "/sbin", "/usr/bin"]
+        is_dangerous = any(export_default_dir.lower().startswith(d.lower()) for d in dangerous)
+        if is_dangerous:
+            errors_list.append("不允许使用系统目录作为默认导出路径。")
+        else:
+            try:
+                AppSettingsService.set(db, "export_default_dir", export_default_dir)
+                success_msgs.append("默认导出目录已保存。")
+            except Exception as e:
+                errors_list.append(f"导出目录设置保存失败: {e}")
+
+    SettingsService.init_defaults(db)
+    current = SettingsService.get_all(db)
+    config = SettingsService.get_effective_config(db)
+    is_live = SettingsService.is_live_enabled(db)
+    app_settings = AppSettingsService.get_all(db)
+
+    success = "；".join(success_msgs) if success_msgs else None
+    app_errors = {("submit" if not success_msgs else ""): "；".join(errors_list)} if errors_list else {}
+
+    return templates.TemplateResponse(request, "settings/ai.html", {
+        "current": current, "config": config, "is_live": is_live,
+        "errors": app_errors, "success": success, "test_result": None,
+        "active_nav": "settings", "app_version": settings.VERSION,
+        "app_settings": app_settings, "settings_category": settings_category,
+        "is_desktop_mode": AppSettingsService.is_desktop_mode(),
     })

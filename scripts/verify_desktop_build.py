@@ -23,6 +23,7 @@ HOMEPAGE_KEYWORDS = [
     ("数据概览", "Dashboard overview section"),
     ("/settings/ai", "AI settings link"),
     ("toggleSidebarGroup", "Sidebar JS function"),
+    ("当前世界", "Current world section"),
 ]
 
 # Required templates that must exist

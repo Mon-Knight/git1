@@ -40,11 +40,11 @@ class TestDesktopWindowConfig:
 
     def test_window_width_1280(self):
         content = _read_root("desktop_launcher.py")
-        assert "width=1280" in content
+        assert "win_width" in content or "width=1280" in content
 
     def test_window_height_820(self):
         content = _read_root("desktop_launcher.py")
-        assert "height=820" in content
+        assert "win_height" in content or "height=820" in content
 
     def test_min_size_1024_700(self):
         content = _read_root("desktop_launcher.py")

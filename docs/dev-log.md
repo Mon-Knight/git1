@@ -1,5 +1,51 @@
 # Development Log — AI World Engine
 
+## 2026-05-11 — v1.7.11.3: 新建世界页面适配、主界面模块切换与设置中心功能化
+
+### 为什么新建世界页面需要适配
+
+v1.7.11.1 已为大部分页面统一了应用壳布局（base.html + app-main-inner），但 `/worlds/new` 仍使用独立 HTML 结构。本版本将其适配为统一软件端样式。
+
+### 为什么要加强主界面模块切换
+
+AI 推演、创作资产、小说工程、检查中心是同级世界功能，但首页缺少快捷入口。本版本在首页增加"当前世界快捷模块"区域，无世界时显示友好引导。
+
+### 设置中心功能化范围
+
+| 分类 | 本版本状态 |
+|------|-----------|
+| AI 设置 | ✅ 可编辑（已有） |
+| 界面显示 | ✅ 可编辑（新增侧边栏展开+紧凑模式） |
+| 桌面窗口 | ✅ 可编辑（新增默认窗口尺寸） |
+| 路径与存储 | ⬜ 只读展示 |
+| 数据与导出 | ✅ 可编辑（新增默认导出目录） |
+| 日志与诊断 | ✅ 基础操作（复制诊断+打开日志目录） |
+| 关于 | ✅ 信息展示 |
+
+### 新增服务
+
+- `app/services/app_settings_service.py`: 应用设置读写服务（SQLite + JSON 双通道，JSON 供桌面启动器读取窗口尺寸）
+
+### 修改文件
+
+- `app/templates/worlds/new.html` — 重写为 base.html + 卡片式表单
+- `app/templates/index.html` — 新增"当前世界快捷模块"区域
+- `app/templates/settings/ai.html` — 4 个分类升级为可操作
+- `app/routes/settings.py` — 新增 POST /settings/app 路由 + GET 传入 app_settings
+- `app/services/app_settings_service.py` — 新建
+- `desktop_launcher.py` — 读取窗口尺寸设置
+- `app/config.py` — VERSION → 1.7.11.3
+
+### 测试结果
+
+待运行。
+
+### 下一步
+
+v1.8.0：基于主线全书演化方案的分卷大纲生成
+
+---
+
 ## 2026-05-11 — v1.7.11.2: 文档同步 Hook、版本文档校验与测试债务收口
 
 ### 为什么要在 v1.8.0 前加 Hook

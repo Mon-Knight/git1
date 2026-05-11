@@ -1,75 +1,129 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>创建世界 — AI World Engine</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1 class="logo">🌍 AI World Engine</h1>
-            <p class="subtitle">创建新世界</p>
-        </header>
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}新建世界 — AI World Engine{% endblock %}
+{% block page_title %}新建世界{% endblock %}
 
-        <nav class="nav">
-            <a href="/worlds" class="nav-link">← 返回世界列表</a>
-        </nav>
+{% block head_extra %}
+<style>
+.new-world-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.5rem 2rem;
+    max-width: 720px;
+    margin: 0 auto;
+}
+.new-world-card .card-desc {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+}
+.new-world-card .form-group {
+    margin-bottom: 1rem;
+}
+.new-world-card .form-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.88rem;
+    margin-bottom: 0.3rem;
+    color: var(--color-text);
+}
+.new-world-card .form-group .required {
+    color: #e74c3c;
+}
+.new-world-card input, .new-world-card select, .new-world-card textarea {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+.new-world-card input:focus, .new-world-card select:focus, .new-world-card textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(108,99,255,0.2);
+}
+.new-world-card .error-msg {
+    display: block;
+    font-size: 0.78rem;
+    color: #e74c3c;
+    margin-top: 0.2rem;
+}
+.new-world-card .form-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+</style>
+{% endblock %}
 
-        <main class="main">
-            <form action="/worlds" method="post" class="world-form">
-                <div class="form-group {% if errors.name %}has-error{% endif %}">
-                    <label for="name">世界名称 <span class="required">*</span></label>
-                    <input type="text" id="name" name="name" value="{{ form_data.name if form_data else '' }}" placeholder="例如：艾泽拉斯" maxlength="100" required>
-                    {% if errors.name %}<span class="error-msg">{{ errors.name }}</span>{% endif %}
-                </div>
+{% block content %}
+<div class="dashboard" style="max-width:960px">
+    <h1>🌍 新建世界</h1>
+    <div class="new-world-card">
+        <div class="card-desc">
+            创建一个新的世界项目，用于管理角色、势力、地点、规则、历史事件和 AI 推演。
+            创建后可在世界控制台中进行详细设定和推演。
+        </div>
 
-                <div class="form-group {% if errors.world_type %}has-error{% endif %}">
-                    <label for="world_type">世界类型</label>
-                    <select id="world_type" name="world_type">
-                        <option value="">-- 请选择 --</option>
-                        {% set types = ['奇幻', '科幻', '修仙', '都市', '末世', '武侠', '历史', '架空', '其他'] %}
-                        {% for t in types %}
-                        <option value="{{ t }}" {% if form_data and form_data.world_type == t %}selected{% endif %}>{{ t }}</option>
-                        {% endfor %}
-                    </select>
-                    {% if errors.world_type %}<span class="error-msg">{{ errors.world_type }}</span>{% endif %}
-                </div>
+        <form action="/worlds" method="post">
+            <div class="form-group {% if errors.name %}has-error{% endif %}">
+                <label for="name">世界名称 <span class="required">*</span></label>
+                <input type="text" id="name" name="name"
+                       value="{{ form_data.name if form_data else '' }}"
+                       placeholder="例如：艾泽拉斯" maxlength="100" required>
+                {% if errors.name %}<span class="error-msg">{{ errors.name }}</span>{% endif %}
+            </div>
 
-                <div class="form-group">
-                    <label for="description">世界简介</label>
-                    <textarea id="description" name="description" rows="4" placeholder="简要描述你的世界…">{{ form_data.description if form_data else '' }}</textarea>
-                </div>
+            <div class="form-group {% if errors.world_type %}has-error{% endif %}">
+                <label for="world_type">世界类型</label>
+                <select id="world_type" name="world_type">
+                    <option value="">-- 请选择 --</option>
+                    {% set types = ['奇幻', '科幻', '修仙', '都市', '末世', '武侠', '历史', '架空', '其他'] %}
+                    {% for t in types %}
+                    <option value="{{ t }}" {% if form_data and form_data.world_type == t %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+                {% if errors.world_type %}<span class="error-msg">{{ errors.world_type }}</span>{% endif %}
+            </div>
 
-                <div class="form-group {% if errors.current_era %}has-error{% endif %}">
-                    <label for="current_era">当前时代</label>
-                    <input type="text" id="current_era" name="current_era" value="{{ form_data.current_era if form_data else '' }}" placeholder="例如：第三纪元、蒸汽时代" maxlength="100">
-                    {% if errors.current_era %}<span class="error-msg">{{ errors.current_era }}</span>{% endif %}
-                </div>
+            <div class="form-group">
+                <label for="description">世界简介</label>
+                <textarea id="description" name="description" rows="4"
+                          placeholder="简要描述你的世界观…">{{ form_data.description if form_data else '' }}</textarea>
+            </div>
 
-                <div class="form-group {% if errors.tone %}has-error{% endif %}">
-                    <label for="tone">世界基调</label>
-                    <select id="tone" name="tone">
-                        <option value="">-- 请选择 --</option>
-                        {% set tones = ['史诗', '黑暗', '光明', '中性', '幽默', '悲剧', '悬疑'] %}
-                        {% for t in tones %}
-                        <option value="{{ t }}" {% if form_data and form_data.tone == t %}selected{% endif %}>{{ t }}</option>
-                        {% endfor %}
-                    </select>
-                    {% if errors.tone %}<span class="error-msg">{{ errors.tone }}</span>{% endif %}
-                </div>
+            <div class="form-group {% if errors.current_era %}has-error{% endif %}">
+                <label for="current_era">当前时代</label>
+                <input type="text" id="current_era" name="current_era"
+                       value="{{ form_data.current_era if form_data else '' }}"
+                       placeholder="例如：第三纪元、蒸汽时代" maxlength="100">
+                {% if errors.current_era %}<span class="error-msg">{{ errors.current_era }}</span>{% endif %}
+            </div>
 
-                <div class="form-actions">
-                    <button type="submit" class="btn-primary">创建世界</button>
-                    <a href="/worlds" class="btn-secondary">取消</a>
-                </div>
-            </form>
-        </main>
+            <div class="form-group {% if errors.tone %}has-error{% endif %}">
+                <label for="tone">世界基调</label>
+                <select id="tone" name="tone">
+                    <option value="">-- 请选择 --</option>
+                    {% set tones = ['史诗', '黑暗', '光明', '中性', '幽默', '悲剧', '悬疑'] %}
+                    {% for t in tones %}
+                    <option value="{{ t }}" {% if form_data and form_data.tone == t %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+                {% if errors.tone %}<span class="error-msg">{{ errors.tone }}</span>{% endif %}
+            </div>
 
-        <footer class="footer">
-            <p>AI World Engine | <a href="/">返回首页</a></p>
-        </footer>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">✨ 创建世界</button>
+                <a href="/worlds" class="btn-secondary">← 返回世界列表</a>
+            </div>
+        </form>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

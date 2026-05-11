@@ -575,11 +575,20 @@ def main():
 
         api = DesktopExportApi()
 
+        # Read configured window size from app settings
+        win_width, win_height = 1280, 820
+        try:
+            from app.services.app_settings_service import AppSettingsService
+            win_width, win_height = AppSettingsService.get_window_size()
+            logger.info(f"Window size from settings: {win_width}x{win_height}")
+        except Exception:
+            logger.info(f"Using default window size: 1280x820")
+
         window = webview.create_window(
             title="AI World Engine",
             url=url,
-            width=1280,
-            height=820,
+            width=win_width,
+            height=win_height,
             min_size=(1024, 700),
             resizable=True,
             js_api=api,

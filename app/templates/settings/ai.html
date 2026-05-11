@@ -85,20 +85,39 @@
 <!-- ===== Category: 界面显示 ===== -->
 <div class="settings-cat-section" data-settings-cat="display">
     <div class="settings-card">
-        <h3>🎨 界面显示 <span class="future-badge">后续开放</span></h3>
+        <h3>🎨 界面显示 <span class="editable-badge">可编辑</span></h3>
     </div>
     <div class="settings-card">
-        <h3>📐 当前布局配置</h3>
-        <div class="info-row">📂 布局：应用壳（顶部栏 + 左侧导航 + 主内容区）</div>
-        <div class="info-row">📂 侧边栏：支持世界项目折叠与设置分类展开</div>
-        <div class="info-row">📺 响应式适配：普通窗口 / 大窗口（1440px+）/ 2K（1920px+）</div>
-        <div class="info-row">📏 看板页最大宽度：1440px（2K：1600px）</div>
-        <div class="info-row">📏 表单页最大宽度：960px</div>
-        <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--color-text-muted);opacity:0.7">后续版本开放</div>
-        <div class="future-item">UI 缩放比例调整</div>
+        <h3>📐 显示偏好</h3>
+        <form action="/settings/app" method="post">
+            <input type="hidden" name="settings_category" value="display">
+            <div class="form-row">
+                <label>侧边栏默认展开</label>
+                <div>
+                    <select name="sidebar_expanded">
+                        <option value="true" {% if app_settings and app_settings.ui_sidebar_default_expanded == 'true' %}selected{% endif %}>是（默认展开世界项目）</option>
+                        <option value="false" {% if app_settings and app_settings.ui_sidebar_default_expanded == 'false' %}selected{% endif %}>否（默认折叠）</option>
+                    </select>
+                    <div class="field-hint">控制页面加载时"世界项目"侧栏是否展开</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>紧凑模式</label>
+                <div>
+                    <select name="compact_mode">
+                        <option value="false" {% if app_settings and app_settings.ui_compact_mode == 'false' %}selected{% endif %}>标准模式（默认）</option>
+                        <option value="true" {% if app_settings and app_settings.ui_compact_mode == 'true' %}selected{% endif %}>紧凑模式（减小间距）</option>
+                    </select>
+                    <div class="field-hint">紧凑模式让页面更密集，适合小屏幕或信息密集型工作</div>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn-primary">💾 保存显示设置</button>
+            </div>
+        </form>
+        <div style="margin-top:0.75rem;font-size:0.75rem;color:var(--color-text-muted);opacity:0.7">后续版本开放</div>
         <div class="future-item">主题颜色 / 深色模式</div>
         <div class="future-item">字体大小调整</div>
-        <div class="future-item">紧凑模式 / 宽屏模式</div>
         <div class="future-item">2K 大屏自适应优化</div>
     </div>
 </div>
@@ -106,17 +125,32 @@
 <!-- ===== Category: 桌面窗口 ===== -->
 <div class="settings-cat-section" data-settings-cat="desktop">
     <div class="settings-card">
-        <h3>🖥️ 桌面窗口 <span class="future-badge">后续开放</span></h3>
+        <h3>🖥️ 桌面窗口 <span class="editable-badge">可编辑</span></h3>
     </div>
     <div class="settings-card">
-        <h3>📐 当前窗口配置</h3>
-        <div class="info-row">📐 默认窗口：1280 × 820</div>
-        <div class="info-row">📏 最小窗口：1024 × 700</div>
-        <div class="info-row">🔲 最大化：支持</div>
-        <div class="info-row">🖥️ 桌面壳：pywebview</div>
-        <div class="info-row">📦 打包：PyInstaller onedir</div>
-        <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--color-text-muted);opacity:0.7">后续版本开放</div>
-        <div class="future-item">默认窗口尺寸自定义</div>
+        <h3>📐 窗口尺寸设置</h3>
+        <form action="/settings/app" method="post">
+            <input type="hidden" name="settings_category" value="desktop">
+            <div class="form-row">
+                <label>默认宽度</label>
+                <div>
+                    <input type="number" name="desktop_width" value="{{ app_settings.desktop_default_width if app_settings else '1280' }}" min="1024" max="2560" step="10">
+                    <div class="field-hint">范围：1024 ~ 2560（默认 1280）</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>默认高度</label>
+                <div>
+                    <input type="number" name="desktop_height" value="{{ app_settings.desktop_default_height if app_settings else '820' }}" min="700" max="1600" step="10">
+                    <div class="field-hint">范围：700 ~ 1600（默认 820）</div>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn-primary">💾 保存窗口设置</button>
+            </div>
+            <div class="field-hint" style="margin-top:0.5rem">💡 窗口尺寸设置将在下次启动时生效。最小窗口限制 1024×700 不会改变。</div>
+        </form>
+        <div style="margin-top:0.75rem;font-size:0.75rem;color:var(--color-text-muted);opacity:0.7">后续版本开放</div>
         <div class="future-item">启动时最大化</div>
         <div class="future-item">记住上次窗口大小与位置</div>
         <div class="future-item">启动后自动进入最近世界</div>
@@ -148,42 +182,84 @@
 <!-- ===== Category: 数据与导出 ===== -->
 <div class="settings-cat-section" data-settings-cat="export">
     <div class="settings-card">
-        <h3>📤 数据与导出 <span class="future-badge">后续开放</span></h3>
+        <h3>📤 数据与导出 <span class="editable-badge">可编辑</span></h3>
     </div>
     <div class="settings-card">
-        <h3>📦 当前导出配置</h3>
-        <div class="info-row">📦 导出中心：<a href="/data/export">进入 →</a></div>
-        <div class="info-row">🌐 Web 模式：浏览器下载</div>
-        <div class="info-row">🖥️ EXE 模式：可选择保存位置（原生对话框）</div>
-        <div class="info-row">📄 支持格式：JSON（含 ZIP 打包）</div>
-        <div class="info-row">🔒 安全规则：不导出 API Key / .env / 日志</div>
-        <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--color-text-muted);opacity:0.7">后续版本开放</div>
-        <div class="future-item">默认导出目录设置</div>
+        <h3>📦 导出配置</h3>
+        <form action="/settings/app" method="post">
+            <input type="hidden" name="settings_category" value="export">
+            <div class="form-row">
+                <label>默认导出目录</label>
+                <div>
+                    <input type="text" name="export_default_dir" value="{{ app_settings.export_default_dir if app_settings else '' }}" placeholder="留空使用系统默认下载目录">
+                    <div class="field-hint">桌面端（EXE）模式下，导出时将优先使用此目录作为初始保存位置。Web 模式下仅保存设置，实际下载由浏览器管理。</div>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn-primary">💾 保存导出设置</button>
+            </div>
+        </form>
+        <div style="margin-top:0.5rem">
+            <a href="/data/export" class="btn-secondary">📦 进入导出中心 →</a>
+        </div>
+        <div style="margin-top:0.75rem;font-size:0.75rem;color:var(--color-text-muted);opacity:0.7">后续版本开放</div>
         <div class="future-item">导出文件命名模板自定义</div>
         <div class="future-item">导出格式选择（JSON / Markdown）</div>
-        <div class="future-item">导出包含快照（世界设定截图）</div>
-        <div class="future-item">导出后自动打开文件夹</div>
+        <div class="future-item">导出包含快照</div>
     </div>
 </div>
 
 <!-- ===== Category: 日志与诊断 ===== -->
 <div class="settings-cat-section" data-settings-cat="diagnostics">
     <div class="settings-card">
-        <h3>📋 日志与诊断 <span class="future-badge">后续开放</span></h3>
+        <h3>📋 日志与诊断</h3>
     </div>
     <div class="settings-card">
-        <h3>📝 当前日志与诊断工具</h3>
-        <div class="info-row">📝 server.log：后端运行日志（FastAPI / uvicorn）</div>
-        <div class="info-row">🖥️ desktop.log：EXE 桌面壳启动日志</div>
-        <div class="info-row">⚠️ error.log：桌面端错误日志</div>
-        <div class="info-row">✅ 构建验证：<code>python scripts/verify_desktop_build.py --all</code></div>
-        <div class="info-row">🔤 编码检查：<code>python scripts/check_encoding.py</code></div>
-        <div class="info-row">🧪 测试套件：<code>pytest tests/ -v</code></div>
-        <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--color-text-muted);opacity:0.7">后续版本开放</div>
+        <h3>📝 系统信息</h3>
+        <div class="info-row"><strong>运行模式</strong>：<span id="diag-mode">{% if is_desktop_mode %}桌面端 EXE 模式{% else %}源码 / Web 模式{% endif %}</span></div>
+        <div class="info-row"><strong>版本</strong>：v{{ app_version or '1.7.11' }}</div>
+        <div class="info-row"><strong>数据库</strong>：SQLite（本地文件）</div>
+        <div class="info-row"><strong>AI 模式</strong>：{{ '真实 API' if is_live else 'Mock AI (演示)' }}</div>
+        <div class="info-row"><strong>日志文件</strong>：
+            {% if is_desktop_mode %}server.log / desktop.log / error.log{% else %}server.log（uvicorn 输出）{% endif %}
+        </div>
+        <div style="margin-top:0.75rem">
+            <button class="btn-secondary" onclick="copyDiagnostics()" style="cursor:pointer">📋 复制诊断信息</button>
+            {% if is_desktop_mode %}
+            <button class="btn-secondary" onclick="openLogDir()" style="cursor:pointer;margin-left:0.5rem">📂 打开日志目录</button>
+            {% else %}
+            <span style="font-size:0.75rem;color:var(--color-text-muted);margin-left:0.5rem">📂 打开日志目录（仅桌面端可用）</span>
+            {% endif %}
+        </div>
+        <script>
+        function copyDiagnostics() {
+            var info = [
+                "AI World Engine 诊断信息",
+                "版本: v{{ app_version or '1.7.11' }}",
+                "运行模式: {% if is_desktop_mode %}桌面端 EXE{% else %}源码/Web{% endif %}",
+                "AI 模式: {{ '真实 API' if is_live else 'Mock AI' }}",
+                "数据库: SQLite",
+                "时间: " + new Date().toISOString()
+            ].join("\\n");
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(info).then(function() {
+                    alert("诊断信息已复制到剪贴板");
+                });
+            } else {
+                prompt("请手动复制以下诊断信息:", info);
+            }
+        }
+        function openLogDir() {
+            if (window.pywebview && window.pywebview.api) {
+                window.pywebview.api.open_log_dir && window.pywebview.api.open_log_dir();
+            } else {
+                alert("打开日志目录功能仅桌面端可用。\\n日志位置：%LOCALAPPDATA%\\\\AIWorldEngine\\\\logs");
+            }
+        }
+        </script>
+        <div style="margin-top:0.75rem;font-size:0.75rem;color:var(--color-text-muted);opacity:0.7">后续版本开放</div>
         <div class="future-item">页面内查看日志内容</div>
-        <div class="future-item">一键打开日志目录</div>
         <div class="future-item">导出诊断包（含日志+配置+系统信息）</div>
-        <div class="future-item">一键复制诊断信息</div>
         <div class="future-item">系统健康检查面板</div>
     </div>
 </div>
