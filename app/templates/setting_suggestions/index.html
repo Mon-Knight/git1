@@ -21,7 +21,7 @@
             候选 × {{ s.generation_count }}
         </div>
         <div class="item-meta" style="font-size:0.75rem;color:var(--color-text-muted)">
-            {{ s.created_at }} · <span class="item-status status-{{ s.status }}">待确认</span>
+            {{ s.created_at }} · <span class="item-status status-{{ s.status }}">{% if s.status=='pending' %}待处理{% elif s.status=='adopted' %}已采纳{% elif s.status=='edited_adopted' %}编辑后采纳{% elif s.status=='discarded' %}已废弃{% else %}{{ s.status }}{% endif %}</span>
         </div>
     </div>
     <a href="/worlds/{{ world.id }}/setting-suggestions/{{ s.id }}" class="btn-sm">查看</a>
@@ -36,8 +36,8 @@
     <strong>⚠️ 重要提示</strong>
     <ul style="margin:0.5rem 0 0 1rem;font-size:0.85rem;color:var(--color-text-muted);line-height:1.8">
         <li>AI 生成的候选设定不会自动写入正式的角色、势力、地点、规则表。</li>
-        <li>所有候选内容均为原创，不会复制现有作品中的专有名称。</li>
-        <li>采纳功能将在 v1.7.10 开放。</li>
+        <li>候选内容进入详情页后，可选择"采纳"、"编辑后采纳"或"废弃"。</li>
+        <li>采纳后的设定会写入正式的角色、势力、地点、规则表。</li>
     </ul>
 </div>
 {% endblock %}

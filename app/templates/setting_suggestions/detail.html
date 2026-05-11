@@ -1,60 +1,9 @@
-{% extends "base.html" %}
-{% set page_class = 'page-dashboard' %}
-{% block title %}候选详情 — {{ world.name }} — AI World Engine{% endblock %}
-{% block page_title %}候选详情{% endblock %}
-
-{% block content %}
-<h1>
-    {% if suggestion.suggestion_type == 'character' %}👤 角色{% elif suggestion.suggestion_type == 'faction' %}🏛️ 势力{% elif suggestion.suggestion_type == 'location' %}🗺️ 地点{% elif suggestion.suggestion_type == 'rule' %}📜 规则{% endif %}
-    候选详情
-</h1>
-
-<div style="display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0;font-size:0.85rem;color:var(--color-text-muted)">
-    <span>世界：{{ world.name }}</span>
-    <span>状态：<span class="item-status status-pending">待确认</span></span>
-    <span>生成时间：{{ suggestion.created_at }}</span>
-    <span>生成数量：{{ suggestion.generation_count }}</span>
-</div>
-
-{% if result_data.parse_warning %}
-<div style="background:rgba(255,193,7,0.1);border:1px solid rgba(255,193,7,0.3);border-radius:8px;padding:0.75rem;margin-bottom:1rem;font-size:0.85rem">
-    ⚠️ {{ result_data.parse_warning }}
-</div>
-{% endif %}
-
-{% if result_data.parsed %}
-<div class="suggestion-results" style="display:grid;gap:0.75rem">
-{% for item in result_data.parsed %}
-<div class="suggestion-card" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem">
-    <h3 style="margin-bottom:0.5rem;color:var(--color-primary)">
-        {{ item.name or item.get('name','候选 ' + loop.index|string) }}
-    </h3>
-    <table style="width:100%;font-size:0.85rem;border-collapse:collapse">
-    {% for key, value in item.items() %}
-    {% if key != 'name' and value %}
-    <tr>
-        <td style="padding:0.3rem 0.5rem;color:var(--color-text-muted);width:120px;vertical-align:top;white-space:nowrap">{{ key }}</td>
-        <td style="padding:0.3rem 0.5rem;color:var(--color-text)">{{ value }}</td>
-    </tr>
-    {% endif %}
-    {% endfor %}
-    </table>
-</div>
-{% endfor %}
-</div>
-{% elif result_data.raw %}
-<div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem;white-space:pre-wrap;line-height:1.7;font-size:0.9rem">{{ result_data.raw }}</div>
-{% else %}
-<div style="text-align:center;padding:2rem;background:var(--color-surface);border:1px dashed var(--color-border);border-radius:var(--radius);color:var(--color-text-muted)">暂无结果数据</div>
-{% endif %}
-
-<div style="margin-top:1.5rem;display:flex;gap:0.5rem;flex-wrap:wrap">
-    <a href="/worlds/{{ world.id }}/setting-suggestions" class="btn-sm">← 返回列表</a>
-    <a href="/worlds/{{ world.id }}/setting-suggestions/new" class="btn-primary">➕ 新建候选生成</a>
-</div>
-
-<div style="margin-top:1.5rem;background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2);border-radius:var(--radius);padding:1rem">
-    <strong>⚠️ 提示</strong>
-    <p style="font-size:0.85rem;color:var(--color-text-muted);margin-top:0.25rem">采纳功能将在 v1.7.10 开放。届时你可以将满意的候选设定采纳到正式的角色、势力、地点、规则中。</p>
-</div>
+{% extends "base.html" %}{% set page_class = 'page-dashboard' %}{% block title %}候选详情 — {{ world.name }} — AI World Engine{% endblock %}{% block page_title %}候选详情{% endblock %}{% block content %}{% set labels = {'pending':'待处理','adopted':'已采纳','edited_adopted':'编辑后采纳','discarded':'已废弃'} %}{% set sc = {'pending':'status-pending','adopted':'status-adopted','edited_adopted':'status-adopted','discarded':'status-discarded'} %}{% set is_pending = suggestion.status == 'pending' %}
+<h1>{% if suggestion.suggestion_type=='character' %}👤 角色{% elif suggestion.suggestion_type=='faction' %}🏛️ 势力{% elif suggestion.suggestion_type=='location' %}🗺️ 地点{% else %}📜 规则{% endif %} 候选详情</h1>
+<div style="display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0;font-size:0.85rem;color:var(--color-text-muted)"><span>世界：{{ world.name }}</span><span>状态：<span class="item-status {{ sc.get(suggestion.status,'') }}" style="display:inline-block;padding:0.1rem 0.45rem;border-radius:10px;font-size:0.72rem;font-weight:600">{{ labels.get(suggestion.status,suggestion.status) }}</span></span><span>生成时间：{{ suggestion.created_at }}</span>{% if suggestion.adopted_target_id %}<span>目标ID：{{ suggestion.adopted_target_id }}</span>{% endif %}</div>
+{% if error %}<div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem;border-radius:var(--radius);margin-bottom:1rem">❌ {{ error }}</div>{% endif %}
+{% if result_data.parsed %}<div style="display:grid;gap:0.75rem">{% for item in result_data.parsed %}
+<div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem"><h3 style="margin:0;color:var(--color-primary)">{{ item.name or '候选' }}</h3>{% if is_pending %}<div style="display:flex;gap:0.3rem"><form action="/worlds/{{ world.id }}/setting-suggestions/{{ suggestion.id }}/adopt" method="post" style="display:inline"><input type="hidden" name="item_index" value="{{ loop.index0 }}"><button type="submit" class="btn-sm" style="background:var(--color-accent);color:#000;border:none;cursor:pointer">✅ 采纳</button></form><a href="/worlds/{{ world.id }}/setting-suggestions/{{ suggestion.id }}/edit-adopt?item_index={{ loop.index0 }}" class="btn-sm">✏️ 编辑后采纳</a></div>{% endif %}</div><table style="width:100%;font-size:0.85rem;border-collapse:collapse;margin-top:0.5rem">{% for k,v in item.items() %}{% if k != 'name' and v %}<tr><td style="padding:0.3rem 0.5rem;color:var(--color-text-muted);width:120px;vertical-align:top;white-space:nowrap">{{ k }}</td><td style="padding:0.3rem 0.5rem;color:var(--color-text)">{{ v }}</td></tr>{% endif %}{% endfor %}</table></div>{% endfor %}</div>{% endif %}
+<div style="margin-top:1.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center"><a href="/worlds/{{ world.id }}/setting-suggestions" class="btn-sm">← 返回列表</a><a href="/worlds/{{ world.id }}/setting-suggestions/new" class="btn-primary">➕ 新建候选生成</a>{% if is_pending %}<form action="/worlds/{{ world.id }}/setting-suggestions/{{ suggestion.id }}/discard" method="post" style="display:inline"><button type="submit" class="btn-sm" style="background:var(--color-bg);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;cursor:pointer">🗑️ 废弃候选</button></form>{% endif %}</div>
+{% if suggestion.status in ('adopted','edited_adopted') %}<div style="margin-top:1rem;padding:1rem;background:rgba(0,212,170,0.08);border:1px solid rgba(0,212,170,0.3);border-radius:var(--radius)"><strong>✅ 该候选已{{ labels.get(suggestion.status,'处理') }}</strong><p style="font-size:0.85rem;color:var(--color-text-muted);margin-top:0.25rem">已写入正式表，目标类型：{{ suggestion.adopted_target_type }}，目标ID：{{ suggestion.adopted_target_id }}</p></div>{% elif suggestion.status == 'discarded' %}<div style="margin-top:1rem;padding:1rem;background:rgba(149,165,166,0.1);border:1px solid rgba(149,165,166,0.3);border-radius:var(--radius)"><strong>🗑️ 该候选已废弃</strong></div>{% else %}<div style="margin-top:1rem;background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2);border-radius:var(--radius);padding:1rem"><strong>⚠️ 提示</strong><p style="font-size:0.85rem;color:var(--color-text-muted);margin-top:0.25rem">AI 生成的候选内容只有用户点击"采纳"或"编辑后采纳"后才会进入正式设定库。</p></div>{% endif %}
 {% endblock %}

@@ -53,6 +53,7 @@ REQUIRED_TEMPLATES = [
     "app/templates/setting_suggestions/index.html",
     "app/templates/setting_suggestions/new.html",
     "app/templates/setting_suggestions/detail.html",
+    "app/templates/setting_suggestions/edit_adopt.html",
 ]
 
 # Required hidden import modules

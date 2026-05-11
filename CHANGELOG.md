@@ -1,5 +1,22 @@
 # Changelog
 
+## [v1.7.10] — 2026-05-11
+
+### Added
+- 新增候选设定直接采纳（adopt）
+- 新增候选设定编辑后采纳（edit-adopt）
+- 新增候选设定废弃（discard）
+- 新增状态流转：pending→adopted/edited_adopted/discarded
+- 新增采纳目标追踪（adopted_target_id/type/at）
+- 新增 SettingSuggestionAdoptionService
+- 新增 edit_adopt 模板
+- 新增 35 个采纳相关测试
+
+### Notes
+- 完成设定库 AI 推演闭环
+- AI 不会自动写入正式设定
+- v1.8.0 进入分卷大纲生成
+
 ## [v1.7.9.1] — 2026-05-11
 
 ### Changed

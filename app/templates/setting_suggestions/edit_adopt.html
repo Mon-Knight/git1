@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}编辑后采纳 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}编辑后采纳{% endblock %}
+
+{% block content %}
+<h1>✏️ 编辑后采纳 — {{ world.name }}</h1>
+<p style="color:var(--color-text-muted);margin-bottom:1rem">修改候选内容后采纳到正式设定库。</p>
+
+{% if error %}<div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem;border-radius:var(--radius);margin-bottom:1rem">❌ {{ error }}</div>{% endif %}
+
+<form action="/worlds/{{ world.id }}/setting-suggestions/{{ suggestion.id }}/edit-adopt" method="post">
+    <input type="hidden" name="item_index" value="{{ item_index }}">
+    <div class="form-group">
+        <label for="name">名称 *</label>
+        <input type="text" id="name" name="name" value="{{ item.name or '' }}" required maxlength="200">
+    </div>
+    <div class="form-group">
+        <label for="description">描述</label>
+        <textarea id="description" name="description" rows="5" maxlength="2000">{{ item.description or '' }}</textarea>
+    </div>
+
+    {% if item %}
+    <div style="margin:1rem 0;padding:1rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius)">
+        <h4 style="margin-bottom:0.5rem;font-size:0.9rem">📋 候选原始字段（将一并写入描述）</h4>
+        <div style="font-size:0.8rem;color:var(--color-text-muted);max-height:200px;overflow-y:auto">
+        {% for k, v in item.items() %}
+        {% if k not in ('name','description') and v %}
+        <div style="padding:0.15rem 0"><strong>{{ k }}:</strong> {{ v }}</div>
+        {% endif %}
+        {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div style="display:flex;gap:0.5rem;margin-top:1rem">
+        <button type="submit" class="btn-primary">💾 编辑后采纳</button>
+        <a href="/worlds/{{ world.id }}/setting-suggestions/{{ suggestion.id }}" class="btn-sm">取消</a>
+    </div>
+</form>
+{% endblock %}

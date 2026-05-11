@@ -330,6 +330,9 @@ class SettingSuggestion(Base):
     prompt = Column(Text, default="")
     result_json = Column(Text, default="")
     status = Column(String(20), default="pending")  # pending/adopted/edited_adopted/discarded
+    adopted_target_id = Column(Integer, nullable=True)
+    adopted_target_type = Column(String(20), nullable=True)  # character/faction/location/rule
+    adopted_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=_utcnow)
     updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
 

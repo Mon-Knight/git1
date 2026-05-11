@@ -25,11 +25,11 @@ class TestDocsStructure:
 
     def test_readme_contains_v176(self):
         content = _read_root("README.md")
-        assert "v1.7.9.1" in content, "README.md missing v1.7.9.1"
+        assert "v1.7.10" in content, "README.md missing v1.7.10"
 
     def test_changelog_contains_v176(self):
         content = _read_root("CHANGELOG.md")
-        assert "v1.7.9.1" in content, "CHANGELOG.md missing v1.7.9.1"
+        assert "v1.7.10" in content, "CHANGELOG.md missing v1.7.10"
 
     def test_changelog_contains_v175(self):
         content = _read_root("CHANGELOG.md")

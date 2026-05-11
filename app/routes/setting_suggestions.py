@@ -127,3 +127,148 @@ async def suggestion_detail(
         "current_world": world, "active_nav": "worlds",
         "app_version": settings.VERSION,
     })
+
+
+# ── v1.7.10 Adoption Routes ────────────────────────────────────────────
+
+from app.services.setting_suggestion_adoption_service import SettingSuggestionAdoptionService
+
+
+@router.post("/{suggestion_id}/adopt")
+async def adopt_suggestion(
+    request: Request,
+    world_id: int, suggestion_id: int,
+    item_index: int = Form(default=0),
+    db: Session = Depends(get_db),
+):
+    world = _get_world_or_404(db, world_id)
+    if not world:
+        return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+
+    result = SettingSuggestionAdoptionService.adopt(db, world_id, suggestion_id, item_index)
+    if not result["ok"]:
+        suggestion = SettingSuggestionService.get_setting_suggestion(db, world_id, suggestion_id)
+        try:
+            result_data = json.loads(suggestion.result_json) if suggestion and suggestion.result_json else {}
+        except json.JSONDecodeError:
+            result_data = {}
+        return templates.TemplateResponse(request, "setting_suggestions/detail.html", {
+            "world": world, "suggestion": suggestion, "result_data": result_data,
+            "current_world": world, "active_nav": "worlds",
+            "app_version": settings.VERSION,
+            "error": result["error"],
+        })
+
+    return RedirectResponse(
+        url=f"/worlds/{world_id}/setting-suggestions/{suggestion_id}",
+        status_code=303,
+    )
+
+
+@router.get("/{suggestion_id}/edit-adopt", response_class=HTMLResponse)
+async def edit_adopt_form(
+    request: Request, world_id: int, suggestion_id: int,
+    item_index: int = 0,
+    db: Session = Depends(get_db),
+):
+    world = _get_world_or_404(db, world_id)
+    if not world:
+        return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+
+    suggestion = SettingSuggestionService.get_setting_suggestion(db, world_id, suggestion_id)
+    if not suggestion:
+        return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+
+    items = SettingSuggestionAdoptionService.extract_items(suggestion)
+    if item_index < 0 or item_index >= len(items):
+        return templates.TemplateResponse(request, "setting_suggestions/edit_adopt.html", {
+            "world": world, "suggestion": suggestion, "item": {},
+            "item_index": item_index, "error": f"item_index {item_index} 不合法",
+            "current_world": world, "active_nav": "worlds", "app_version": settings.VERSION,
+        })
+
+    return templates.TemplateResponse(request, "setting_suggestions/edit_adopt.html", {
+        "world": world, "suggestion": suggestion, "item": items[item_index],
+        "item_index": item_index,
+        "current_world": world, "active_nav": "worlds",
+        "app_version": settings.VERSION,
+    })
+
+
+@router.post("/{suggestion_id}/edit-adopt")
+async def do_edit_adopt(
+    request: Request,
+    world_id: int, suggestion_id: int,
+    item_index: int = Form(default=0),
+    name: str = Form(default=""),
+    description: str = Form(default=""),
+    db: Session = Depends(get_db),
+):
+    world = _get_world_or_404(db, world_id)
+    if not world:
+        return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+
+    if not name.strip():
+        suggestion = SettingSuggestionService.get_setting_suggestion(db, world_id, suggestion_id)
+        items = SettingSuggestionAdoptionService.extract_items(suggestion) if suggestion else []
+        item = items[item_index] if 0 <= item_index < len(items) else {}
+        return templates.TemplateResponse(request, "setting_suggestions/edit_adopt.html", {
+            "world": world, "suggestion": suggestion, "item": item,
+            "item_index": item_index, "error": "名称不能为空",
+            "current_world": world, "active_nav": "worlds", "app_version": settings.VERSION,
+        })
+
+    edited = {"name": name.strip(), "description": description.strip()}
+    # Preserve other candidate fields
+    suggestion = SettingSuggestionService.get_setting_suggestion(db, world_id, suggestion_id)
+    if suggestion:
+        items = SettingSuggestionAdoptionService.extract_items(suggestion)
+        if 0 <= item_index < len(items):
+            for k, v in items[item_index].items():
+                if k not in edited and v:
+                    edited[k] = v
+
+    result = SettingSuggestionAdoptionService.adopt_with_edit(
+        db, world_id, suggestion_id, item_index, edited
+    )
+    if not result["ok"]:
+        return templates.TemplateResponse(request, "setting_suggestions/edit_adopt.html", {
+            "world": world, "suggestion": suggestion, "item": edited,
+            "item_index": item_index, "error": result["error"],
+            "current_world": world, "active_nav": "worlds", "app_version": settings.VERSION,
+        })
+
+    return RedirectResponse(
+        url=f"/worlds/{world_id}/setting-suggestions/{suggestion_id}",
+        status_code=303,
+    )
+
+
+@router.post("/{suggestion_id}/discard")
+async def discard_suggestion(
+    request: Request,
+    world_id: int, suggestion_id: int,
+    db: Session = Depends(get_db),
+):
+    world = _get_world_or_404(db, world_id)
+    if not world:
+        return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+
+    result = SettingSuggestionAdoptionService.discard(db, world_id, suggestion_id)
+    if not result["ok"]:
+        suggestion = SettingSuggestionService.get_setting_suggestion(db, world_id, suggestion_id)
+        try:
+            result_data = json.loads(suggestion.result_json) if suggestion and suggestion.result_json else {}
+        except json.JSONDecodeError:
+            result_data = {}
+        return templates.TemplateResponse(request, "setting_suggestions/detail.html", {
+            "world": world, "suggestion": suggestion, "result_data": result_data,
+            "current_world": world, "active_nav": "worlds",
+            "app_version": settings.VERSION,
+            "error": result["error"],
+        })
+
+    return RedirectResponse(
+        url=f"/worlds/{world_id}/setting-suggestions/{suggestion_id}",
+        status_code=303,
+    )
