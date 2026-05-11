@@ -246,6 +246,21 @@
     pointer-events: none;
 }
 
+/* Current world label in sidebar */
+.sidebar-world-current {
+    pointer-events: none;
+}
+
+.sidebar-sublink.world-label {
+    font-weight: 600;
+    color: var(--color-accent);
+    font-size: 0.78rem;
+    padding-top: 0.55rem;
+    padding-bottom: 0.15rem;
+    border-left-color: transparent;
+    cursor: default;
+}
+
 /* ===== Sidebar Future Modules ===== */
 .sidebar-future {
     margin-top: auto;

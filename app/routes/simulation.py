@@ -10,6 +10,7 @@ from pathlib import Path
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.config import settings
 from app.services.world_service import WorldService
 from app.services.simulation_service import SimulationService
 from app.services.world_context_service import WorldContextService
@@ -33,10 +34,12 @@ def _get_ai_mode_info(db: Session) -> str:
 
 
 def _render_template(request, template, db=None, status_code=200, **kwargs):
-    """Helper to always pass ai_mode_info."""
+    """Helper to always pass ai_mode_info, active_nav, and app_version."""
     db = db or kwargs.pop("db")
     defaults = {
         "ai_mode_info": _get_ai_mode_info(db),
+        "active_nav": "simulation",
+        "app_version": settings.VERSION,
     }
     defaults.update(kwargs)
     return templates.TemplateResponse(request, template, defaults, status_code=status_code)

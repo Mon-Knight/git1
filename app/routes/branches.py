@@ -9,6 +9,7 @@ from fastapi.templating import Jinja2Templates
 from pathlib import Path
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.database import get_db
 from app.services.world_service import WorldService
 from app.services.branch_service import BranchService
@@ -30,7 +31,9 @@ async def list_branches(request: Request, world_id: int, db: Session = Depends(g
 
     branches = BranchService.list_branches(db, world_id)
     return templates.TemplateResponse(request, "branches/list.html", {
-        "world": world, "branches": branches
+        "world": world, "branches": branches,
+        "current_world": world, "active_nav": "simulation",
+        "app_version": settings.VERSION,
     })
 
 

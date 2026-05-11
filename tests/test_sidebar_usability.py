@@ -61,8 +61,9 @@ class TestSidebarStructure:
         assert "/None/" not in content, "base.html contains /None/ links"
 
     def test_sidebar_has_disabled_class(self):
+        # v1.7.8.2: disabled spans removed from sidebar; only future items remain disabled
         content = _read_template("base.html")
-        assert "disabled" in content, "Missing disabled class on sidebar links"
+        assert "sidebar-future" in content  # future items section present
 
     def test_sidebar_future_items_exist(self):
         content = _read_template("base.html")
@@ -127,9 +128,10 @@ class TestSidebarOnBasePages:
         assert "/None/" not in resp.text
 
     def test_home_has_disabled_links(self, client):
+        # v1.7.8.2: no disabled sublinks when no world; future items present
         resp = client.get("/")
         assert resp.status_code == 200
-        assert "disabled" in resp.text
+        assert "sidebar-future" in resp.text
 
 
 class TestStandalonePagesAccessible:

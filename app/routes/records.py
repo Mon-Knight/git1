@@ -10,6 +10,7 @@ from pathlib import Path
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.config import settings
 from app.services.world_service import WorldService
 from app.services.simulation_service import SimulationService
 from app.services.record_action_service import RecordActionService
@@ -35,7 +36,9 @@ async def list_records(request: Request, world_id: int, db: Session = Depends(ge
 
     records = SimulationService.list_simulation_records(db, world_id)
     return templates.TemplateResponse(request, "records/list.html", {
-        "world": world, "records": records
+        "world": world, "records": records,
+        "current_world": world, "active_nav": "simulation",
+        "app_version": settings.VERSION,
     })
 
 

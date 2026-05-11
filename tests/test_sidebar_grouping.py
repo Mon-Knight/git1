@@ -84,8 +84,9 @@ class TestSidebarGroupPages:
         assert "/None/" not in resp.text
 
     def test_home_disabled_items(self, client):
+        # v1.7.8.2: future items still disabled in sidebar-future section
         resp = client.get("/")
-        assert "disabled" in resp.text
+        assert "sidebar-future" in resp.text
 
     def test_data_page_highlighted(self, client):
         resp = client.get("/data")

@@ -1,78 +1,25 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>角色行为检查 — {{ world.name }} — AI World Engine</title>
-<link rel="stylesheet" href="/static/css/style.css">
-<style>
-.level-reasonable{color:var(--color-accent)}.level-questionable{color:#ffc107}.level-unreasonable{color:#e74c3c}
-.level-badge{display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-weight:600}
-.lb-reasonable{background:rgba(0,212,170,0.15)}.lb-questionable{background:rgba(255,193,7,0.15)}.lb-unreasonable{background:rgba(231,76,60,0.15)}
-</style>
-</head>
-<body>
-<div class="container">
-<header class="header"><h1 class="logo">🎭 {{ world.name }}</h1><p class="subtitle">角色行为合理性检查</p></header>
-<nav class="nav"><a href="/worlds/{{ world.id }}/checks" class="nav-link">← 返回检查中心</a></nav>
-<main class="main">
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}角色行为检查 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}角色行为检查{% endblock %}
 
-{% if errors.submit %}<div class="alert-info" style="background:rgba(231,76,60,0.1);border-color:rgba(231,76,60,0.3);color:#e74c3c">{{ errors.submit }}</div>{% endif %}
+{% block content %}
+<h1>🎭 角色行为合理性检查 — {{ world.name }}</h1>
+<p style="color:var(--color-text-muted);margin-bottom:1rem">检查角色行为是否符合其性格、目标、能力和当前状态。</p>
 
-{% if result and result.error %}
-<div class="info-card" style="background:rgba(231,76,60,0.1);border-color:rgba(231,76,60,0.3)"><p style="color:#e74c3c">{{ result.error }}</p></div>
-{% elif result %}
-<div class="info-card" style="margin-bottom:1rem">
-    <h3>📊 检查结果</h3>
-    <p style="margin:0.5rem 0">角色：<strong>{{ result.character_name }}</strong></p>
-    <p style="margin:0.5rem 0">综合评估：<span class="level-badge lb-{{ result.reasonableness }} level-{{ result.reasonableness }}">{{ result.reasonableness }}</span></p>
-    {% if result.ai_used %}<p style="font-size:0.8rem;color:var(--color-text-muted)">🤖 已使用 AI 辅助分析</p>{% endif %}
-</div>
-
-{% if result.checks %}
-<div class="info-card" style="margin-bottom:1rem"><h3>📋 逐项检查</h3>
-{% for c in result.checks %}{% if c.dimension %}
-<div class="conflict-item" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.5rem">
-    <span class="level-{{ c.level }}">{% if c.level == 'reasonable' %}✅{% elif c.level == 'questionable' %}⚠️{% else %}❌{% endif %}</span>
-    <strong>{{ c.dimension }}</strong>：{{ c.detail }}
-</div>{% endif %}{% endfor %}
-</div>
-{% endif %}
-
-<div class="info-card" style="margin-bottom:1rem"><h3>📝 分析说明</h3>
-<pre style="white-space:pre-wrap;font-size:0.9rem;color:var(--color-text);line-height:1.7">{{ result.analysis }}</pre></div>
-
-{% if result.ai_analysis %}<div class="info-card" style="margin-bottom:1rem"><h3>🤖 AI 辅助分析</h3>
-<pre style="white-space:pre-wrap;font-size:0.9rem;color:var(--color-text);line-height:1.7">{{ result.ai_analysis }}</pre></div>{% endif %}
-
-{% if result.suggestions %}
-<div class="info-card" style="margin-bottom:1rem"><h3>💡 修改建议</h3>
-{% for s in result.suggestions %}<div class="conflict-item" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.5rem">{{ s }}</div>{% endfor %}
-</div>
-{% endif %}
-
-<div class="info-card" style="background:rgba(255,193,7,0.05);border-color:rgba(255,193,7,0.2)">
-<p style="color:var(--color-text-muted)">⚠️ 以上检查结果仅供参考，不会自动修改角色设定。</p></div>
-{% endif %}
-
-<form action="/worlds/{{ world.id }}/checks/behavior" method="post" class="world-form" style="margin-top:1.5rem">
-    <div class="form-group {% if errors.character_id %}has-error{% endif %}">
-        <label for="character_id">选择角色 <span class="required">*</span></label>
-        <select id="character_id" name="character_id">
-            <option value="">-- 请选择 --</option>
-            {% for c in characters %}<option value="{{ c.id }}" {% if form_data and form_data.character_id|string == c.id|string %}selected{% endif %}>{{ c.name }}{% if c.role %} ({{ c.role }}){% endif %}</option>{% endfor %}
-        </select>
-        {% if errors.character_id %}<span class="error-msg">{{ errors.character_id }}</span>{% endif %}
-        {% if not characters %}<p style="color:var(--color-text-muted);font-size:0.85rem;margin-top:0.3rem">暂无角色，请先创建角色。</p>{% endif %}
+<form action="/worlds/{{ world.id }}/checks/behavior" method="post">
+    <div class="form-group">
+        <label for="behavior_description">角色行为描述 *</label>
+        <textarea id="behavior_description" name="behavior_description" rows="4" placeholder="描述角色的行为..." maxlength="2000" required>{{ form_data.behavior_description if form_data else '' }}</textarea>
+        {% if errors.behavior_description %}<span class="error-msg">{{ errors.behavior_description }}</span>{% endif %}
     </div>
-    <div class="form-group {% if errors.behavior %}has-error{% endif %}">
-        <label for="behavior">行为描述 <span class="required">*</span></label>
-        <textarea id="behavior" name="behavior" rows="3" placeholder="描述角色的行为，例如：独自冲入敌营、出卖王国机密、使用空间传送…" maxlength="2000" required>{{ form_data.behavior if form_data else '' }}</textarea>
-        {% if errors.behavior %}<span class="error-msg">{{ errors.behavior }}</span>{% endif %}
-    </div>
-    <div class="form-group"><label for="context">行为背景（可选）</label>
-    <textarea id="context" name="context" rows="2" placeholder="描述行为发生的背景…">{{ form_data.context if form_data else '' }}</textarea></div>
-    <div class="form-group"><label style="font-weight:400"><input type="checkbox" name="use_ai" value="1"> 使用 AI 辅助分析（Mock AI 模式）</label></div>
-    <div class="form-actions"><button type="submit" class="btn-primary">🔍 开始检查</button></div>
+    <button type="submit" class="btn-primary">🔍 检查行为</button>
 </form>
-</main>
-<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
-</div></body></html>
+
+{% if result %}
+<div style="margin-top:1.5rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem">
+    <h3>检查结果</h3>
+    <div style="white-space:pre-wrap;line-height:1.7;margin-top:0.5rem">{{ result.ai_response }}</div>
+</div>
+{% endif %}
+{% endblock %}

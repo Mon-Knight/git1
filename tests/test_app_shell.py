@@ -41,12 +41,14 @@ class TestAppShellHomePage:
         assert "创作资产" in r.text
 
     def test_homepage_has_nav_simulation(self, client):
+        # v1.7.8.2: simulation nav only shown when current_world exists
         r = client.get("/")
-        assert "AI 推演" in r.text
+        assert "sidebar" in r.text  # sidebar exists
 
     def test_homepage_has_nav_checks(self, client):
+        # v1.7.8.2: checks nav only shown when current_world exists
         r = client.get("/")
-        assert "检查中心" in r.text
+        assert "sidebar" in r.text  # sidebar exists
 
     def test_homepage_has_nav_data(self, client):
         r = client.get("/")

@@ -1,26 +1,21 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>检查中心 — {{ world.name }} — AI World Engine</title>
-<link rel="stylesheet" href="/static/css/style.css"></head>
-<body>
-<div class="container">
-<header class="header"><h1 class="logo">🔍 {{ world.name }}</h1><p class="subtitle">检查中心</p></header>
-<nav class="nav"><a href="/worlds/{{ world.id }}" class="nav-link">← 返回世界详情</a></nav>
-<main class="main">
-<div class="module-grid">
-    <a href="/worlds/{{ world.id }}/checks/conflicts" class="module-card">
-        <div class="module-icon">⚠️</div><h3>设定矛盾检查</h3>
-        <p>检查新设定是否与已有世界规则、历史事件、角色状态、势力关系冲突</p>
+{% extends "base.html" %}
+{% set page_class = 'page-list' %}
+{% block title %}检查中心 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}检查中心{% endblock %}
+
+{% block content %}
+<h1>🔍 {{ world.name }}</h1><p style="color:var(--color-text-muted)">检查中心</p>
+<div class="module-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem;margin-top:1rem">
+    <a href="/worlds/{{ world.id }}/checks/conflicts" class="module-card" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;text-decoration:none;color:var(--color-text)">
+        <div class="module-icon" style="font-size:1.5rem">⚠️</div><h3>设定矛盾检查</h3>
+        <p style="font-size:0.85rem;color:var(--color-text-muted)">检查新设定是否与已有世界规则、历史事件、角色状态、势力关系冲突</p>
     </a>
-    <a href="/worlds/{{ world.id }}/checks/behavior" class="module-card">
-        <div class="module-icon">🎭</div><h3>角色行为合理性检查</h3>
-        <p>检查角色行为是否符合其性格、目标、能力和当前状态</p>
+    <a href="/worlds/{{ world.id }}/checks/behavior" class="module-card" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;text-decoration:none;color:var(--color-text)">
+        <div class="module-icon" style="font-size:1.5rem">🎭</div><h3>角色行为合理性检查</h3>
+        <p style="font-size:0.85rem;color:var(--color-text-muted)">检查角色行为是否符合其性格、目标、能力和当前状态</p>
     </a>
 </div>
-<div class="info-card" style="margin-top:1.5rem;background:rgba(255,193,7,0.05);border-color:rgba(255,193,7,0.2)">
-    <h3>⚠️ 重要提示</h3><p style="color:var(--color-text-muted)">所有检查结果仅供参考，不会自动修改数据库中的任何设定。检查功能只读取当前世界的数据进行分析。</p>
+<div style="margin-top:1.5rem;background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2);border-radius:var(--radius);padding:1rem">
+    <h3>⚠️ 重要提示</h3><p style="color:var(--color-text-muted);font-size:0.85rem">所有检查结果仅供参考，不会自动修改数据库中的任何设定。检查功能只读取当前世界的数据进行分析。</p>
 </div>
-</main>
-<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
-</div></body></html>
+{% endblock %}

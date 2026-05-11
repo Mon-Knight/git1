@@ -1,72 +1,25 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>设定矛盾检查 — {{ world.name }} — AI World Engine</title>
-<link rel="stylesheet" href="/static/css/style.css">
-<style>
-.risk-low{color:var(--color-accent)}.risk-medium{color:#ffc107}.risk-high{color:#e74c3c}
-.risk-badge{display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-weight:600}
-.risk-low-bg{background:rgba(0,212,170,0.15)}.risk-medium-bg{background:rgba(255,193,7,0.15)}.risk-high-bg{background:rgba(231,76,60,0.15)}
-.conflict-item{background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.5rem}
-</style>
-</head>
-<body>
-<div class="container">
-<header class="header"><h1 class="logo">⚠️ {{ world.name }}</h1><p class="subtitle">设定矛盾检查</p></header>
-<nav class="nav"><a href="/worlds/{{ world.id }}/checks" class="nav-link">← 返回检查中心</a></nav>
-<main class="main">
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}设定矛盾检查 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}设定矛盾检查{% endblock %}
 
-{% if errors.submit %}<div class="alert-info" style="background:rgba(231,76,60,0.1);border-color:rgba(231,76,60,0.3);color:#e74c3c">{{ errors.submit }}</div>{% endif %}
+{% block content %}
+<h1>⚠️ 设定矛盾检查 — {{ world.name }}</h1>
+<p style="color:var(--color-text-muted);margin-bottom:1rem">检查新设定是否与已有世界规则、历史事件、角色状态、势力关系冲突。</p>
+
+<form action="/worlds/{{ world.id }}/checks/conflicts" method="post">
+    <div class="form-group">
+        <label for="setting_description">新设定描述 *</label>
+        <textarea id="setting_description" name="setting_description" rows="4" placeholder="描述你想添加的新设定..." maxlength="2000" required>{{ form_data.setting_description if form_data else '' }}</textarea>
+        {% if errors.setting_description %}<span class="error-msg">{{ errors.setting_description }}</span>{% endif %}
+    </div>
+    <button type="submit" class="btn-primary">🔍 检查矛盾</button>
+</form>
 
 {% if result %}
-<div class="info-card" style="margin-bottom:1rem">
-    <h3>📊 检查结果</h3>
-    <p style="margin:0.5rem 0">风险等级：<span class="risk-badge risk-{{ result.risk_level }}-bg risk-{{ result.risk_level }}">{{ result.risk_level }}</span></p>
-    {% if result.ai_used %}<p style="font-size:0.8rem;color:var(--color-text-muted)">🤖 已使用 AI 辅助分析</p>{% endif %}
-</div>
-
-{% if result.conflicts %}
-<div class="info-card" style="margin-bottom:1rem"><h3>⚠️ 发现的矛盾 ({{ result.conflicts|length }})</h3>
-{% for c in result.conflicts %}<div class="conflict-item">{{ c }}</div>{% endfor %}
-</div>
-{% else %}
-<div class="info-card" style="margin-bottom:1rem;background:rgba(0,212,170,0.05);border-color:rgba(0,212,170,0.2)">
-<h3>✅ 未发现明显矛盾</h3></div>
-{% endif %}
-
-<div class="info-card" style="margin-bottom:1rem"><h3>📝 分析说明</h3>
-<pre style="white-space:pre-wrap;font-size:0.9rem;color:var(--color-text);line-height:1.7">{{ result.analysis }}</pre></div>
-
-{% if result.ai_analysis %}<div class="info-card" style="margin-bottom:1rem"><h3>🤖 AI 辅助分析</h3>
-<pre style="white-space:pre-wrap;font-size:0.9rem;color:var(--color-text);line-height:1.7">{{ result.ai_analysis }}</pre></div>{% endif %}
-
-{% if result.suggestions %}
-<div class="info-card" style="margin-bottom:1rem"><h3>💡 修改建议</h3>
-{% for s in result.suggestions %}<div class="conflict-item">{{ s }}</div>{% endfor %}
+<div style="margin-top:1.5rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem">
+    <h3>检查结果</h3>
+    <div style="white-space:pre-wrap;line-height:1.7;margin-top:0.5rem">{{ result.ai_response }}</div>
 </div>
 {% endif %}
-
-<div class="info-card" style="background:rgba(255,193,7,0.05);border-color:rgba(255,193,7,0.2)">
-<p style="color:var(--color-text-muted)">⚠️ 以上检查结果仅供参考，不会自动修改数据库中的任何设定。</p></div>
-{% endif %}
-
-<form action="/worlds/{{ world.id }}/checks/conflicts" method="post" class="world-form" style="margin-top:1.5rem">
-    <div class="form-group {% if errors.content %}has-error{% endif %}">
-        <label for="content">待检查内容 <span class="required">*</span></label>
-        <textarea id="content" name="content" rows="4" placeholder="输入需要检查的设定内容，例如新事件、新规则、新剧情设定…" maxlength="2000" required>{{ form_data.content if form_data else '' }}</textarea>
-        {% if errors.content %}<span class="error-msg">{{ errors.content }}</span>{% endif %}
-    </div>
-    <div class="form-group"><label>检查类型</label>
-    <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
-        <label style="font-weight:400"><input type="checkbox" name="check_type_rule" value="1" checked> 世界规则</label>
-        <label style="font-weight:400"><input type="checkbox" name="check_type_event" value="1" checked> 历史事件</label>
-        <label style="font-weight:400"><input type="checkbox" name="check_type_character" value="1" checked> 角色状态</label>
-        <label style="font-weight:400"><input type="checkbox" name="check_type_faction" value="1" checked> 势力关系</label>
-        <label style="font-weight:400"><input type="checkbox" name="check_type_timeline" value="1" checked> 时间线</label>
-    </div></div>
-    <div class="form-group"><label style="font-weight:400"><input type="checkbox" name="use_ai" value="1"> 使用 AI 辅助分析（Mock AI 模式）</label></div>
-    <div class="form-actions"><button type="submit" class="btn-primary">🔍 开始检查</button></div>
-</form>
-</main>
-<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
-</div></body></html>
+{% endblock %}

@@ -50,24 +50,20 @@
                 </a>
                 <ul class="sidebar-subnav {% if not is_world_page %}collapsed{% endif %}">
                     <li>
-                        <a href="/worlds" class="sidebar-sublink {% if active == 'worlds' and not nav_world_id %}active{% endif %}" data-nav="worlds">
+                        <a href="/worlds" class="sidebar-sublink {% if not nav_world_id and active == 'worlds' %}active{% endif %}" data-nav="worlds">
                             📋 世界列表
                         </a>
                     </li>
+                    <li>
+                        <a href="/worlds/new" class="sidebar-sublink">➕ 新建世界</a>
+                    </li>
                     {% if nav_world_id %}
-                    <li>
-                        <a href="/worlds/{{ nav_world_id }}" class="sidebar-sublink {% if active == 'worlds' and nav_world_id %}active{% endif %}" data-nav="worlds">
-                            🎛️ 当前世界控制台
-                        </a>
+                    <li class="sidebar-world-current">
+                        <span class="sidebar-sublink world-label">📖 当前世界：{{ current_world.name }}</span>
                     </li>
                     <li>
-                        <a href="/worlds/{{ nav_world_id }}#world-library" class="sidebar-sublink" data-nav="worlds">
-                            📚 设定库
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/worlds/{{ nav_world_id }}#story-history" class="sidebar-sublink" data-nav="worlds">
-                            📜 剧情历史
+                        <a href="/worlds/{{ nav_world_id }}" class="sidebar-sublink {% if not active or active == 'worlds' %}active{% endif %}" data-nav="worlds">
+                            🎛️ 世界控制台
                         </a>
                     </li>
                     <li>
@@ -89,22 +85,6 @@
                         <a href="/worlds/{{ nav_world_id }}/checks" class="sidebar-sublink {% if active == 'checks' %}active{% endif %}" data-nav="checks">
                             🔍 检查中心
                         </a>
-                    </li>
-                    {% else %}
-                    <li><span class="sidebar-sublink disabled" title="请先选择一个世界">🎛️ 当前世界控制台</span></li>
-                    <li><span class="sidebar-sublink disabled" title="请先选择一个世界">📚 设定库</span></li>
-                    <li><span class="sidebar-sublink disabled" title="请先选择一个世界">📜 剧情历史</span></li>
-                    <li>
-                        <a href="/worlds" class="sidebar-sublink" data-nav="simulation">🤖 AI 推演</a>
-                    </li>
-                    <li>
-                        <a href="/worlds" class="sidebar-sublink" data-nav="assets">📦 创作资产</a>
-                    </li>
-                    <li>
-                        <a href="/worlds" class="sidebar-sublink" data-nav="novel">📖 小说工程</a>
-                    </li>
-                    <li>
-                        <a href="/worlds" class="sidebar-sublink" data-nav="checks">🔍 检查中心</a>
                     </li>
                     {% endif %}
                 </ul>

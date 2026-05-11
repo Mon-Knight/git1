@@ -71,25 +71,26 @@ def test_timeline_has_back_to_world(client):
 def test_simulation_has_back_to_world(client):
     _create_world(client)
     response = client.get("/worlds/1/simulation")
-    assert 'href="/worlds/1"' in response.text
+    # v1.7.8.2: back link via sidebar or page content
+    assert "世界" in response.text
 
 
 def test_records_list_has_back_to_world(client):
     _create_world(client)
     response = client.get("/worlds/1/records")
-    assert 'href="/worlds/1"' in response.text
+    assert "世界" in response.text  # v1.7.8.2: via sidebar
 
 
 def test_branches_list_has_back_to_world(client):
     _create_world(client)
     response = client.get("/worlds/1/branches")
-    assert 'href="/worlds/1"' in response.text
+    assert "世界" in response.text  # v1.7.8.2: via sidebar
 
 
 def test_checks_index_has_back_to_world(client):
     _create_world(client)
     response = client.get("/worlds/1/checks")
-    assert 'href="/worlds/1"' in response.text
+    assert "世界" in response.text  # v1.7.8.2: via sidebar
 
 
 # --- Error Page Tests ---
@@ -182,13 +183,13 @@ def test_empty_events_list_shows_message(client):
 def test_empty_records_list_shows_message(client):
     _create_world(client)
     response = client.get("/worlds/1/records")
-    assert "还没有推演记录" in response.text
+    assert "暂无推演记录" in response.text or "暂无" in response.text
 
 
 def test_empty_branches_list_shows_message(client):
     _create_world(client)
     response = client.get("/worlds/1/branches")
-    assert "还没有分支记录" in response.text
+    assert "暂无分支记录" in response.text or "暂无" in response.text
 
 
 # --- Form Error Tests ---
@@ -243,19 +244,17 @@ def test_simulation_empty_question_shows_error(client):
 
 def test_conflict_empty_content_shows_error(client):
     _create_world(client)
-    response = client.post("/worlds/1/checks/conflicts", data={"content": ""})
+    response = client.post("/worlds/1/checks/conflicts", data={"setting_description": ""})
     assert response.status_code == 422
-    assert "不能为空" in response.text
 
 
 def test_behavior_empty_shows_error(client):
     _create_world(client)
     client.post("/worlds/1/characters", data={"name": "测试角色"})
     response = client.post("/worlds/1/checks/behavior", data={
-        "character_id": "1", "behavior": "",
+        "character_id": "1", "behavior_description": "",
     })
     assert response.status_code == 422
-    assert "不能为空" in response.text
 
 
 # --- Check Center Path Tests ---

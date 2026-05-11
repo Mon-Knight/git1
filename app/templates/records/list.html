@@ -1,43 +1,29 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>推演记录 — {{ world.name }} — AI World Engine</title>
-<link rel="stylesheet" href="/static/css/style.css">
-<style>.status-pending{color:#ffc107}.status-adopted{color:var(--color-accent)}.status-branched{color:var(--color-primary)}.status-discarded{color:#888}</style>
-</head>
-<body>
-<div class="container">
-<header class="header"><h1 class="logo">📋 {{ world.name }}</h1><p class="subtitle">推演记录</p></header>
-<nav class="nav">
-    <a href="/worlds/{{ world.id }}" class="nav-link">← 返回世界详情</a>
-    <a href="/worlds/{{ world.id }}/simulation" class="btn-primary btn-sm">🤖 新推演</a>
-</nav>
-<main class="main">
+{% extends "base.html" %}
+{% set page_class = 'page-list' %}
+{% block title %}推演记录 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}推演记录{% endblock %}
+
+{% block content %}
+<h1>📋 推演记录 — {{ world.name }}</h1>
+<p style="color:var(--color-text-muted);margin-bottom:1rem">查看和管理 AI 推演记录。采纳为正史、保存为分支或标记为废弃。</p>
+
 {% if records %}
-<div class="world-grid">
+<div class="item-list">
 {% for r in records %}
-<div class="world-card">
-    <div class="world-card-header">
-        <h3><a href="/worlds/{{ world.id }}/records/{{ r.id }}">{{ r.question[:60] }}{% if r.question|length > 60 %}…{% endif %}</a></h3>
-        <span class="badge">{{ get_type_label(r.simulation_type) }}</span>
-    </div>
-    <div class="world-card-body">
-        <p class="world-desc">{% if r.ai_response %}{{ r.ai_response[:100] }}{% else %}<span class="muted">暂无结果</span>{% endif %}</p>
-        <div class="world-meta">
-            <span class="status-{{ r.status }}">📌 {{ r.status }}</span>
-            <span>{{ 'Mock' if r.is_mock else 'Live' }}</span>
+<div class="item-row" style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;padding:0.6rem 1rem;margin-bottom:0.4rem">
+    <div class="item-info" style="flex:1;min-width:150px">
+        <div class="item-title" style="font-weight:500">{{ r.question[:80] or '(无标题)' }}</div>
+        <div class="item-meta" style="font-size:0.75rem;color:var(--color-text-muted)">
+            {% if r.simulation_type %}{{ r.simulation_type }} · {% endif %}
+            {{ r.created_at }}
+            <span class="item-status status-{{ r.status }}" style="display:inline-block;padding:0.1rem 0.45rem;border-radius:10px;font-size:0.72rem;font-weight:600">{% if r.status=='pending' %}待处理{% elif r.status=='adopted' %}已采纳{% elif r.status=='branched' %}已分支{% elif r.status=='discarded' %}已废弃{% else %}{{ r.status }}{% endif %}</span>
         </div>
     </div>
-    <div class="world-card-footer">
-        <span class="time">{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
-        <div class="actions"><a href="/worlds/{{ world.id }}/records/{{ r.id }}" class="btn-sm">详情</a></div>
-    </div>
+    <a href="/worlds/{{ world.id }}/records/{{ r.id }}" class="btn-sm">查看</a>
 </div>
 {% endfor %}
 </div>
 {% else %}
-<section class="empty-state"><div class="empty-icon">📋</div><h2>还没有推演记录</h2><p>提交一个 AI 推演问题来开始。</p><a href="/worlds/{{ world.id }}/simulation" class="btn-primary">开始推演</a></section>
+<div style="text-align:center;padding:2rem;background:var(--color-surface);border:1px dashed var(--color-border);border-radius:var(--radius);color:var(--color-text-muted)">暂无推演记录</div>
 {% endif %}
-</main>
-<footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
-</div></body></html>
+{% endblock %}
