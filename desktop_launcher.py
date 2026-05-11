@@ -440,6 +440,7 @@ def _ensure_pyinstaller_imports():
     import app.services.ai.response_parser  # noqa: F401
     import app.routes.settings  # noqa: F401
     import app.routes.novel  # noqa: F401
+    import app.routes.volume_outlines  # noqa: F401
     import app.routes.data  # noqa: F401
 
 

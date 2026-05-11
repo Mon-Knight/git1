@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}新建分卷大纲 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}新建分卷大纲{% endblock %}
+
+{% block head_extra %}
+<style>
+.vo-form-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.5rem 2rem;max-width:800px;margin:0 auto}
+.vo-form-card .fg{margin-bottom:1rem}
+.vo-form-card label{display:block;font-weight:600;font-size:0.88rem;margin-bottom:0.3rem;color:var(--color-text)}
+.vo-form-card input,.vo-form-card select,.vo-form-card textarea{width:100%;padding:0.6rem 0.8rem;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg);color:var(--color-text);font-size:0.9rem;box-sizing:border-box;font-family:inherit}
+.vo-form-card input:focus,.vo-form-card select:focus,.vo-form-card textarea:focus{outline:none;border-color:var(--color-primary);box-shadow:0 0 0 2px rgba(108,99,255,0.2)}
+.vo-form-card .hint{font-size:0.78rem;color:var(--color-text-muted);margin-top:0.25rem}
+.vo-form-card .warning{font-size:0.8rem;color:#f39c12;margin-top:0.25rem}
+.btn-row{display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard" style="max-width:960px">
+    <h1>📚 新建分卷大纲</h1>
+    <p style="color:var(--color-text-muted);margin-bottom:1.5rem">
+        基于全书演化方案和创作资产，AI 生成分卷大纲候选方案。当前世界：<strong>{{ world.name }}</strong>
+    </p>
+
+    {% if error %}
+    <div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem;border-radius:var(--radius);margin-bottom:1rem">❌ {{ error }}</div>
+    {% endif %}
+
+    <div class="vo-form-card">
+        <form action="/worlds/{{ world.id }}/novel/volume-outlines" method="post">
+
+            <div class="fg">
+                <label>来源全书演化方案 <span style="color:#e74c3c">*</span></label>
+                <select name="source_evolution_id" required>
+                    <option value="">-- 请选择 --</option>
+                    {% for evo in evolutions %}
+                    <option value="{{ evo.id }}" {% if form_data and form_data.source_evolution_id == evo.id|string %}selected{% endif %}>
+                        {{ evo.question or ('方案 #'+evo.id|string) }} ({{ evo.created_at.strftime('%m-%d') }})
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if not evolutions %}
+                <div class="warning">⚠️ 暂无全书演化方案。请先<a href="/worlds/{{ world.id }}/novel/evolution">生成全书演化方案 →</a></div>
+                {% endif %}
+            </div>
+
+            <div class="fg">
+                <label>写作风格方案（可选）</label>
+                <select name="style_profile_id">
+                    <option value="">-- 不选择（使用默认风格）--</option>
+                    {% for s in styles %}
+                    <option value="{{ s.id }}">{{ s.name }}{% if s.genre %} ({{ s.genre }}){% endif %}</option>
+                    {% endfor %}
+                </select>
+                {% if not styles %}
+                <div class="hint">暂无风格方案，将使用默认风格。可在<a href="/worlds/{{ world.id }}/context/styles">创作资产 → 风格方案</a> 中创建。</div>
+                {% endif %}
+            </div>
+
+            <div class="fg">
+                <label>剧情时间点（可选）</label>
+                <select name="plot_anchor_id">
+                    <option value="">-- 不选择 --</option>
+                    {% for a in anchors %}
+                    <option value="{{ a.id }}">{{ a.name }} ({{ a.stage or '?' }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="fg">
+                <label>创作上下文包（可选）</label>
+                <select name="context_package_id">
+                    <option value="">-- 不选择（AI 基于当前世界资料生成）--</option>
+                    {% for p in packages %}
+                    <option value="{{ p.id }}">{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="fg">
+                <label>分卷数量</label>
+                <input type="number" name="volume_count" value="{{ form_data.volume_count if form_data else '5' }}" min="2" max="20">
+                <div class="hint">建议 3-10 卷，默认 5 卷</div>
+            </div>
+
+            <div class="fg">
+                <label>补充要求（可选）</label>
+                <textarea name="extra_requirements" rows="3" placeholder="例如：第一卷重点描写学院生活，第三卷需要有重大转折…">{{ form_data.extra_requirements if form_data else '' }}</textarea>
+            </div>
+
+            <div class="btn-row">
+                <button type="submit" class="btn-primary">🤖 生成分卷大纲</button>
+                <a href="/worlds/{{ world.id }}/novel/volume-outlines" class="btn-secondary">← 返回列表</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

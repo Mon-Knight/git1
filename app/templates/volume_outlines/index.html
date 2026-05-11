@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% set page_class = 'page-list' %}
+{% block title %}分卷大纲 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}分卷大纲{% endblock %}
+
+{% block head_extra %}
+<style>
+.vo-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.6rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem}
+.vo-card .vo-info{flex:1;min-width:200px}
+.vo-card .vo-title{font-weight:600;font-size:0.95rem;color:var(--color-text)}
+.vo-card .vo-meta{font-size:0.78rem;color:var(--color-text-muted);margin-top:0.2rem}
+.vo-status{display:inline-block;padding:0.15rem 0.55rem;border-radius:10px;font-size:0.72rem;font-weight:600}
+.vo-status.candidate{background:rgba(52,152,219,0.15);color:#3498db}
+.vo-status.main{background:rgba(0,212,170,0.15);color:var(--color-accent)}
+.vo-status.discarded{background:rgba(149,165,166,0.15);color:#95a5a6}
+.vo-actions{display:flex;gap:0.4rem;flex-wrap:wrap}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard" style="max-width:1200px">
+    <h1>📚 分卷大纲</h1>
+    <p style="color:var(--color-text-muted);margin-bottom:1rem">
+        当前世界：<strong>{{ world.name }}</strong> | 
+        <a href="/worlds/{{ world.id }}/novel/volume-outlines/new" class="btn-primary" style="margin-left:0.5rem">➕ 新建分卷大纲</a>
+    </p>
+
+    {% if outlines %}
+    <div class="vo-list">
+        {% for o in outlines %}
+        <div class="vo-card">
+            <div class="vo-info">
+                <div class="vo-title">
+                    <a href="/worlds/{{ world.id }}/novel/volume-outlines/{{ o.id }}">{{ o.title or '(无标题)' }}</a>
+                </div>
+                <div class="vo-meta">
+                    <span class="vo-status {{ o.status }}">{{ {'candidate':'候选','main':'主线','discarded':'已废弃'}.get(o.status, o.status) }}</span>
+                    {% if o.is_main %}<span style="color:var(--color-accent);font-weight:600;margin-left:0.3rem">★ 主线方案</span>{% endif %}
+                    · {{ o.volume_count }} 卷
+                    · {{ o.created_at.strftime('%m-%d %H:%M') }}
+                    {% if o.source_evolution_id %}<span> · 来源方案 #{{ o.source_evolution_id }}</span>{% endif %}
+                </div>
+            </div>
+            <div class="vo-actions">
+                <a href="/worlds/{{ world.id }}/novel/volume-outlines/{{ o.id }}" class="btn-sm">查看</a>
+                {% if o.status != 'discarded' %}
+                <a href="/worlds/{{ world.id }}/novel/volume-outlines/{{ o.id }}/edit" class="btn-sm">编辑</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state-dash">
+        <div class="empty-icon">📚</div>
+        <p>还没有分卷大纲方案。</p>
+        <p style="font-size:0.82rem;color:var(--color-text-muted)">分卷大纲是连接全书演化方案与章节大纲的桥梁。</p>
+        <a href="/worlds/{{ world.id }}/novel/volume-outlines/new" class="btn-primary">生成第一个分卷大纲</a>
+        <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--color-text-muted)">
+            需要先有<a href="/worlds/{{ world.id }}/novel/evolution">全书演化方案 →</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div style="margin-top:1.5rem;font-size:0.75rem;color:var(--color-text-muted);opacity:0.6">
+        后续版本开放：章节大纲 · 正文生成
+    </div>
+</div>
+{% endblock %}

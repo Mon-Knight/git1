@@ -330,7 +330,7 @@ class WorldDashboardService:
                 "links": [
                     {"label": "全书演化推演", "url": f"/worlds/{world_id}/novel/evolution", "disabled": False},
                     {"label": "演化方案列表", "url": f"/worlds/{world_id}/novel/evolutions", "disabled": False},
-                    {"label": "分卷大纲", "url": "", "disabled": True, "hint": "后续版本开放"},
+                    {"label": "📚 分卷大纲", "url": f"/worlds/{world_id}/novel/volume-outlines", "disabled": False},
                     {"label": "章节大纲", "url": "", "disabled": True, "hint": "后续版本开放"},
                     {"label": "正文生成", "url": "", "disabled": True, "hint": "后续版本开放"},
                 ],

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard' %}
+{% block title %}{{ outline.title }} — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}分卷大纲详情{% endblock %}
+
+{% block head_extra %}
+<style>
+.vo-detail-header{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.vo-detail-header h2{font-size:1.2rem;margin-bottom:0.3rem}
+.vo-detail-meta{font-size:0.82rem;color:var(--color-text-muted)}
+.vo-vol-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:0.75rem}
+.vo-vol-card h3{font-size:1rem;color:var(--color-primary);margin-bottom:0.5rem}
+.vo-vol-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.85rem}
+@media(max-width:700px){.vo-vol-grid{grid-template-columns:1fr}}
+.vo-vol-item{}
+.vo-vol-item .label{color:var(--color-text-muted);font-size:0.75rem;display:block}
+.vo-vol-item .value{color:var(--color-text)}
+.vo-vol-events{grid-column:1/-1}
+.vo-vol-events .value{white-space:pre-wrap}
+.btn-row{display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap}
+.vo-raw{background:var(--color-bg);border:1px solid var(--color-border);border-radius:6px;padding:0.75rem;margin-top:0.5rem;font-size:0.8rem;white-space:pre-wrap;max-height:300px;overflow-y:auto;display:none}
+details summary{cursor:pointer;font-size:0.82rem;color:var(--color-text-muted);margin-top:0.5rem}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard" style="max-width:1200px">
+    {% if error %}<div style="color:#e74c3c;margin-bottom:1rem">{{ error }}</div>{% endif %}
+
+    <div class="vo-detail-header">
+        <h2>{{ outline.title }}</h2>
+        <div class="vo-detail-meta">
+            <span class="vo-status {{ outline.status }}">{{ {'candidate':'候选','main':'主线','discarded':'已废弃'}.get(outline.status, outline.status) }}</span>
+            {% if outline.is_main %}<span style="color:var(--color-accent);font-weight:600;margin-left:0.3rem">★ 主线分卷方案</span>{% endif %}
+            · {{ outline.volume_count }} 卷
+            · {{ outline.created_at.strftime('%Y-%m-%d %H:%M') }}
+            {% if outline.source_evolution_id %} · 来源方案 #{{ outline.source_evolution_id }}{% endif %}
+            {% if outline.style_profile_id %} · 风格方案 #{{ outline.style_profile_id }}{% endif %}
+        </div>
+
+        <div class="btn-row">
+            {% if outline.status != 'discarded' %}
+            <form action="/worlds/{{ world.id }}/novel/volume-outlines/{{ outline.id }}/set-main" method="post" style="display:inline">
+                <button type="submit" class="btn-primary" onclick="return confirm('设为当前世界的主线分卷方案？{% if outline.is_main %}这将取消当前主线状态。{% else %}如有已有主线方案将被替换。{% endif %}')">
+                    ★ 设为主线方案
+                </button>
+            </form>
+            <a href="/worlds/{{ world.id }}/novel/volume-outlines/{{ outline.id }}/edit" class="btn-secondary">✏️ 编辑</a>
+            <form action="/worlds/{{ world.id }}/novel/volume-outlines/{{ outline.id }}/discard" method="post" style="display:inline">
+                <button type="submit" class="btn-secondary" style="color:#e74c3c" onclick="return confirm('确定要废弃此分卷方案吗？废弃后不能编辑或设为主线。')">🗑️ 废弃</button>
+            </form>
+            {% endif %}
+            <a href="/worlds/{{ world.id }}/novel/volume-outlines" class="btn-secondary">← 返回列表</a>
+        </div>
+    </div>
+
+    {% if volumes %}
+    {% for vol in volumes %}
+    <div class="vo-vol-card">
+        <h3>{{ vol.title or ('第' + (vol.volume_index|string) + '卷') }}</h3>
+        <div class="vo-vol-grid">
+            <div class="vo-vol-item"><span class="label">核心主题</span><span class="value">{{ vol.core_theme or '-' }}</span></div>
+            <div class="vo-vol-item"><span class="label">主要矛盾</span><span class="value">{{ vol.main_conflict or '-' }}</span></div>
+            <div class="vo-vol-item"><span class="label">主角目标</span><span class="value">{{ vol.protagonist_goal or '-' }}</span></div>
+            <div class="vo-vol-item"><span class="label">预计章节</span><span class="value">{{ vol.estimated_chapters or '?' }} 章</span></div>
+            <div class="vo-vol-item"><span class="label">关键角色</span><span class="value">{{ vol.key_characters|join(', ') if vol.key_characters else '-' }}</span></div>
+            <div class="vo-vol-item"><span class="label">关键势力</span><span class="value">{{ vol.key_factions|join(', ') if vol.key_factions else '-' }}</span></div>
+            <div class="vo-vol-item"><span class="label">关键地点</span><span class="value">{{ vol.key_locations|join(', ') if vol.key_locations else '-' }}</span></div>
+            <div class="vo-vol-item"><span class="label">转折点</span><span class="value">{{ vol.turning_point or '-' }}</span></div>
+            <div class="vo-vol-item"><span class="label">结尾钩子</span><span class="value">{{ vol.ending_hook or '-' }}</span></div>
+            <div class="vo-vol-item vo-vol-events"><span class="label">主要事件</span><span class="value">{{ vol.major_events|join('\n') if vol.major_events else '-' }}</span></div>
+            {% if vol.notes %}
+            <div class="vo-vol-item" style="grid-column:1/-1"><span class="label">备注</span><span class="value">{{ vol.notes }}</span></div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state-dash"><p>暂无分卷数据。AI 返回可能非标准 JSON。</p></div>
+    {% endif %}
+
+    {% if outline.generation_requirement %}
+    <details>
+        <summary>📝 生成要求</summary>
+        <div class="vo-raw" style="display:block">{{ outline.generation_requirement }}</div>
+    </details>
+    {% endif %}
+
+    {% if outline.prompt %}
+    <details>
+        <summary>📋 生成 Prompt（折叠）</summary>
+        <div class="vo-raw" style="display:block">{% if outline.prompt|length > 2000 %}{{ outline.prompt[:2000] }}...(截断){% else %}{{ outline.prompt }}{% endif %}</div>
+    </details>
+    {% endif %}
+
+    {% if outline.raw_text and outline.raw_text != outline.result_json %}
+    <details>
+        <summary>🗒️ AI 原始输出</summary>
+        <div class="vo-raw" style="display:block">{% if outline.raw_text|length > 2000 %}{{ outline.raw_text[:2000] }}...(截断){% else %}{{ outline.raw_text }}{% endif %}</div>
+    </details>
+    {% endif %}
+</div>
+{% endblock %}

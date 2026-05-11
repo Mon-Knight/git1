@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}编辑分卷大纲 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}编辑分卷大纲{% endblock %}
+
+{% block head_extra %}
+<style>
+.ve-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:0.75rem;max-width:800px;margin-left:auto;margin-right:auto}
+.ve-card h3{font-size:0.95rem;margin-bottom:0.5rem;color:var(--color-primary)}
+.ve-card label{display:block;font-size:0.82rem;color:var(--color-text-muted);margin-bottom:0.2rem}
+.ve-card input,.ve-card textarea{width:100%;padding:0.5rem 0.7rem;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg);color:var(--color-text);font-size:0.88rem;box-sizing:border-box;font-family:inherit}
+.ve-card input:focus,.ve-card textarea:focus{outline:none;border-color:var(--color-primary)}
+.btn-row{display:flex;gap:0.75rem;margin-top:1rem;max-width:800px;margin-left:auto;margin-right:auto;flex-wrap:wrap}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard" style="max-width:960px">
+    <h1>✏️ 编辑分卷大纲</h1>
+    <p style="color:var(--color-text-muted);margin-bottom:1.5rem">
+        编辑 {{ outline.title }} · 当前世界：<strong>{{ world.name }}</strong>
+    </p>
+
+    <form action="/worlds/{{ world.id }}/novel/volume-outlines/{{ outline.id }}/edit" method="post">
+        <div class="ve-card">
+            <h3>📋 方案信息</h3>
+            <label>方案标题</label>
+            <input type="text" name="title" value="{{ outline.title }}" style="font-size:1rem">
+            <label style="margin-top:0.5rem">全书概述</label>
+            {% set data = outline.result_json | default('{}') %}
+            {% set summary = '' %}
+            {% if data and data is string %}
+                {% set data_obj = data | tojson if False else '' %}
+            {% endif %}
+            <textarea name="summary" rows="3">{{ summary }}</textarea>
+        </div>
+
+        {% if volumes %}
+        {% for vol in volumes %}
+        <div class="ve-card">
+            <h3>📖 {{ vol.title or ('第'+(vol.volume_index|string)+'卷') }}</h3>
+            <input type="hidden" name="volume_index" value="{{ vol.volume_index }}">
+            <label>卷标题</label>
+            <input type="text" name="volume_titles" value="{{ vol.title or '' }}">
+            <label style="margin-top:0.4rem">主要矛盾</label>
+            <input type="text" name="volume_conflicts" value="{{ vol.main_conflict or '' }}">
+            <label style="margin-top:0.4rem">主角目标</label>
+            <input type="text" name="volume_goals" value="{{ vol.protagonist_goal or '' }}">
+            <label style="margin-top:0.4rem">主要事件（每行一个）</label>
+            <textarea name="volume_events" rows="4">{% if vol.major_events %}{{ vol.major_events|join('\n') }}{% endif %}</textarea>
+            <label style="margin-top:0.4rem">结尾钩子</label>
+            <input type="text" name="volume_hooks" value="{{ vol.ending_hook or '' }}">
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state-dash"><p>无法解析分卷数据，无法编辑。</p></div>
+        {% endif %}
+
+        {% if volumes %}
+        <div class="btn-row">
+            <button type="submit" class="btn-primary">💾 保存修改</button>
+            <a href="/worlds/{{ world.id }}/novel/volume-outlines/{{ outline.id }}" class="btn-secondary">← 返回详情</a>
+        </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

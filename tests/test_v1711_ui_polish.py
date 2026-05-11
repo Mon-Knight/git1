@@ -85,4 +85,4 @@ class TestExistingFeatures:
 
     def test_version_in_homepage(self, client):
         resp = client.get("/")
-        assert "v1.7.12" in resp.text
+        assert "v1.8.0" in resp.text

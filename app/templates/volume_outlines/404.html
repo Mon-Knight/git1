@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard' %}
+{% block title %}分卷大纲不存在 — AI World Engine{% endblock %}
+{% block page_title %}分卷大纲不存在{% endblock %}
+{% block content %}
+<div class="empty-state-dash" style="max-width:600px;margin:2rem auto">
+    <div class="empty-icon">📚</div>
+    <h2>分卷大纲 #{{ outline_id }} 不存在</h2>
+    <p>该分卷大纲可能已被删除，或不属于当前世界。</p>
+    <a href="/worlds/{{ world_id }}/novel/volume-outlines" class="btn-primary">返回分卷大纲列表</a>
+</div>
+{% endblock %}
