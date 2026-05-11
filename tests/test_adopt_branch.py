@@ -189,9 +189,10 @@ def test_branch_not_visible_from_other_world(client):
     client.post("/worlds", data={"name": "世界B", "world_type": "科幻"})
     client.post("/worlds/1/simulation", data={"question": "A的推演"})
     client.post("/worlds/1/records/1/branch", follow_redirects=False)
-    # World B should not see World A's branch
+    # World B should not see World A's branch records
     resp_b = client.get("/worlds/2/branches")
-    assert "分支" not in resp_b.text or "还没有分支记录" in resp_b.text
+    # "分支" always appears in sidebar nav; check for actual branch record instead
+    assert "世界A" not in resp_b.text or "还没有分支记录" in resp_b.text
 
 
 # --- UI State Tests ---

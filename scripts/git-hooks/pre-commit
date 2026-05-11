@@ -1,0 +1,36 @@
+#!/bin/bash
+# AI World Engine - Pre-commit Hook
+# Lightweight checks before each commit.
+# Runs: encoding check, version sync, docs sync (staged), compileall.
+
+set -e
+
+PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+cd "$PROJECT_ROOT"
+
+echo "=== AI World Engine Pre-commit Checks ==="
+
+# 1. Encoding check
+echo "[1/4] Checking file encoding..."
+python scripts/check_encoding.py
+echo "  OK"
+
+# 2. Version consistency
+echo "[2/4] Checking version consistency..."
+python scripts/check_version_sync.py
+echo "  OK"
+
+# 3. Documentation sync (staged files)
+echo "[3/4] Checking documentation sync..."
+python scripts/check_docs_sync.py --staged
+echo "  OK"
+
+# 4. Python syntax
+echo "[4/4] Checking Python syntax..."
+python -m compileall -q app scripts desktop_launcher.py 2>/dev/null || {
+    python -m compileall app scripts desktop_launcher.py
+}
+echo "  OK"
+
+echo ""
+echo "=== All pre-commit checks passed ==="

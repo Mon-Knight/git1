@@ -1,0 +1,44 @@
+#!/bin/bash
+# AI World Engine - Pre-push Hook
+# Full quality gate before pushing to remote.
+# Runs: compileall, encoding, version sync, docs sync, desktop build verify, pytest.
+
+set -e
+
+PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+cd "$PROJECT_ROOT"
+
+echo "=== AI World Engine Pre-push Quality Gate ==="
+
+# 1. Python syntax (full)
+echo "[1/6] Checking all Python syntax..."
+python -m compileall -q . 2>/dev/null || python -m compileall .
+echo "  OK"
+
+# 2. Encoding check
+echo "[2/6] Checking file encoding..."
+python scripts/check_encoding.py
+echo "  OK"
+
+# 3. Version consistency
+echo "[3/6] Checking version consistency..."
+python scripts/check_version_sync.py
+echo "  OK"
+
+# 4. Documentation sync (full history range)
+echo "[4/6] Checking documentation sync..."
+python scripts/check_docs_sync.py --all
+echo "  OK"
+
+# 5. Desktop build verification
+echo "[5/6] Verifying desktop build..."
+python scripts/verify_desktop_build.py --all
+echo "  OK"
+
+# 6. Full test suite
+echo "[6/6] Running full test suite..."
+python -m pytest tests/ -q --tb=short
+echo "  OK"
+
+echo ""
+echo "=== All pre-push quality gate checks passed ==="

@@ -1,5 +1,63 @@
 # Development Log — AI World Engine
 
+## 2026-05-11 — v1.7.11.2: 文档同步 Hook、版本文档校验与测试债务收口
+
+### 为什么要在 v1.8.0 前加 Hook
+
+在 v1.7.11.1 及之前版本中，多次出现以下问题：
+1. Agent 修改代码后忘记更新 CHANGELOG / dev-log / version-roadmap
+2. 修改 VERSION 后 README 等文档仍为旧版本号
+3. 测试存在失败但以"预存失败"口头说明，无正式记录
+4. 版本号与文档不一致未被自动检测
+
+为避免 v1.8.0 及后续版本再次出现同类问题，在进入分卷大纲开发前建立完整质量门禁。
+
+### 新增基础设施
+
+- `scripts/install_git_hooks.py`: Hook 安装脚本，可重复执行
+- `scripts/git-hooks/pre-commit`: 提交前轻量检查
+- `scripts/git-hooks/pre-push`: 推送前完整质量门禁
+- `scripts/check_docs_sync.py`: 文档同步检查（--staged / --all）
+- `scripts/check_version_sync.py`: VERSION 与文档一致性检查
+- `scripts/check_test_debt.py`: 测试债务记录检查
+
+### v1.7.11.1 遗留 16 个失败测试处理
+
+- **test_adopt_branch.py::test_branch_not_visible_from_other_world**: 已修复。侧边栏重构后"分支"始终出现在导航中，改为检查"世界A"不在 World B 页面中。
+- **test_checks.py (15 tests)**: 已标记为 `@pytest.mark.xfail`。根本原因是检查服务（conflict/behavior check）的 Mock AI 实现返回占位表单页，而非实际的 AI 分析结果。详见 `docs/project/test-debt.md`。
+
+### Hook 检查内容
+
+**pre-commit**:
+- encoding check
+- version sync
+- docs sync (staged)
+- compileall (app/scripts/desktop_launcher)
+
+**pre-push**:
+- compileall (full)
+- encoding check
+- version sync
+- docs sync (all)
+- verify_desktop_build --all
+- pytest tests/ -q
+
+### 测试结果
+
+- pytest: 15 xfailed (test_checks), all others passed
+- 新增 4 个测试文件，共约 25 个测试
+- compileall: All OK
+- encoding check: All passed
+- version sync: PASSED
+- docs sync --all: PASSED
+- verify_desktop_build --all: PASSED
+
+### 下一步
+
+v1.8.0：基于主线全书演化方案的分卷大纲生成
+
+---
+
 ## 2026-05-11 — v1.7.11.1: 左侧二级导航统一与设置中心折叠分类补丁
 
 ### 修改内容
