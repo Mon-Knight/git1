@@ -34,6 +34,7 @@ async def data_index(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse(request, "data/index.html", {
         "worlds": worlds,
         "backups": backups,
+        "active_nav": "data",
     })
 
 
@@ -235,6 +236,7 @@ async def export_center(
         "worlds": worlds,
         "pre_selected_world": pre_selected,
         "active_nav": "data",
+        "app_version": settings.VERSION,
     })
 
 

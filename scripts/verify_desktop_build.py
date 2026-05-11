@@ -41,6 +41,7 @@ REQUIRED_TEMPLATES = [
     "app/templates/data/export_result.html",
     "app/templates/data/export.html",
     "app/static/js/export-center.js",
+    "app/static/js/sidebar.js",
     "app/templates/context/index.html",
     "app/templates/context/styles.html",
     "app/templates/context/style_form.html",

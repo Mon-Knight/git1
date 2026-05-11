@@ -1,41 +1,41 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>数据管理 — AI World Engine</title><link rel="stylesheet" href="/static/css/style.css">
-<style>img[src*="placeholder"]+svg{display:none}.dcard{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}</style>
-</head>
-<body><div class="container">
-<header class="header"><h1 class="logo">📦 数据管理</h1></header>
-<nav class="nav"><a href="/" class="nav-link">← 返回首页</a> <a href="/worlds" class="nav-link">世界列表</a></nav>
-<main class="main">
+{% extends "base.html" %}
+{% set page_class = 'page-list' %}
+{% block title %}数据管理 — AI World Engine{% endblock %}
+{% block page_title %}数据管理{% endblock %}
 
-<div class="dcard"><h3>📋 世界导入</h3>
-<p style="color:var(--color-text-muted)">上传 AI World Engine 导出的 JSON 文件，导入为一个新世界。</p>
-<a href="/data/import" class="btn-primary" style="margin-top:0.5rem;display:inline-block">进入导入页面</a></div>
+{% block content %}
+<h1>📦 数据管理</h1>
+<p style="color:var(--color-text-muted);margin-bottom:1.5rem">世界导入导出、数据库备份恢复、导出中心</p>
 
-<div class="dcard"><h3>💾 数据库备份与恢复</h3>
-<p style="color:var(--color-text-muted)">一键备份整个数据库，或从备份文件恢复。</p>
-<a href="/data/backups" class="btn-primary" style="margin-top:0.5rem;display:inline-block">管理备份</a></div>
-
-<div class="dcard" style="border-color:var(--color-accent)"><h3>📤 导出中心 <span style="font-size:0.75rem;background:var(--color-accent);color:#000;padding:0.1rem 0.4rem;border-radius:4px">NEW</span></h3>
-<p style="color:var(--color-text-muted)">进入导出中心，选择导出世界/备份/创作资产。EXE 桌面模式支持选择保存位置。</p>
-<a href="/data/export" class="btn-primary" style="margin-top:0.5rem;display:inline-block">进入导出中心</a></div>
-
-<div class="dcard"><h3>📤 导出世界</h3>
-<p style="color:var(--color-text-muted)">选择一个世界，导出为 JSON 文件（包含角色、势力、地点、规则、历史事件、推演记录和分支）。</p>
-{% if worlds %}
-<ul style="margin:0.5rem 0;padding-left:1.2rem">
-{% for w in worlds %}<li style="margin:0.5rem 0"><strong>{{ w.name }}</strong> — <a href="/worlds/{{ w.id }}/export">导出</a> | <a href="/worlds/{{ w.id }}/export.json" download>直接下载 JSON</a></li>{% endfor %}
-</ul>
-{% else %}<p style="color:var(--color-text-muted)">暂无世界，请先创建一个世界。</p>{% endif %}
+<div class="dcard" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem">
+    <h3>📤 导出中心</h3>
+    <p style="color:var(--color-text-muted);font-size:0.85rem">进入导出中心，选择导出世界/备份/创作资产。EXE 桌面模式支持选择保存位置。</p>
+    <a href="/data/export" class="btn-primary" style="margin-top:0.5rem;display:inline-block">进入导出中心</a>
 </div>
 
-<div class="dcard" style="background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2)">
-<h3>⚠️ 安全说明</h3><ul style="margin:0.5rem 0;padding-left:1.2rem;font-size:0.85rem;color:var(--color-text-muted);line-height:1.8">
-<li>导出文件<b>不包含</b> API Key、app_settings 和 .env</li>
-<li>备份文件包含完整本地数据，请妥善保存</li>
-<li>恢复数据库会替换当前数据，恢复前会自动备份当前数据库</li>
-</ul></div>
+<div class="dcard" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem">
+    <h3>📋 世界导入</h3>
+    <p style="color:var(--color-text-muted);font-size:0.85rem">上传 AI World Engine 导出的 JSON 文件，导入为一个新世界。</p>
+    <a href="/data/import" class="btn-primary" style="margin-top:0.5rem;display:inline-block">进入导入页面</a>
+</div>
 
-</main><footer class="footer"><p>AI World Engine | <a href="/">返回首页</a></p></footer>
-</div></body></html>
+<div class="dcard" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem">
+    <h3>💾 数据库备份与恢复</h3>
+    <p style="color:var(--color-text-muted);font-size:0.85rem">一键备份整个数据库，或从备份文件恢复。</p>
+    <a href="/data/backups" class="btn-primary" style="margin-top:0.5rem;display:inline-block">管理备份</a>
+</div>
+
+<div class="dcard" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem">
+    <h3>📤 导出世界</h3>
+    <p style="color:var(--color-text-muted);font-size:0.85rem">选择一个世界，导出为 JSON 文件（包含角色、势力、地点、规则、历史事件、推演记录和分支）。</p>
+    {% if worlds %}
+    <ul style="margin:0.5rem 0;padding-left:1.2rem">
+    {% for w in worlds %}<li style="margin:0.5rem 0"><strong>{{ w.name }}</strong> — <a href="/worlds/{{ w.id }}/export">导出</a> | <a href="/worlds/{{ w.id }}/export.json" download>直接下载 JSON</a></li>{% endfor %}
+    </ul>
+    {% else %}<p style="color:var(--color-text-muted)">暂无世界，请先创建一个世界。</p>{% endif %}
+</div>
+
+<div style="margin-top:1rem;padding:0.75rem;background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2);border-radius:var(--radius);font-size:0.8rem;color:var(--color-text-muted)">
+    <strong>🔒 安全提示：</strong>导出内容不包含 API Key、.env、日志文件等敏感信息。
+</div>
+{% endblock %}
