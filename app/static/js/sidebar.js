@@ -9,8 +9,8 @@
     'use strict';
 
     /**
-     * Toggle a sidebar group expand/collapse.
-     * v2.0.1: Supports all sidebar groups (小说工程, 世界设定, 创作资产, AI 推演, 质量检查, 设置).
+     * v2.0.1: Toggle a sidebar group expand/collapse.
+     * Works with both &lt;a&gt; and &lt;button&gt; toggle elements.
      */
     window.toggleSidebarGroup = function (event) {
         event.preventDefault();
@@ -27,9 +27,11 @@
         if (isCollapsed) {
             subnav.classList.remove('collapsed');
             if (arrow) arrow.classList.add('open');
+            toggle.setAttribute('aria-expanded', 'true');
         } else {
             subnav.classList.add('collapsed');
             if (arrow) arrow.classList.remove('open');
+            toggle.setAttribute('aria-expanded', 'false');
         }
     };
 
