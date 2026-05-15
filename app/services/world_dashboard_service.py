@@ -18,7 +18,7 @@ class WorldDashboardService:
             Character, Faction, Location, WorldRule,
             HistoricalEvent, SimulationRecord, Branch,
             ContextPackage, StyleProfile, PlotAnchor,
-            NovelVolumeOutline, NovelChapterOutline,
+            NovelVolumeOutline, NovelChapterOutline, NovelDraft,
         )
 
         return {
@@ -68,6 +68,10 @@ class WorldDashboardService:
             "chapter_outline_count": _count(db, NovelChapterOutline, world_id),
             "main_chapter_outline_count": db.query(func.count(NovelChapterOutline.id)).filter(
                 NovelChapterOutline.world_id == world_id, NovelChapterOutline.is_main == True
+            ).scalar() or 0,
+            "novel_draft_count": _count(db, NovelDraft, world_id),
+            "accepted_draft_count": db.query(func.count(NovelDraft.id)).filter(
+                NovelDraft.world_id == world_id, NovelDraft.is_accepted == True
             ).scalar() or 0,
         }
 
@@ -334,16 +338,21 @@ class WorldDashboardService:
                 "anchor": "novel-engineering",
                 "stats": [
                     {"label": "演化方案", "count": summary["novel_evolution_count"]},
+                    {"label": "主线方案", "count": summary["mainline_evolution_count"]},
                     {"label": "分卷大纲", "count": summary["volume_outline_count"]},
                     {"label": "章节大纲", "count": summary["chapter_outline_count"]},
-                    {"label": "主线方案", "count": summary["mainline_evolution_count"]},
+                    {"label": "正文草稿", "count": summary["novel_draft_count"]},
                 ],
                 "links": [
                     {"label": "全书演化推演", "url": f"/worlds/{world_id}/novel/evolution", "disabled": False},
                     {"label": "演化方案列表", "url": f"/worlds/{world_id}/novel/evolutions", "disabled": False},
                     {"label": "📚 分卷大纲", "url": f"/worlds/{world_id}/novel/volume-outlines", "disabled": False},
                     {"label": "📝 章节大纲", "url": f"/worlds/{world_id}/novel/chapter-outlines", "disabled": False},
-                    {"label": "正文生成", "url": "", "disabled": True, "hint": "后续版本开放"},
+                    {"label": "✍️ 正文草稿", "url": f"/worlds/{world_id}/novel/drafts", "disabled": False},
+                    {"label": "🪄 生成正文草稿", "url": f"/worlds/{world_id}/novel/drafts/new", "disabled": False},
+                    {"label": "正文润色", "url": "", "disabled": True, "hint": "后续版本开放"},
+                    {"label": "整卷生成", "url": "", "disabled": True, "hint": "后续版本开放"},
+                    {"label": "整书导出", "url": "", "disabled": True, "hint": "后续版本开放"},
                 ],
             },
             {

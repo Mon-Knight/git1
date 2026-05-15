@@ -1,5 +1,70 @@
 # Development Log — AI World Engine
 
+## 2026-05-16 — v2.0.0: 正文草稿生成基础闭环
+
+### 版本目标
+
+v2.0.0 实现了基于主线章节方案的正文初稿生成基础闭环。用户现在可以从小说工程选择一个主线章节方案中的具体章节，使用 AI 生成正文草稿候选，然后标记为采用稿或废弃。
+
+### 核心功能
+
+- **正文草稿模型 (NovelDraft)**：包含 21 个字段，支持 candidate/accepted/discarded 状态流转
+- **正文草稿服务层 (novel_draft_service.py)**：Prompt 构建、Mock/AI 生成、CRUD、内容提取
+- **正文草稿路由 (novel_drafts.py)**：8 个端点（列表/新建/生成/详情/编辑/保存/采用/废弃）
+- **4 个模板页面**：index/new/detail/edit
+- **世界控制台集成**：小说工程分组新增"正文草稿"和"生成正文草稿"入口
+
+### 状态流转规则
+
+```
+candidate → accepted（标记为采用稿）
+candidate → discarded（废弃）
+candidate → candidate（编辑保存仍为候选）
+accepted → candidate（同章节被新采用稿替代时自动降级）
+accepted → discarded（允许但需确认）
+discarded 不可设为 accepted / 不可编辑
+```
+
+### 同章节采用稿唯一性
+
+- 同一世界、同一 chapter_outline_id、同一 chapter_index 最多只能有一个 is_accepted=True
+- 设置新的采用稿时，旧采用稿自动取消
+- 不同章节可以各自拥有采用稿
+
+### 输入缺失处理
+
+- 无主线章节方案 → 提示"请先生成并确认一个主线章节方案"
+- 主线章节方案无 chapters → 提示"当前主线章节方案缺少章节结构"
+- 未选择章节 → 提示"请选择要生成正文的章节"
+- 无风格方案/上下文包 → 允许继续但给出提示
+
+### Mock 模式验证
+
+Mock 模式返回 ~1100 字的中文示例正文，包含 12 段完整内容，覆盖章节目标、冲突推进、人物心理、场景描写、对话推进和章末钩子。
+
+### 修复内容
+
+- 修复 `novel_draft_service.py` 中正则表达式的 `\\s`/`\\n` 双重转义问题（导致 extract_draft_content 无法正确提取正文内容）
+- 修复 `novel_drafts.py` 路由中目标字数验证正则的 `\\d` 双重转义问题
+- 扩充 Mock 生成内容从 ~495 字到 ~1100 字
+- 更新测试以匹配 v2.0.0 版本变更
+
+### 测试覆盖
+
+新增 5 个测试文件：
+- `test_novel_draft_model.py` — 模型字段验证
+- `test_novel_draft_service.py` — 服务层（Prompt 构建、Mock 生成、CRUD、状态流转）
+- `test_novel_draft_routes.py` — 路由层（HTTP 响应、404、跨世界隔离）
+- `test_novel_draft_integration.py` — 集成测试（控制台入口、回归验证、采用稿流程）
+- `test_novel_draft_ui_adaptation.py` — UI 适配（布局、状态标签、按钮状态）
+
+### 回归验证
+
+- 全书演化、分卷大纲、章节大纲仍正常
+- 设定库 AI 推演、候选采纳、创作资产仍正常
+- 设置中心、导出中心仍正常
+- Hook、文档同步、测试债务检查通过
+
 ## 2026-05-15 — v1.9.0: 基于主线分卷方案的章节大纲生成
 
 ### 为什么 v1.9.0 开始做章节大纲

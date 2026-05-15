@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
+import app.database as app_database
 from app.main import app
 
 
@@ -22,6 +23,10 @@ test_engine = create_engine(
 )
 
 TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+
+# Ensure the application-wide SessionLocal uses the test engine
+app_database.engine = test_engine
+app_database.SessionLocal.configure(bind=test_engine)
 
 
 def override_get_db():

@@ -69,7 +69,7 @@ class TestDocContent:
 
     def test_version_roadmap_contains_v180(self):
         content = _read_doc("project/version-roadmap.md")
-        assert "v1.9.0" in content, "version-roadmap.md missing v1.9.0"
+        assert "v2.0.0" in content, "version-roadmap.md missing v2.0.0"
 
     def test_development_rules_has_no_auto_canon(self):
         content = _read_doc("project/development-rules.md")

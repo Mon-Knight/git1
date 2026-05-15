@@ -32,6 +32,7 @@ REQUIRED_TEMPLATES = [
     "app/templates/base.html",
     "app/templates/settings/ai.html",
     "app/static/css/dashboard.css",
+    "app/static/css/app-shell.css",
     "app/templates/simulation/index.html",
     "app/templates/novel/form.html",
     "app/templates/novel/evolution_form.html",
@@ -66,6 +67,11 @@ REQUIRED_TEMPLATES = [
     "app/templates/chapter_outlines/new.html",
     "app/templates/chapter_outlines/detail.html",
     "app/templates/chapter_outlines/edit.html",
+    # v2.0.0 Novel Drafts
+    "app/templates/novel_drafts/index.html",
+    "app/templates/novel_drafts/new.html",
+    "app/templates/novel_drafts/detail.html",
+    "app/templates/novel_drafts/edit.html",
 ]
 
 # Sidebar related checks (in base.html)
@@ -97,6 +103,9 @@ AI_MODULES = [
     # v1.9.0 Chapter Outlines
     "app/routes/chapter_outlines.py",
     "app/services/chapter_outline_service.py",
+    # v2.0.0 Novel Drafts
+    "app/routes/novel_drafts.py",
+    "app/services/novel_draft_service.py",
 ]
 
 
@@ -127,6 +136,15 @@ def check_source_templates():
             print(f"  FAIL: {tpl} missing")
             errors.append(f"Missing source template: {tpl}")
 
+    # Check required python modules
+    for module_path in AI_MODULES:
+        path = os.path.join(PROJECT_ROOT, module_path)
+        if os.path.isfile(path):
+            print(f"  OK: {module_path} exists")
+        else:
+            print(f"  FAIL: {module_path} missing")
+            errors.append(f"Missing module: {module_path}")
+
     # Check world detail page has module groups
     detail_path = os.path.join(PROJECT_ROOT, "app", "templates", "worlds", "detail.html")
     if os.path.isfile(detail_path):
@@ -139,6 +157,7 @@ def check_source_templates():
             ("剧情历史", "story history group"),
             ("AI 推演", "AI simulation group"),
             ("小说工程", "novel engineering group"),
+            ("正文草稿", "novel drafts entry"),
             ("创作资产", "creative assets group"),
             ("检查中心", "checks group"),
             ("数据与设置", "data & settings group"),
@@ -167,6 +186,12 @@ def check_source_templates():
         else:
             print("  FAIL: world detail page missing chapter outlines entry")
             errors.append("World detail missing: 章节大纲")
+        # v2.0.0 Novel Drafts
+        if "正文草稿" in detail_html:
+            print("  OK: world detail page has novel drafts entry")
+        else:
+            print("  FAIL: world detail page missing novel drafts entry")
+            errors.append("World detail missing: 正文草稿")
 
     # Check sidebar and settings features
     base_path = os.path.join(PROJECT_ROOT, "app", "templates", "base.html")

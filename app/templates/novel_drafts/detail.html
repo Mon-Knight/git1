@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard' %}
+{% block title %}正文草稿详情 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}正文草稿详情{% endblock %}
+
+{% block head_extra %}
+<style>
+.draft-header{display:flex;flex-direction:column;gap:0.5rem}
+.draft-status{display:inline-block;padding:0.2rem 0.6rem;border-radius:10px;font-size:0.75rem;font-weight:600}
+.draft-status.candidate{background:rgba(52,152,219,0.15);color:#3498db}
+.draft-status.accepted{background:rgba(0,212,170,0.15);color:var(--color-accent)}
+.draft-status.discarded{background:rgba(149,165,166,0.15);color:#95a5a6}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;margin-top:1rem}
+.info-item{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:0.75rem}
+.info-label{font-size:0.75rem;color:var(--color-text-muted)}
+.info-value{margin-top:0.2rem;font-weight:600}
+.draft-content{white-space:pre-wrap;line-height:1.7;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem;margin-top:0.75rem}
+.action-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem}
+.warn{background:rgba(243,156,18,0.08);border:1px solid rgba(243,156,18,0.2);padding:0.6rem;border-radius:var(--radius);margin-top:0.75rem}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard" style="max-width:1100px">
+    <div class="draft-header">
+        <h1>✍️ {{ draft.title or '(无标题)' }}</h1>
+        <div>
+            <span class="draft-status {{ draft.status }}">{{ status_labels.get(draft.status, draft.status) }}</span>
+            {% if draft.is_accepted %}<span style="color:var(--color-accent);font-weight:600;margin-left:0.4rem">★ 当前采用稿</span>{% endif %}
+        </div>
+        {% if error %}
+        <div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.6rem;border-radius:var(--radius)">{{ error }}</div>
+        {% endif %}
+    </div>
+
+    <div class="info-grid">
+        <div class="info-item">
+            <div class="info-label">来源章节方案</div>
+            <div class="info-value">
+                {% if outline %}{{ outline.title or ('方案 #' ~ outline.id) }}{% else %}来源章节方案已不可用{% endif %}
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">所属卷</div>
+            <div class="info-value">第{{ draft.volume_index }}卷{% if draft.volume_title %}《{{ draft.volume_title }}》{% endif %}</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">所属章节</div>
+            <div class="info-value">第{{ draft.chapter_index }}章{% if draft.chapter_title %}《{{ draft.chapter_title }}》{% endif %}</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">正文字数</div>
+            <div class="info-value">{{ draft.word_count }} 字</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">生成时间</div>
+            <div class="info-value">{{ draft.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+        </div>
+        {% if draft.generation_requirement %}
+        <div class="info-item">
+            <div class="info-label">生成要求</div>
+            <div class="info-value">{{ draft.generation_requirement }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if existing_accepted %}
+    <div class="warn">
+        ⚠️ 当前章节已有采用稿：{{ existing_accepted.title or ('草稿 #' ~ existing_accepted.id) }}。如继续标记，将替换旧采用稿。
+    </div>
+    {% endif %}
+
+    <h2 style="margin-top:1.25rem">正文内容</h2>
+    <div class="draft-content">{{ draft.content or '（正文为空）' }}</div>
+
+    {% if draft.notes %}
+    <h3 style="margin-top:1rem">备注</h3>
+    <div class="draft-content" style="margin-top:0.4rem">{{ draft.notes }}</div>
+    {% endif %}
+
+    <details style="margin-top:1rem">
+        <summary>Prompt 摘要</summary>
+        <div class="draft-content" style="margin-top:0.5rem">{{ draft.prompt }}</div>
+    </details>
+
+    {% if draft.raw_text %}
+    <details style="margin-top:0.75rem">
+        <summary>原始返回</summary>
+        <div class="draft-content" style="margin-top:0.5rem">{{ draft.raw_text }}</div>
+    </details>
+    {% endif %}
+
+    <div class="action-row">
+        {% if draft.status != 'discarded' and not draft.is_accepted %}
+        <form action="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/set-accepted" method="post" {% if existing_accepted %}onsubmit="return confirm('该章节已有采用稿，确定要替换吗？')"{% endif %}>
+            <button type="submit" class="btn-primary">✅ 标记为采用稿</button>
+        </form>
+        {% endif %}
+        {% if draft.status != 'discarded' %}
+        <a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/edit" class="btn-secondary">✏️ 编辑</a>
+        {% else %}
+        <span class="btn-secondary" style="opacity:0.6;pointer-events:none">✏️ 编辑</span>
+        {% endif %}
+        {% if draft.status != 'discarded' %}
+        <form action="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/discard" method="post" onsubmit="return confirm('确认废弃该草稿？')">
+            <button type="submit" class="btn-secondary">🗑️ 废弃</button>
+        </form>
+        {% else %}
+        <span class="btn-secondary" style="opacity:0.6;pointer-events:none">🗑️ 已废弃</span>
+        {% endif %}
+        <a href="/worlds/{{ world.id }}/novel/drafts" class="btn-secondary">← 返回列表</a>
+    </div>
+</div>
+{% endblock %}

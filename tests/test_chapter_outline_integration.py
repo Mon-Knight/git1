@@ -31,9 +31,13 @@ def _get_test_db():
 @pytest.fixture(autouse=True)
 def override_db():
     """Override FastAPI DB dependency for this test module."""
+    previous = app.dependency_overrides.get(get_db)
     app.dependency_overrides[get_db] = _get_test_db
     yield
-    app.dependency_overrides.clear()
+    if previous is not None:
+        app.dependency_overrides[get_db] = previous
+    else:
+        app.dependency_overrides.pop(get_db, None)
 
 
 @pytest.fixture(autouse=True)

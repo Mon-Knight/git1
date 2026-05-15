@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}生成正文草稿 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}生成正文草稿{% endblock %}
+
+{% block head_extra %}
+<style>
+.draft-form-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.5rem 2rem;max-width:960px;margin:0 auto}
+.draft-form-card .fg{margin-bottom:1rem}
+.draft-form-card label{display:block;font-weight:600;font-size:0.88rem;margin-bottom:0.3rem;color:var(--color-text)}
+.draft-form-card input,.draft-form-card select,.draft-form-card textarea{width:100%;padding:0.6rem 0.8rem;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg);color:var(--color-text);font-size:0.9rem;box-sizing:border-box;font-family:inherit}
+.draft-form-card input:focus,.draft-form-card select:focus,.draft-form-card textarea:focus{outline:none;border-color:var(--color-primary);box-shadow:0 0 0 2px rgba(108,99,255,0.2)}
+.draft-form-card .hint{font-size:0.78rem;color:var(--color-text-muted);margin-top:0.25rem}
+.draft-form-card .warning{font-size:0.8rem;color:#f39c12;margin-top:0.25rem}
+.btn-row{display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap}
+.loading-text{display:none;color:var(--color-text-muted);font-size:0.85rem}
+form.submitting .loading-text{display:inline}
+form.submitting button[type=submit]{opacity:0.6;pointer-events:none}
+.asset-warn{background:rgba(243,156,18,0.08);border:1px solid rgba(243,156,18,0.2);padding:0.75rem;border-radius:var(--radius);margin-bottom:1rem}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard" style="max-width:960px">
+    <h1>✍️ 生成正文草稿</h1>
+    <p style="color:var(--color-text-muted);margin-bottom:1.5rem">
+        基于主线章节方案生成单章正文初稿。当前世界：<strong>{{ world.name }}</strong>
+    </p>
+
+    {% if error %}
+    <div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem;border-radius:var(--radius);margin-bottom:1rem">❌ {{ error }}</div>
+    {% endif %}
+
+    {% if 'main_chapter_outline' in missing_prereqs %}
+    <div class="empty-state-dash" style="border:1px solid rgba(243,156,18,0.3);background:rgba(243,156,18,0.05);margin-bottom:1.5rem">
+        <div class="empty-icon">📝</div>
+        <p style="color:#f39c12">⚠️ 请先生成并确认一个主线章节方案。</p>
+        <p style="font-size:0.82rem;color:var(--color-text-muted)">正文草稿生成依赖主线章节方案。</p>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem">
+            <a href="/worlds/{{ world.id }}/novel/chapter-outlines" class="btn-primary">前往章节大纲 →</a>
+            <a href="/worlds/{{ world.id }}/novel/volume-outlines" class="btn-secondary">分卷大纲</a>
+            <a href="/worlds/{{ world.id }}/context" class="btn-secondary">创作资产</a>
+            <a href="/worlds/{{ world.id }}/characters" class="btn-secondary">设定库</a>
+        </div>
+    </div>
+    {% elif 'no_chapters' in missing_prereqs %}
+    <div class="empty-state-dash" style="border:1px solid rgba(243,156,18,0.3);background:rgba(243,156,18,0.05);margin-bottom:1.5rem">
+        <div class="empty-icon">📝</div>
+        <p style="color:#f39c12">⚠️ 当前主线章节方案缺少章节结构。</p>
+        <p style="font-size:0.82rem;color:var(--color-text-muted)">请先修复或重新生成章节大纲，确保包含 chapters 数组。</p>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem">
+            <a href="/worlds/{{ world.id }}/novel/chapter-outlines" class="btn-primary">前往章节大纲 →</a>
+            <a href="/worlds/{{ world.id }}/novel/volume-outlines" class="btn-secondary">分卷大纲</a>
+            <a href="/worlds/{{ world.id }}/context" class="btn-secondary">创作资产</a>
+            <a href="/worlds/{{ world.id }}/characters" class="btn-secondary">设定库</a>
+        </div>
+    </div>
+    {% else %}
+    {% if asset_counts.character_count == 0 and asset_counts.faction_count == 0 and asset_counts.location_count == 0 and asset_counts.rule_count == 0 %}
+    <div class="asset-warn">
+        <strong>资料不足提示：</strong>当前世界尚未完善角色/势力/地点/规则，仍可生成草稿，但建议先补充设定。
+        <div style="margin-top:0.4rem">
+            <a href="/worlds/{{ world.id }}/characters" class="btn-sm">角色</a>
+            <a href="/worlds/{{ world.id }}/factions" class="btn-sm">势力</a>
+            <a href="/worlds/{{ world.id }}/locations" class="btn-sm">地点</a>
+            <a href="/worlds/{{ world.id }}/rules" class="btn-sm">规则</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="draft-form-card">
+        <form action="/worlds/{{ world.id }}/novel/drafts" method="post" onsubmit="this.classList.add('submitting')">
+            <div class="fg">
+                <label>主线章节方案</label>
+                {% if chapter_outlines %}
+                <div class="hint">
+                    已读取 {{ chapter_outlines|length }} 个主线章节方案
+                </div>
+                {% else %}
+                <div class="warning">⚠️ 未找到主线章节方案</div>
+                {% endif %}
+            </div>
+
+            <div class="fg">
+                <label>选择章节 <span style="color:#e74c3c">*</span></label>
+                {% set selected_key = '' %}
+                {% if form_data and form_data.chapter_outline_id and form_data.chapter_index %}
+                    {% set selected_key = form_data.chapter_outline_id ~ ':' ~ form_data.chapter_index %}
+                {% endif %}
+                <select name="chapter_key" required>
+                    <option value="">-- 请选择 --</option>
+                    {% for ch in chapter_options %}
+                    {% set opt_value = ch.outline_id ~ ':' ~ ch.chapter_index %}
+                    <option value="{{ opt_value }}" {% if selected_key == opt_value %}selected{% endif %}>
+                        第{{ ch.volume_index }}卷{% if ch.volume_title %}《{{ ch.volume_title }}》{% endif %} · 第{{ ch.chapter_index }}章{% if ch.chapter_title %}《{{ ch.chapter_title }}》{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if not chapter_options %}
+                <div class="warning">⚠️ 未找到章节数据，请确认主线章节方案包含 chapters 结构。</div>
+                {% endif %}
+            </div>
+
+            <div class="fg">
+                <label>写作风格方案（可选）</label>
+                <select name="style_profile_id">
+                    <option value="">-- 不选择（使用默认风格）--</option>
+                    {% for s in styles %}
+                    <option value="{{ s.id }}" {% if form_data and form_data.style_profile_id == s.id|string %}selected{% endif %}>{{ s.name }}{% if s.genre %} ({{ s.genre }}){% endif %}</option>
+                    {% endfor %}
+                </select>
+                {% if not styles %}
+                <div class="hint">暂无风格方案，将使用默认风格。可在<a href="/worlds/{{ world.id }}/context/styles">创作资产 → 风格方案</a> 中创建。</div>
+                {% else %}
+                <div class="hint">未选择时将使用默认风格生成。</div>
+                {% endif %}
+            </div>
+
+            <div class="fg">
+                <label>剧情时间点（可选）</label>
+                <select name="plot_anchor_id">
+                    <option value="">-- 不选择 --</option>
+                    {% for a in anchors %}
+                    <option value="{{ a.id }}" {% if form_data and form_data.plot_anchor_id == a.id|string %}selected{% endif %}>{{ a.name }} ({{ a.stage or '?' }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="fg">
+                <label>创作上下文包（可选）</label>
+                <select name="context_package_id">
+                    <option value="">-- 不选择（AI 基于当前世界资料生成）--</option>
+                    {% for p in packages %}
+                    <option value="{{ p.id }}" {% if form_data and form_data.context_package_id == p.id|string %}selected{% endif %}>{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+                {% if not packages %}
+                <div class="hint">暂无上下文包，AI 将基于当前世界和主线方案生成。可在<a href="/worlds/{{ world.id }}/context/packages">创作资产 → 上下文包</a> 中创建。</div>
+                {% else %}
+                <div class="hint">未选择上下文包时将直接使用世界资料、主线分卷与章节方案。</div>
+                {% endif %}
+            </div>
+
+            <div class="fg">
+                <label>目标字数</label>
+                <input type="text" name="target_words" value="{{ form_data.target_words if form_data else '' }}" placeholder="例如：2000">
+                <div class="hint">请输入数字，可加“字”后缀</div>
+            </div>
+
+            <div class="fg">
+                <label>叙事人称（可选）</label>
+                <select name="narrative_pov">
+                    <option value="">-- 不选择 --</option>
+                    <option value="第三人称" {% if form_data and form_data.narrative_pov == '第三人称' %}selected{% endif %}>第三人称</option>
+                    <option value="第一人称" {% if form_data and form_data.narrative_pov == '第一人称' %}selected{% endif %}>第一人称</option>
+                </select>
+            </div>
+
+            <div class="fg">
+                <label>节奏要求（可选）</label>
+                <select name="pacing_requirement">
+                    <option value="">-- 不选择 --</option>
+                    <option value="平稳铺垫" {% if form_data and form_data.pacing_requirement == '平稳铺垫' %}selected{% endif %}>平稳铺垫</option>
+                    <option value="冲突推进" {% if form_data and form_data.pacing_requirement == '冲突推进' %}selected{% endif %}>冲突推进</option>
+                    <option value="高强度剧情" {% if form_data and form_data.pacing_requirement == '高强度剧情' %}selected{% endif %}>高强度剧情</option>
+                </select>
+            </div>
+
+            <div class="fg">
+                <label>补充要求（可选）</label>
+                <textarea name="extra_requirements" rows="3" placeholder="例如：强调主角内心变化，场景描写细致，结尾留悬念…">{{ form_data.extra_requirements if form_data else '' }}</textarea>
+            </div>
+
+            <div class="fg">
+                <label>强化选项</label>
+                <div style="display:flex;flex-wrap:wrap;gap:0.75rem">
+                    <label style="display:flex;align-items:center;gap:0.4rem;font-weight:400">
+                        <input type="checkbox" name="strict_outline" {% if form_data and form_data.strict_outline %}checked{% endif %}> 严格遵守章节大纲
+                    </label>
+                    <label style="display:flex;align-items:center;gap:0.4rem;font-weight:400">
+                        <input type="checkbox" name="emphasize_psychology" {% if form_data and form_data.emphasize_psychology %}checked{% endif %}> 强调人物心理
+                    </label>
+                    <label style="display:flex;align-items:center;gap:0.4rem;font-weight:400">
+                        <input type="checkbox" name="emphasize_scene" {% if form_data and form_data.emphasize_scene %}checked{% endif %}> 强调场景描写
+                    </label>
+                    <label style="display:flex;align-items:center;gap:0.4rem;font-weight:400">
+                        <input type="checkbox" name="emphasize_dialogue" {% if form_data and form_data.emphasize_dialogue %}checked{% endif %}> 强调对话推进
+                    </label>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button type="submit" class="btn-primary">🤖 生成正文草稿</button>
+                <span class="loading-text">⏳ AI 正在生成正文草稿，请稍候…</span>
+                <a href="/worlds/{{ world.id }}/novel/drafts" class="btn-secondary">← 返回列表</a>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

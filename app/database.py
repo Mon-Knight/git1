@@ -46,5 +46,6 @@ def init_db():
         StyleProfile,
         PlotAnchor,
         ContextPackage,
+        NovelDraft,
     )
     Base.metadata.create_all(bind=engine)

@@ -87,8 +87,9 @@
                 ('创作上下文', summary.context_package_count > 0, '/worlds/' + world.id|string + '/context'),
                 ('全书演化', summary.novel_evolution_count > 0, '/worlds/' + world.id|string + '/novel/evolution'),
                 ('主线方案', summary.mainline_evolution_count > 0, '/worlds/' + world.id|string + '/novel/evolutions'),
-                ('分卷大纲', false, ''),
-                ('章节大纲', false, ''),
+                ('分卷大纲', summary.volume_outline_count > 0, '/worlds/' + world.id|string + '/novel/volume-outlines'),
+                ('章节大纲', summary.chapter_outline_count > 0, '/worlds/' + world.id|string + '/novel/chapter-outlines'),
+                ('正文草稿', summary.novel_draft_count > 0, '/worlds/' + world.id|string + '/novel/drafts'),
             ] %}
             {% for name, done, url in stages %}
             <a href="{{ url if url else '#' }}" style="text-decoration:none;{% if not url %}opacity:0.5;cursor:default{% endif %}">
