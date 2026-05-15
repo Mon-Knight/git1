@@ -53,17 +53,19 @@ class TestNoWorldModuleDisabled:
         assert "/worlds//" not in resp.text
 
     def test_sidebar_modules_exist(self):
+        """v2.0.1: Updated module names; world console only with active world."""
         resp = client.get("/")
-        assert "世界控制台" in resp.text
         assert "AI 推演" in resp.text
         assert "创作资产" in resp.text
         assert "小说工程" in resp.text
-        assert "检查中心" in resp.text
+        assert "质量检查" in resp.text
+        assert "世界设定" in resp.text
 
     def test_settings_nav_exists(self):
+        """v2.0.1: Updated module names."""
         resp = client.get("/")
         assert "设置" in resp.text
-        assert "数据管理" in resp.text
+        assert "数据与导出" in resp.text
 
 
 class TestActiveNavHighlight:

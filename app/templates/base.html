@@ -12,8 +12,8 @@
     <!-- ===== Top Bar ===== -->
     <header class="topbar">
         <div class="topbar-left">
-            <span class="topbar-logo">🌍 AI World Engine</span>
-            <span class="topbar-version">v{{ app_version or '1.7.2' }}</span>
+            <span class="topbar-logo">📖 AI World Engine</span>
+            <span class="topbar-version">v{{ app_version or '2.0.1' }}</span>
         </div>
         <div class="topbar-center">
             {% if current_world %}
@@ -29,27 +29,92 @@
         </div>
     </header>
 
-    <!-- ===== Sidebar ===== -->
+    <!-- ===== Sidebar (v2.0.1: 小说工程核心化 UI 信息架构) ===== -->
     <nav class="sidebar">
         <ul class="sidebar-nav">
             {% set nav_world_id = current_world.id if current_world else None %}
+            {% set has_world = nav_world_id or recent_world_id %}
+            {% set target_world_id = nav_world_id or recent_world_id or 0 %}
             {% set active = active_nav or '' %}
-            {% set is_world_page = active in ('worlds','novel','assets','simulation','checks') %}
+            {% set is_world_page = active in ('worlds',) %}
+            {% set is_novel_page = active in ('novel',) %}
+            {% set is_assets_page = active in ('assets',) %}
+            {% set is_simulation_page = active in ('simulation',) %}
+            {% set is_checks_page = active in ('checks',) %}
             {% set is_settings_page = active == 'settings' %}
+
+            <!-- 1. 工作台 -->
             <li>
                 <a href="/" class="sidebar-link {% if active == 'dashboard' %}active{% endif %}" data-nav="dashboard">
                     <span class="sidebar-icon">🏠</span> 工作台
                 </a>
             </li>
+
+            <!-- 2. 小说工程（核心入口，v2.0.1 前移至第二位） -->
+            <li class="sidebar-group">
+                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/novel{% else %}#{% endif %}"
+                   class="sidebar-link sidebar-group-toggle {% if is_novel_page %}active{% endif %}{% if not nav_world_id %} disabled{% endif %}"
+                   data-nav="novel"
+                   onclick="toggleSidebarGroup(event)"
+                   {% if not nav_world_id %}title="请先进入世界"{% endif %}>
+                    <span class="sidebar-icon">📖</span> 小说工程
+                    <span class="sidebar-arrow {% if is_novel_page %}open{% endif %}">▾</span>
+                </a>
+                <ul class="sidebar-subnav {% if not is_novel_page %}collapsed{% endif %}">
+                    {% if nav_world_id %}
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/novel" class="sidebar-sublink {% if active == 'novel' and request.url.path == '/worlds/' + nav_world_id|string + '/novel' %}active{% endif %}" data-nav="novel">
+                            📊 工程总览
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/novel/evolution" class="sidebar-sublink" data-nav="novel">
+                            📖 全书演化
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/novel/evolutions" class="sidebar-sublink" data-nav="novel">
+                            📋 主线方案
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/novel/volume-outlines" class="sidebar-sublink" data-nav="novel">
+                            📚 分卷大纲
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/novel/chapter-outlines" class="sidebar-sublink" data-nav="novel">
+                            📝 章节大纲
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/novel/drafts" class="sidebar-sublink" data-nav="novel">
+                            ✍️ 正文草稿
+                        </a>
+                    </li>
+                    <li class="sidebar-subnav-divider"></li>
+                    {% else %}
+                    <li><span class="sidebar-sublink disabled">请先选择或创建世界</span></li>
+                    {% endif %}
+                    <!-- 后续开放 -->
+                    <li><span class="sidebar-sublink future-link">🔍 正文质量检查 <small>(后续开放)</small></span></li>
+                    <li><span class="sidebar-sublink future-link">✨ 正文润色 <small>(后续开放)</small></span></li>
+                    <li><span class="sidebar-sublink future-link">📕 整卷生成 <small>(后续开放)</small></span></li>
+                    <li><span class="sidebar-sublink future-link">📤 定稿导出 <small>(后续开放)</small></span></li>
+                </ul>
+            </li>
+
+            <!-- 3. 世界设定（原"世界项目"） -->
             <li class="sidebar-group">
                 <a href="/worlds"
                    class="sidebar-link sidebar-group-toggle {% if is_world_page %}active{% endif %}"
                    data-nav="worlds"
                    onclick="toggleSidebarGroup(event)">
-                    <span class="sidebar-icon">🌍</span> 世界项目
+                    <span class="sidebar-icon">🌍</span> 世界设定
                     <span class="sidebar-arrow {% if is_world_page %}open{% endif %}">▾</span>
                 </a>
                 <ul class="sidebar-subnav {% if not is_world_page %}collapsed{% endif %}">
+                    <!-- Always-available items -->
                     <li>
                         <a href="/worlds" class="sidebar-sublink {% if not nav_world_id and active == 'worlds' %}active{% endif %}" data-nav="worlds">
                             📋 世界列表
@@ -58,70 +123,174 @@
                     <li>
                         <a href="/worlds/new" class="sidebar-sublink">➕ 新建世界</a>
                     </li>
-                    {% if recent_world_id %}
-                    <li>
-                        <a href="/worlds/{{ recent_world_id }}" class="sidebar-sublink {% if nav_world_id == recent_world_id and active == 'worlds' %}active{% endif %}" data-nav="worlds">
-                            ⚡ 最近世界
-                        </a>
-                    </li>
-                    {% endif %}
+
                     {% if nav_world_id %}
+                    <!-- Active world: show all world-specific modules -->
                     <li class="sidebar-world-current">
                         <span class="sidebar-sublink world-label">📖 当前世界：{{ current_world.name }}</span>
                     </li>
-                    {% endif %}
-                    <!-- Divider between management and core modules -->
-                    <li class="sidebar-subnav-divider"></li>
-                    <!-- Core world modules: always visible, disabled if no world selected -->
-                    {% set has_world = nav_world_id or recent_world_id %}
-                    {% set target_world_id = nav_world_id or recent_world_id or 0 %}
                     <li>
-                        <a href="{% if has_world %}/worlds/{{ target_world_id }}{% else %}#{% endif %}"
-                           class="sidebar-sublink {% if has_world and active == 'worlds' %}active{% endif %} {% if not has_world %}disabled{% endif %}"
-                           data-nav="worlds"
-                           {% if not has_world %}onclick="return false" title="暂无可用世界，请先创建或选择世界"{% endif %}>
+                        <a href="/worlds/{{ nav_world_id }}" class="sidebar-sublink" data-nav="worlds">
                             🎛️ 世界控制台
                         </a>
                     </li>
+                    <li class="sidebar-subnav-divider"></li>
                     <li>
-                        <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/simulation{% else %}#{% endif %}"
-                           class="sidebar-sublink {% if active == 'simulation' %}active{% endif %} {% if not nav_world_id %}disabled{% endif %}"
-                           data-nav="simulation"
-                           {% if not nav_world_id %}onclick="return false" title="请先进入世界"{% endif %}>
-                            🤖 AI 推演
-                        </a>
+                        <a href="/worlds/{{ nav_world_id }}/characters" class="sidebar-sublink" data-nav="worlds">👤 角色</a>
                     </li>
                     <li>
-                        <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/context{% else %}#{% endif %}"
-                           class="sidebar-sublink {% if active == 'assets' %}active{% endif %} {% if not nav_world_id %}disabled{% endif %}"
-                           data-nav="assets"
-                           {% if not nav_world_id %}onclick="return false" title="请先进入世界"{% endif %}>
-                            📦 创作资产
-                        </a>
+                        <a href="/worlds/{{ nav_world_id }}/factions" class="sidebar-sublink" data-nav="worlds">🏛️ 势力</a>
                     </li>
                     <li>
-                        <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/novel/evolution{% else %}#{% endif %}"
-                           class="sidebar-sublink {% if active == 'novel' %}active{% endif %} {% if not nav_world_id %}disabled{% endif %}"
-                           data-nav="novel"
-                           {% if not nav_world_id %}onclick="return false" title="请先进入世界"{% endif %}>
-                            📖 小说工程
-                        </a>
+                        <a href="/worlds/{{ nav_world_id }}/locations" class="sidebar-sublink" data-nav="worlds">📍 地点</a>
                     </li>
                     <li>
-                        <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/checks{% else %}#{% endif %}"
-                           class="sidebar-sublink {% if active == 'checks' %}active{% endif %} {% if not nav_world_id %}disabled{% endif %}"
-                           data-nav="checks"
-                           {% if not nav_world_id %}onclick="return false" title="请先进入世界"{% endif %}>
-                            🔍 检查中心
+                        <a href="/worlds/{{ nav_world_id }}/rules" class="sidebar-sublink" data-nav="worlds">📜 规则</a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/events" class="sidebar-sublink" data-nav="worlds">📋 历史事件</a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/timeline" class="sidebar-sublink" data-nav="worlds">⏱️ 时间线</a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/setting-suggestions" class="sidebar-sublink" data-nav="worlds">💡 设定库 AI 扩展</a>
+                    </li>
+                    {% elif recent_world_id %}
+                    <!-- No active world but has a recent world: show quick link -->
+                    <li>
+                        <a href="/worlds/{{ recent_world_id }}" class="sidebar-sublink" data-nav="worlds">
+                            ⚡ 最近世界
                         </a>
                     </li>
+                    <li class="sidebar-subnav-divider"></li>
+                    <li><span class="sidebar-sublink disabled">请先进入世界以查看设定模块</span></li>
+                    {% else %}
+                    <!-- No worlds at all -->
+                    <li class="sidebar-subnav-divider"></li>
+                    <li><span class="sidebar-sublink disabled">请先创建世界</span></li>
+                    {% endif %}
                 </ul>
             </li>
+
+            <!-- 4. 创作资产 -->
+            <li class="sidebar-group">
+                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/context{% else %}#{% endif %}"
+                   class="sidebar-link sidebar-group-toggle {% if is_assets_page %}active{% endif %}{% if not nav_world_id %} disabled{% endif %}"
+                   data-nav="assets"
+                   onclick="toggleSidebarGroup(event)"
+                   {% if not nav_world_id %}title="请先进入世界"{% endif %}>
+                    <span class="sidebar-icon">📦</span> 创作资产
+                    <span class="sidebar-arrow {% if is_assets_page %}open{% endif %}">▾</span>
+                </a>
+                <ul class="sidebar-subnav {% if not is_assets_page %}collapsed{% endif %}">
+                    {% if nav_world_id %}
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/context" class="sidebar-sublink" data-nav="assets">
+                            📦 创作上下文包
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/context/styles" class="sidebar-sublink" data-nav="assets">
+                            ✏️ 写作风格方案
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/context/anchors" class="sidebar-sublink" data-nav="assets">
+                            📍 剧情时间点
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/context/packages" class="sidebar-sublink" data-nav="assets">
+                            📋 上下文包列表
+                        </a>
+                    </li>
+                    <li class="sidebar-subnav-divider"></li>
+                    {% else %}
+                    <li><span class="sidebar-sublink disabled">请先选择或创建世界</span></li>
+                    {% endif %}
+                    <!-- 后续开放 -->
+                    <li><span class="sidebar-sublink future-link">📋 主线资产 <small>(后续开放)</small></span></li>
+                    <li><span class="sidebar-sublink future-link">📋 备选资产 <small>(后续开放)</small></span></li>
+                    <li><span class="sidebar-sublink future-link">🗑️ 废弃资产 <small>(后续开放)</small></span></li>
+                </ul>
+            </li>
+
+            <!-- 5. AI 推演 -->
+            <li class="sidebar-group">
+                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/simulation{% else %}#{% endif %}"
+                   class="sidebar-link sidebar-group-toggle {% if is_simulation_page %}active{% endif %}{% if not nav_world_id %} disabled{% endif %}"
+                   data-nav="simulation"
+                   onclick="toggleSidebarGroup(event)"
+                   {% if not nav_world_id %}title="请先进入世界"{% endif %}>
+                    <span class="sidebar-icon">🤖</span> AI 推演
+                    <span class="sidebar-arrow {% if is_simulation_page %}open{% endif %}">▾</span>
+                </a>
+                <ul class="sidebar-subnav {% if not is_simulation_page %}collapsed{% endif %}">
+                    {% if nav_world_id %}
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/simulation" class="sidebar-sublink" data-nav="simulation">
+                            🌍 世界推演
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/records" class="sidebar-sublink" data-nav="simulation">
+                            📋 推演记录
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/branches" class="sidebar-sublink" data-nav="simulation">
+                            🌿 分支推演
+                        </a>
+                    </li>
+                    {% else %}
+                    <li><span class="sidebar-sublink disabled">请先选择或创建世界</span></li>
+                    {% endif %}
+                </ul>
+            </li>
+
+            <!-- 6. 质量检查（原"检查中心"） -->
+            <li class="sidebar-group">
+                <a href="{% if nav_world_id %}/worlds/{{ nav_world_id }}/checks{% else %}#{% endif %}"
+                   class="sidebar-link sidebar-group-toggle {% if is_checks_page %}active{% endif %}{% if not nav_world_id %} disabled{% endif %}"
+                   data-nav="checks"
+                   onclick="toggleSidebarGroup(event)"
+                   {% if not nav_world_id %}title="请先进入世界"{% endif %}>
+                    <span class="sidebar-icon">🔍</span> 质量检查
+                    <span class="sidebar-arrow {% if is_checks_page %}open{% endif %}">▾</span>
+                </a>
+                <ul class="sidebar-subnav {% if not is_checks_page %}collapsed{% endif %}">
+                    {% if nav_world_id %}
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/checks" class="sidebar-sublink" data-nav="checks">
+                            ⚠️ 设定矛盾检查
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/worlds/{{ nav_world_id }}/checks?type=behavior" class="sidebar-sublink" data-nav="checks">
+                            👤 角色行为检查
+                        </a>
+                    </li>
+                    {% else %}
+                    <li><span class="sidebar-sublink disabled">请先选择或创建世界</span></li>
+                    {% endif %}
+                    <!-- 后续开放 -->
+                    <li class="sidebar-subnav-divider"></li>
+                    <li><span class="sidebar-sublink future-link">🔍 正文质量检查 <small>(后续开放)</small></span></li>
+                    <li><span class="sidebar-sublink future-link">🎨 风格一致性检查 <small>(后续开放)</small></span></li>
+                    <li><span class="sidebar-sublink future-link">📌 伏笔回收检查 <small>(后续开放)</small></span></li>
+                    <li><span class="sidebar-sublink future-link">📏 长篇一致性检查 <small>(后续开放)</small></span></li>
+                </ul>
+            </li>
+
+            <!-- 7. 数据与导出（原"数据管理"） -->
             <li>
                 <a href="/data" class="sidebar-link {% if active == 'data' %}active{% endif %}" data-nav="data">
-                    <span class="sidebar-icon">💾</span> 数据管理
+                    <span class="sidebar-icon">💾</span> 数据与导出
                 </a>
             </li>
+
+            <!-- 8. 设置 -->
             <li class="sidebar-group">
                 <a href="/settings/ai"
                    class="sidebar-link sidebar-group-toggle {% if is_settings_page %}active{% endif %}"
@@ -133,7 +302,11 @@
                 <ul class="sidebar-subnav {% if not is_settings_page %}collapsed{% endif %}">
                     <li>
                         <a href="/settings/ai" class="sidebar-sublink {% if active == 'settings' %}active{% endif %}" data-nav="settings"
-                           onclick="showSettingsCategory('ai', event); return false;">🤖 AI 设置</a>
+                           onclick="showSettingsCategory('ai', event); return false;">🤖 AI 模型设置</a>
+                    </li>
+                    <li>
+                        <a href="/settings/ai#task-model" class="sidebar-sublink" data-nav="settings"
+                           onclick="showSettingsCategory('task-model', event); return false;">📋 任务模型分配 <small>(后续开放)</small></a>
                     </li>
                     <li>
                         <a href="/settings/ai#display" class="sidebar-sublink" data-nav="settings"
@@ -148,28 +321,16 @@
                            onclick="showSettingsCategory('storage', event); return false;">📁 路径与存储</a>
                     </li>
                     <li>
-                        <a href="/settings/ai#export" class="sidebar-sublink" data-nav="settings"
-                           onclick="showSettingsCategory('export', event); return false;">📤 数据与导出</a>
-                    </li>
-                    <li>
                         <a href="/settings/ai#diagnostics" class="sidebar-sublink" data-nav="settings"
                            onclick="showSettingsCategory('diagnostics', event); return false;">📋 日志与诊断</a>
                     </li>
                     <li>
                         <a href="/settings/ai#about" class="sidebar-sublink" data-nav="settings"
-                           onclick="showSettingsCategory('about', event); return false;">ℹ️ 关于</a>
+                           onclick="showSettingsCategory('about', event); return false;">ℹ️ 关于软件</a>
                     </li>
                 </ul>
             </li>
         </ul>
-
-        <!-- Future modules indicator -->
-        <div class="sidebar-future">
-            <span class="sidebar-future-label">后续版本开放</span>
-            <span class="sidebar-future-item">📋 分卷大纲</span>
-            <span class="sidebar-future-item">📝 章节大纲</span>
-            <span class="sidebar-future-item">✍️ 正文生成</span>
-        </div>
     </nav>
 
     <!-- ===== Main Content ===== -->
@@ -182,13 +343,13 @@
     <!-- ===== Scripts ===== -->
     <script src="/static/js/sidebar.js"></script>
     <script>
-    // Auto-detect active sidebar item from current URL path
+    // v2.0.1: Auto-detect active sidebar item from current URL path
     (function() {
         var path = window.location.pathname;
         var hash = window.location.hash;
         var links = document.querySelectorAll('.sidebar-link, .sidebar-sublink');
 
-        // Priority-based matching
+        // Priority-based matching (most specific first)
         var patterns = [
             { test: /^\/data/, nav: 'data' },
             { test: /^\/settings/, nav: 'settings' },
@@ -198,6 +359,13 @@
             { test: /^\/worlds\/\d+\/records/, nav: 'simulation' },
             { test: /^\/worlds\/\d+\/branches/, nav: 'simulation' },
             { test: /^\/worlds\/\d+\/checks/, nav: 'checks' },
+            { test: /^\/worlds\/\d+\/setting-suggestions/, nav: 'worlds' },
+            { test: /^\/worlds\/\d+\/characters/, nav: 'worlds' },
+            { test: /^\/worlds\/\d+\/factions/, nav: 'worlds' },
+            { test: /^\/worlds\/\d+\/locations/, nav: 'worlds' },
+            { test: /^\/worlds\/\d+\/rules/, nav: 'worlds' },
+            { test: /^\/worlds\/\d+\/events/, nav: 'worlds' },
+            { test: /^\/worlds\/\d+\/timeline/, nav: 'worlds' },
             { test: /^\/worlds\/\d+/, nav: 'worlds' },
             { test: /^\/worlds/, nav: 'worlds' },
             { test: /^\/$/, nav: 'dashboard' }
@@ -230,6 +398,29 @@
                     link.classList.add('active');
                 }
             });
+        }
+
+        // v2.0.1: Auto-expand correct groups based on active nav
+        function expandGroup(nav) {
+            var groups = document.querySelectorAll('.sidebar-group');
+            groups.forEach(function(group) {
+                var toggle = group.querySelector('.sidebar-group-toggle');
+                if (toggle && toggle.getAttribute('data-nav') === nav) {
+                    var subnav = group.querySelector('.sidebar-subnav');
+                    if (subnav) subnav.classList.remove('collapsed');
+                    var arrow = group.querySelector('.sidebar-arrow');
+                    if (arrow) arrow.classList.add('open');
+                }
+            });
+        }
+
+        if (matched) {
+            expandGroup(matched);
+        }
+
+        // Always expand world group on any world-related page not otherwise matched
+        if (/^\/worlds/.test(path) && !matched) {
+            expandGroup('worlds');
         }
     })();
     </script>

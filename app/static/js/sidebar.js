@@ -2,7 +2,7 @@
  * AI World Engine - Sidebar JS
  * Handles sidebar group expand/collapse, active state detection,
  * and settings category navigation.
- * v1.7.11.1
+ * v2.0.1 — 小说工程核心化：支持多独立分组展开/折叠
  */
 
 (function () {
@@ -10,7 +10,7 @@
 
     /**
      * Toggle a sidebar group expand/collapse.
-     * Supports both "世界项目" and "设置" groups.
+     * v2.0.1: Supports all sidebar groups (小说工程, 世界设定, 创作资产, AI 推演, 质量检查, 设置).
      */
     window.toggleSidebarGroup = function (event) {
         event.preventDefault();
@@ -88,58 +88,44 @@
     };
 
     /**
-     * On load: auto-expand correct groups and show settings category.
+     * v2.0.1: On load — auto-expand the correct sidebar group based on current URL.
      */
     (function () {
         var path = window.location.pathname;
         var hash = window.location.hash;
 
-        // World-related paths: ensure world group expanded
-        if (/^\/worlds/.test(path)) {
-            var worldSubnav = document.querySelector('.sidebar-group .sidebar-subnav');
-            if (worldSubnav) {
-                worldSubnav.classList.remove('collapsed');
-            }
-            var worldArrow = document.querySelector('.sidebar-group .sidebar-arrow');
-            if (worldArrow) {
-                worldArrow.classList.add('open');
-            }
-        }
+        // Determine which group to expand based on path
+        var expandNav = null;
+        if (/^\/worlds\/\d+\/novel/.test(path)) expandNav = 'novel';
+        else if (/^\/worlds\/\d+\/context/.test(path)) expandNav = 'assets';
+        else if (/^\/worlds\/\d+\/simulation/.test(path) || /^\/worlds\/\d+\/records/.test(path) || /^\/worlds\/\d+\/branches/.test(path)) expandNav = 'simulation';
+        else if (/^\/worlds\/\d+\/checks/.test(path)) expandNav = 'checks';
+        else if (/^\/worlds/.test(path)) expandNav = 'worlds';
+        else if (/^\/settings/.test(path)) expandNav = 'settings';
 
-        // Settings page: ensure settings group expanded and show correct category
-        if (/^\/settings/.test(path)) {
-            var settingsGroups = document.querySelectorAll('.sidebar-group');
-            settingsGroups.forEach(function (group) {
+        if (expandNav) {
+            var groups = document.querySelectorAll('.sidebar-group');
+            groups.forEach(function (group) {
                 var toggle = group.querySelector('.sidebar-group-toggle');
-                if (toggle && toggle.getAttribute('data-nav') === 'settings') {
+                if (toggle && toggle.getAttribute('data-nav') === expandNav) {
                     var subnav = group.querySelector('.sidebar-subnav');
                     if (subnav) subnav.classList.remove('collapsed');
                     var arrow = group.querySelector('.sidebar-arrow');
                     if (arrow) arrow.classList.add('open');
                 }
             });
+        }
 
-            // Determine which category to show from hash
-            var catName = 'ai'; // default
-            if (hash) {
-                var hashCat = hash.replace('#', '');
-                var validCats = ['ai', 'display', 'desktop', 'storage', 'export', 'diagnostics', 'about'];
-                if (validCats.indexOf(hashCat) !== -1) {
-                    catName = hashCat;
-                }
+        // Settings page: show correct category section
+        if (/^\/settings/.test(path) && hash) {
+            var catName = hash.replace('#', '');
+            if (catName && typeof showSettingsCategory === 'function') {
+                setTimeout(function () {
+                    showSettingsCategory(catName);
+                }, 0);
             }
-            // Show the correct category on load
-            var sections = document.querySelectorAll('.settings-cat-section');
-            var hasSections = sections.length > 0;
-            if (hasSections) {
-                sections.forEach(function (section) {
-                    if (section.getAttribute('data-settings-cat') === catName) {
-                        section.style.display = '';
-                    } else {
-                        section.style.display = 'none';
-                    }
-                });
-                // Highlight correct sidebar link
+        }
+})();
                 var settingsLinks = document.querySelectorAll('.sidebar-sublink[data-nav="settings"]');
                 settingsLinks.forEach(function (link) {
                     link.classList.remove('active');

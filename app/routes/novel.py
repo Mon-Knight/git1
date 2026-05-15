@@ -41,35 +41,80 @@ def _get_ai_mode_info(db: Session) -> str:
 
 
 @router.get("", response_class=HTMLResponse)
-async def novel_form_page(
+async def novel_overview_page(
     request: Request,
     world_id: int,
-    context_package_id: int = None,
     db: Session = Depends(get_db),
 ):
-    """Show the novel engineering form."""
+    """v2.0.1: Show novel engineering overview page."""
     world = WorldService.get_world(db, world_id)
     if not world:
         return templates.TemplateResponse(
             request, "worlds/404.html", {"world_id": world_id}, status_code=404
         )
 
-    context = WorldContextService.build_world_context(db, world_id)
-    context_snapshot = WorldContextService.build_context_snapshot(context)
+    # Get world dashboard summary for status counts
+    from app.services.world_dashboard_service import WorldDashboardService
+    summary = WorldDashboardService.get_world_dashboard_summary(db, world_id)
 
-    # Load available context packages for this world
-    from app.services.context_package_service import ContextPackageService
-    context_packages = ContextPackageService.list_context_packages_by_world(db, world_id)
+    # Build recommendations
+    recommendations = []
+    if summary.get("context_package_count", 0) == 0:
+        recommendations.append({
+            "title": "创建创作上下文包",
+            "desc": "创作上下文包是全书演化的基础，包含风格方案和剧情时间点。",
+            "url": "/worlds/" + str(world_id) + "/context/packages/new",
+            "label": "创建上下文包",
+        })
+    elif summary.get("novel_evolution_count", 0) == 0:
+        recommendations.append({
+            "title": "开始全书演化推演",
+            "desc": "已有创作上下文包，可以进行全书演化推演，生成全书主线方案。",
+            "url": "/worlds/" + str(world_id) + "/novel/evolution",
+            "label": "全书演化",
+        })
+    elif summary.get("mainline_evolution_count", 0) == 0:
+        recommendations.append({
+            "title": "审核并采纳主线方案",
+            "desc": "已有推演方案，需要审核并采纳一条作为主线方案。",
+            "url": "/worlds/" + str(world_id) + "/novel/evolutions",
+            "label": "审核方案",
+        })
+    elif summary.get("volume_outline_count", 0) == 0:
+        recommendations.append({
+            "title": "生成分卷大纲",
+            "desc": "已有主线方案，可基于主线方案生成分卷大纲。",
+            "url": "/worlds/" + str(world_id) + "/novel/volume-outlines/new",
+            "label": "生成分卷大纲",
+        })
+    elif summary.get("chapter_outline_count", 0) == 0:
+        recommendations.append({
+            "title": "生成章节大纲",
+            "desc": "已有分卷大纲，可基于分卷生成章节大纲。",
+            "url": "/worlds/" + str(world_id) + "/novel/chapter-outlines/new",
+            "label": "生成章节大纲",
+        })
+    elif summary.get("novel_draft_count", 0) == 0:
+        recommendations.append({
+            "title": "生成正文草稿",
+            "desc": "已有章节大纲，可基于章节大纲生成正文草稿。",
+            "url": "/worlds/" + str(world_id) + "/novel/drafts/new",
+            "label": "生成正文草稿",
+        })
+    else:
+        recommendations.append({
+            "title": "查看正文草稿",
+            "desc": "已有正文草稿，可继续编辑和完善。正文质量检查将在 v2.1.0 开放。",
+            "url": "/worlds/" + str(world_id) + "/novel/drafts",
+            "label": "查看草稿",
+        })
 
-    return templates.TemplateResponse(request, "novel/form.html", {
+    return templates.TemplateResponse(request, "novel/overview.html", {
         "world": world,
-        "context_snapshot": context_snapshot,
-        "ai_mode_info": _get_ai_mode_info(db),
-        "errors": {},
-        "form_data": {},
-        "result": None,
-        "context_packages": context_packages,
-        "selected_package_id": context_package_id,
+        "summary": summary,
+        "recommendations": recommendations,
+        "active_nav": "novel",
+        "app_version": "2.0.1",
     })
 
 

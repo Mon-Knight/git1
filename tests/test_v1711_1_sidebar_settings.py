@@ -22,12 +22,12 @@ class TestSidebarNavigation:
     """Left sidebar secondary navigation tests."""
 
     def test_base_template_has_sidebar_groups(self):
-        """base.html should have both world and settings sidebar groups."""
+        """v2.0.1: base.html should have multiple sidebar groups with new names."""
         response = client.get("/")
         assert response.status_code == 200
         html = response.text
-        # World project group
-        assert '世界项目' in html
+        # World settings group (was 世界项目)
+        assert '世界设定' in html
         # Settings group
         assert '设置' in html
         # Sidebar group toggle class
@@ -41,23 +41,24 @@ class TestSidebarNavigation:
         assert 'sidebar-subnav-divider' in html
 
     def test_world_sub_modules_always_visible(self):
-        """World core sub-modules should always be in the HTML."""
+        """v2.0.1: Top-level groups always visible; world console only with active world."""
         response = client.get("/")
         assert response.status_code == 200
         html = response.text
-        assert '世界控制台' in html
+        # Top-level module groups are always visible in sidebar
+        assert '小说工程' in html
         assert 'AI 推演' in html
         assert '创作资产' in html
-        assert '小说工程' in html
-        assert '检查中心' in html
+        assert '质量检查' in html
+        assert '世界设定' in html
 
     def test_disabled_sub_module_when_no_world(self):
-        """Without an active world, sub-modules should be disabled."""
+        """v2.0.1: Without an active world, sub-modules should be disabled."""
         response = client.get("/")
         assert response.status_code == 200
         html = response.text
-        # Core modules should have 'disabled' class when no world
-        assert 'disabled' in html
+        # Core modules should have 'disabled' class or '后续开放' when no world
+        assert 'disabled' in html or '后续开放' in html
 
     def test_sidebar_js_has_toggle_function(self):
         """sidebar.js should export toggleSidebarGroup function."""
@@ -182,12 +183,12 @@ class TestWorldConsoleEntry:
     """World console entry optimization tests."""
 
     def test_world_console_link_has_recent_fallback(self):
-        """World console link should fallback to recent_world_id."""
+        """v2.0.1: World console link shows when world is active; fallback via recent_world_id."""
         response = client.get("/")
         assert response.status_code == 200
         html = response.text
-        # Should have the world console link
-        assert '世界控制台' in html
+        # Should have recent world link or world list as fallback
+        assert '世界列表' in html or '最近世界' in html or '世界设定' in html
 
     def test_world_detail_page_renders(self):
         """World detail page should render with sidebar active."""

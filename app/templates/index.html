@@ -10,16 +10,133 @@
 {% block content %}
 <div class="dashboard">
 
-    <!-- Welcome -->
+    <!-- v2.0.1: Welcome — 强化小说工程定位 -->
     <section class="dashboard-welcome">
         <h1>📖 创作工作台</h1>
-        <p>管理世界设定、创作上下文、全书演化方案和后续小说工程流程。</p>
+        <p>AI 小说工程工作台 — 从世界设定到全书演化、分卷大纲、章节大纲、正文草稿的完整创作流程。</p>
         <span class="dashboard-ai-badge {{ 'mock' if mock_ai else 'live' }}">
             {{ 'Mock AI (演示)' if mock_ai else 'Live API' }}
         </span>
     </section>
 
-    <!-- Overview -->
+    <!-- v2.0.1: 小说工程进度优先展示 -->
+    <section class="dashboard-section">
+        <h2>📖 小说工程进度</h2>
+        {% if recent_worlds %}
+        {% set cw = recent_worlds[0] %}
+        <div class="overview-grid" style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr))">
+            <div class="overview-card">
+                <div class="count">{{ cw.novel_evolution_count or 0 }}</div>
+                <div class="label">演化方案</div>
+            </div>
+            <div class="overview-card">
+                <div class="count">{{ cw.volume_outline_count or 0 }}</div>
+                <div class="label">分卷大纲</div>
+            </div>
+            <div class="overview-card">
+                <div class="count">{{ cw.chapter_outline_count or 0 }}</div>
+                <div class="label">章节大纲</div>
+            </div>
+            <div class="overview-card">
+                <div class="count">{{ cw.novel_draft_count or 0 }}</div>
+                <div class="label">正文草稿</div>
+            </div>
+        </div>
+        <div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap">
+            <a href="/worlds/{{ cw.id }}/novel" class="btn-sm">📊 小说工程总览</a>
+            <a href="/worlds/{{ cw.id }}/novel/evolution" class="btn-sm">📖 全书演化</a>
+            <a href="/worlds/{{ cw.id }}/novel/drafts" class="btn-sm">✍️ 正文草稿</a>
+        </div>
+        {% else %}
+        <div class="empty-state-dash">
+            <div class="empty-icon">📖</div>
+            <p>还没有世界项目，无法展示小说工程进度。</p>
+            <a href="/worlds/new" class="btn-primary">创建第一个世界</a>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- v2.0.1: 下一步建议 -->
+    <section class="dashboard-section">
+        <h2>💡 下一步建议</h2>
+        {% if recent_worlds %}
+        {% set cw = recent_worlds[0] %}
+        <div class="item-list">
+            {% if (cw.novel_draft_count or 0) > 0 %}
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">已有正文草稿，可进行质量检查</div>
+                    <div class="item-meta">正文质量检查将在 v2.1.0 开放，当前可进入质量检查页面查看设定矛盾</div>
+                </div>
+                <a href="/worlds/{{ cw.id }}/checks" class="btn-sm">质量检查</a>
+            </div>
+            {% elif (cw.chapter_outline_count or 0) > 0 %}
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">已有章节大纲，可生成正文草稿</div>
+                    <div class="item-meta">进入小说工程 → 正文草稿，基于章节大纲生成正文</div>
+                </div>
+                <a href="/worlds/{{ cw.id }}/novel/drafts" class="btn-sm">生成正文草稿</a>
+            </div>
+            {% elif (cw.volume_outline_count or 0) > 0 %}
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">已有分卷大纲，可生成章节大纲</div>
+                    <div class="item-meta">进入小说工程 → 章节大纲，基于分卷生成章节</div>
+                </div>
+                <a href="/worlds/{{ cw.id }}/novel/chapter-outlines" class="btn-sm">生成章节大纲</a>
+            </div>
+            {% elif (cw.mainline_evolution_count or 0) > 0 %}
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">已有主线方案，可生成分卷大纲</div>
+                    <div class="item-meta">进入小说工程 → 分卷大纲，基于主线方案生成分卷</div>
+                </div>
+                <a href="/worlds/{{ cw.id }}/novel/volume-outlines" class="btn-sm">生成分卷大纲</a>
+            </div>
+            {% elif (cw.novel_evolution_count or 0) > 0 %}
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">有推演方案待审核</div>
+                    <div class="item-meta">审核并采纳一条作为主线方案</div>
+                </div>
+                <a href="/worlds/{{ cw.id }}/novel/evolutions" class="btn-sm">审核方案</a>
+            </div>
+            {% elif cw.context_package_count or 0 > 0 %}
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">已有创作上下文包，可开始全书演化</div>
+                    <div class="item-meta">进入小说工程 → 全书演化，开始推演</div>
+                </div>
+                <a href="/worlds/{{ cw.id }}/novel/evolution" class="btn-sm">全书演化</a>
+            </div>
+            {% else %}
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">创建创作上下文包</div>
+                    <div class="item-meta">先创建创作上下文包（风格方案 + 剧情时间点），再开始全书演化</div>
+                </div>
+                <a href="/worlds/{{ cw.id }}/context" class="btn-sm">创作上下文</a>
+            </div>
+            {% endif %}
+            {% if (cw.setting_suggestion_count or 0) > 0 %}
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">有设定库候选未采纳</div>
+                    <div class="item-meta">建议进入世界设定 → 设定库 AI 扩展，审核候选设定</div>
+                </div>
+                <a href="/worlds/{{ cw.id }}/setting-suggestions" class="btn-sm">设定库扩展</a>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="empty-state-dash">
+            <p>创建世界后，系统将根据创作进度自动给出下一步建议。</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Data Overview -->
     <section class="dashboard-section">
         <h2>📊 数据概览</h2>
         <div class="overview-grid">
@@ -80,9 +197,9 @@
                 </div>
                 <div class="world-actions">
                     <a href="/worlds/{{ w.id }}" class="btn-sm">进入世界</a>
+                    <a href="/worlds/{{ w.id }}/novel" class="btn-sm">小说工程</a>
                     <a href="/worlds/{{ w.id }}/simulation" class="btn-sm">AI 推演</a>
                     <a href="/worlds/{{ w.id }}/context" class="btn-sm">创作上下文</a>
-                    <a href="/worlds/{{ w.id }}/novel/evolution" class="btn-sm">全书演化</a>
                 </div>
             </div>
             {% endfor %}
@@ -103,6 +220,9 @@
     <section class="dashboard-section" id="current-world-modules">
         <h2>⚡ 当前世界快捷模块{% if cw_name %}：{{ cw_name }}{% endif %}</h2>
         <div class="quick-actions" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem">
+            <a href="/worlds/{{ cw_id }}/novel" class="quick-action-btn">
+                <span>📖</span> 小说工程
+            </a>
             <a href="/worlds/{{ cw_id }}" class="quick-action-btn">
                 <span>🎛️</span> 世界控制台
             </a>
@@ -112,11 +232,8 @@
             <a href="/worlds/{{ cw_id }}/context" class="quick-action-btn">
                 <span>📦</span> 创作资产
             </a>
-            <a href="/worlds/{{ cw_id }}/novel/evolution" class="quick-action-btn">
-                <span>📖</span> 小说工程
-            </a>
             <a href="/worlds/{{ cw_id }}/checks" class="quick-action-btn">
-                <span>🔍</span> 检查中心
+                <span>🔍</span> 质量检查
             </a>
         </div>
     </section>

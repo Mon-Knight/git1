@@ -230,8 +230,11 @@ class TestNovelFormIntegration:
     """Test that novel form integrates context package selection."""
 
     def test_novel_form_has_context_package_dropdown(self, client):
+        """v2.0.1: Context package dropdown appears when packages exist."""
         _create_world(client)
-        r = client.get("/worlds/1/novel")
+        # Create a context package first so the dropdown appears
+        client.post("/worlds/1/context/packages/new", data={"name": "TestPkg"})
+        r = client.get("/worlds/1/novel/evolution")
         assert r.status_code == 200
         assert "context_package_id" in r.text
 

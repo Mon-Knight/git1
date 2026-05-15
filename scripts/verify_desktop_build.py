@@ -72,6 +72,19 @@ REQUIRED_TEMPLATES = [
     "app/templates/novel_drafts/new.html",
     "app/templates/novel_drafts/detail.html",
     "app/templates/novel_drafts/edit.html",
+    # v2.0.1 Novel Engineering Overview
+    "app/templates/novel/overview.html",
+]
+
+# v2.0.1: Sidebar navigation keywords (base.html)
+SIDEBAR_KEYWORDS_V201 = [
+    ("小说工程", "Novel Engineering in sidebar"),
+    ("世界设定", "World Settings in sidebar"),
+    ("质量检查", "Quality Check in sidebar"),
+    ("数据与导出", "Data & Export in sidebar"),
+    ("创作资产", "Creative Assets in sidebar"),
+    ("AI 推演", "AI Simulation in sidebar"),
+    ("后续开放", "Future items indicator"),
 ]
 
 # Sidebar related checks (in base.html)
@@ -159,7 +172,7 @@ def check_source_templates():
             ("小说工程", "novel engineering group"),
             ("正文草稿", "novel drafts entry"),
             ("创作资产", "creative assets group"),
-            ("检查中心", "checks group"),
+            ("质量检查", "checks group"),
             ("数据与设置", "data & settings group"),
             ("module-group-link disabled", "disabled future link class"),
             ("dashboard-subnav", "secondary navigation"),
@@ -204,6 +217,21 @@ def check_source_templates():
             else:
                 print(f"  FAIL: base.html missing '{desc}'")
                 errors.append(f"base.html missing: {keyword}")
+
+        # v2.0.1: Check new navigation terms
+        for keyword, desc in SIDEBAR_KEYWORDS_V201:
+            if keyword in base_html:
+                print(f"  OK: base.html has '{desc}'")
+            else:
+                print(f"  FAIL: base.html missing '{desc}'")
+                errors.append(f"base.html v2.0.1 missing: {keyword}")
+
+        # v2.0.1: No bad links
+        if "/None/" in base_html:
+            print("  FAIL: base.html contains /None/ links")
+            errors.append("base.html contains /None/ links")
+        else:
+            print("  OK: base.html has no /None/ links")
 
     sidebar_js_path = os.path.join(PROJECT_ROOT, "app", "static", "js", "sidebar.js")
     if os.path.isfile(sidebar_js_path):

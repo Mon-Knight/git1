@@ -49,8 +49,9 @@ class TestSidebarGroupPages:
         assert "工作台" in resp.text
 
     def test_home_has_world_group(self, client):
+        """v2.0.1: \u4e16\u754c\u9879\u76ee → \u4e16\u754c\u8bbe\u5b9a"""
         resp = client.get("/")
-        assert "世界项目" in resp.text
+        assert "世界设定" in resp.text
         assert "sidebar-group" in resp.text
 
     def test_worlds_list_worlds_highlighted(self, client):
@@ -59,10 +60,11 @@ class TestSidebarGroupPages:
         assert 'data-nav="worlds"' in resp.text
 
     def test_world_detail_has_expanded_group(self, client):
+        """v2.0.1: \u4e16\u754c\u9879\u76ee → \u4e16\u754c\u8bbe\u5b9a"""
         w_id = _create_world(client)
         resp = client.get(f"/worlds/{w_id}")
         assert resp.status_code == 200
-        assert "世界项目" in resp.text
+        assert "世界设定" in resp.text
         assert "sidebar-sublink" in resp.text
 
     def test_world_detail_no_none_links(self, client):
@@ -84,9 +86,9 @@ class TestSidebarGroupPages:
         assert "/None/" not in resp.text
 
     def test_home_disabled_items(self, client):
-        # v1.7.8.2: future items still disabled in sidebar-future section
+        """v2.0.1: future items are inline with 后续开放 label."""
         resp = client.get("/")
-        assert "sidebar-future" in resp.text
+        assert "后续开放" in resp.text or "disabled" in resp.text
 
     def test_data_page_highlighted(self, client):
         resp = client.get("/data")

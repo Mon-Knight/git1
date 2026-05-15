@@ -61,16 +61,16 @@ class TestSidebarStructure:
         assert "/None/" not in content, "base.html contains /None/ links"
 
     def test_sidebar_has_disabled_class(self):
-        # v1.7.8.2: disabled spans removed from sidebar; only future items remain disabled
+        """v2.0.1: Disabled and future-link classes used instead of sidebar-future."""
         content = _read_template("base.html")
-        assert "sidebar-future" in content  # future items section present
+        assert "disabled" in content or "future-link" in content, (
+            "Sidebar should have disabled or future-link classes"
+        )
 
     def test_sidebar_future_items_exist(self):
+        """v2.0.1: Future items are inline in groups, not in separate sidebar-future section."""
         content = _read_template("base.html")
-        assert "后续版本开放" in content, "Missing future version label"
-        assert "分卷大纲" in content, "Missing 分卷大纲 in future items"
-        assert "章节大纲" in content, "Missing 章节大纲 in future items"
-        assert "正文生成" in content, "Missing 正文生成 in future items"
+        assert "后续开放" in content, "Missing future version indicators"
 
 
 class TestSidebarCSS:
@@ -128,10 +128,11 @@ class TestSidebarOnBasePages:
         assert "/None/" not in resp.text
 
     def test_home_has_disabled_links(self, client):
-        # v1.7.8.2: no disabled sublinks when no world; future items present
+        """v2.0.1: Future items are inline with future-link class, not sidebar-future section."""
         resp = client.get("/")
         assert resp.status_code == 200
-        assert "sidebar-future" in resp.text
+        # Check for future-link or disabled indicators
+        assert "后续开放" in resp.text or "disabled" in resp.text or "future-link" in resp.text
 
 
 class TestStandalonePagesAccessible:

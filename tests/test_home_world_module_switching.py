@@ -54,9 +54,11 @@ class TestHomepageStructure:
         assert "/worlds//" not in resp.text
 
     def test_homepage_sidebar_has_world_modules(self):
+        """v2.0.1: Updated module names in sidebar."""
         resp = client.get("/")
-        assert "世界控制台" in resp.text
+        # Top-level groups always visible
+        assert "小说工程" in resp.text
         assert "AI 推演" in resp.text
         assert "创作资产" in resp.text
-        assert "小说工程" in resp.text
-        assert "检查中心" in resp.text
+        assert "质量检查" in resp.text
+        assert "世界设定" in resp.text

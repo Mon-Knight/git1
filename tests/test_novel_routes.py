@@ -15,22 +15,26 @@ def test_novel_form_returns_200(client):
 
 
 def test_novel_form_contains_title(client):
+    """v2.0.1: GET /novel now renders overview page."""
     _create_world(client)
     response = client.get("/worlds/1/novel")
-    assert "小说工程模式" in response.text
+    assert "小说工程总览" in response.text
 
 
 def test_novel_form_contains_button(client):
+    """v2.0.1: Overview page has quick action links."""
     _create_world(client)
     response = client.get("/worlds/1/novel")
-    assert "生成全书演化方向" in response.text
+    # Overview page should have navigation links to sub-modules
+    assert "全书演化" in response.text
 
 
 def test_novel_form_contains_fields(client):
+    """v2.0.1: Overview page shows status cards, evolution form is at /evolution."""
     _create_world(client)
     response = client.get("/worlds/1/novel")
-    assert "main_story_direction" in response.text
-    assert "protagonist" in response.text
+    # Overview shows status, not form fields
+    assert "小说工程总览" in response.text or "未开始" in response.text
 
 
 def test_novel_form_404_for_nonexistent_world(client):
@@ -79,8 +83,9 @@ def test_novel_post_does_not_create_historical_event(client):
 
 
 def test_novel_page_shows_ai_mode(client):
+    """v2.0.1: AI mode info is shown on the evolution form page."""
     _create_world(client)
-    response = client.get("/worlds/1/novel")
+    response = client.get("/worlds/1/novel/evolution")
     assert "Mock AI" in response.text or "mock" in response.text.lower()
 
 

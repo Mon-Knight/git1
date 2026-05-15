@@ -52,10 +52,11 @@ class DashboardService:
 
     @staticmethod
     def get_recent_worlds(db: Session, limit: int = 5) -> List[Dict[str, Any]]:
-        """Return recent worlds with summary counts."""
+        """Return recent worlds with summary counts (v2.0.1: added novel engineering stats)."""
         from app.models import (
             World, Character, Faction, WorldRule,
             HistoricalEvent, SimulationRecord, ContextPackage,
+            NovelVolumeOutline, NovelChapterOutline, NovelDraft,
         )
 
         worlds = (
@@ -98,6 +99,21 @@ class DashboardService:
                 "novel_evolution_count": db.query(func.count(SimulationRecord.id)).filter(
                     SimulationRecord.world_id == w.id,
                     SimulationRecord.simulation_type == "novel_evolution",
+                ).scalar() or 0,
+                # v2.0.1: Novel engineering stats
+                "mainline_evolution_count": db.query(func.count(SimulationRecord.id)).filter(
+                    SimulationRecord.world_id == w.id,
+                    SimulationRecord.simulation_type == "novel_evolution",
+                    SimulationRecord.status == "adopted",
+                ).scalar() or 0,
+                "volume_outline_count": db.query(func.count(NovelVolumeOutline.id)).filter(
+                    NovelVolumeOutline.world_id == w.id
+                ).scalar() or 0,
+                "chapter_outline_count": db.query(func.count(NovelChapterOutline.id)).filter(
+                    NovelChapterOutline.world_id == w.id
+                ).scalar() or 0,
+                "novel_draft_count": db.query(func.count(NovelDraft.id)).filter(
+                    NovelDraft.world_id == w.id
                 ).scalar() or 0,
             })
         return result

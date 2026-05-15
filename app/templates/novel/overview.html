@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard page-novel-overview' %}
+{% block title %}小说工程总览 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}小说工程总览{% endblock %}
+{% block head_extra %}
+<link rel="stylesheet" href="/static/css/dashboard.css">
+<style>
+/* v2.0.1 小说工程流程 */
+.novel-flow { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:flex-start; margin:1rem 0; }
+.novel-flow-step { display:flex; flex-direction:column; align-items:center; flex:0 0 auto; min-width:80px; text-align:center; }
+.novel-flow-arrow { font-size:1.2rem; color:var(--color-text-muted); margin:0 0.25rem; align-self:center; }
+.novel-flow-badge { display:inline-block; padding:0.3rem 0.6rem; border-radius:12px; font-size:0.75rem; font-weight:600; white-space:nowrap; }
+.novel-flow-badge--done { background:rgba(0,212,170,0.12); color:var(--color-accent); border:1px solid var(--color-accent); }
+.novel-flow-badge--has { background:rgba(108,99,255,0.1); color:var(--color-primary); border:1px solid var(--color-primary); }
+.novel-flow-badge--none { background:var(--color-surface); color:var(--color-text-muted); border:1px solid var(--color-border); }
+.novel-flow-badge--future { background:var(--color-surface); color:var(--color-text-muted); border:1px dashed var(--color-border); }
+.novel-flow-label { font-size:0.7rem; color:var(--color-text-muted); margin-top:0.2rem; }
+.novel-status-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:0.75rem; margin:0.75rem 0; }
+.novel-status-card { background:var(--color-surface); border:1px solid var(--color-border); border-radius:8px; padding:0.75rem; text-decoration:none; color:inherit; }
+.novel-status-card:hover { border-color:var(--color-primary); }
+.novel-status-card h4 { margin:0 0 0.3rem; font-size:0.9rem; }
+.novel-status-card .count { font-size:1.5rem; font-weight:700; color:var(--color-primary); }
+.novel-status-card .meta { font-size:0.75rem; color:var(--color-text-muted); }
+.novel-status-card--future { opacity:0.6; cursor:default; }
+.novel-status-card--future h4 { color:var(--color-text-muted); }
+.novel-stage-done { color:var(--color-accent); font-weight:600; }
+.novel-stage-has { color:var(--color-primary); font-weight:600; }
+.novel-stage-none { color:var(--color-text-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+
+    <!-- Header -->
+    <section class="dashboard-welcome">
+        <h1>📖 小说工程总览</h1>
+        <p>世界：<strong>{{ world.name }}</strong> | 类型：{{ world.world_type or '未分类' }} | 时代：{{ world.current_era or '未知' }}</p>
+        <div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap">
+            <a href="/worlds/{{ world.id }}" class="btn-sm">🎛️ 世界控制台</a>
+            <a href="/worlds/{{ world.id }}/novel/evolution" class="btn-sm">📖 全书演化推演</a>
+            <a href="/worlds/{{ world.id }}/novel/drafts" class="btn-sm">✍️ 正文草稿</a>
+        </div>
+    </section>
+
+    <!-- Flow Diagram -->
+    <section class="dashboard-section">
+        <h2>🔄 小说工程流程</h2>
+        <div class="novel-flow">
+            {% set stages = [
+                ('世界设定', summary.character_count > 0 or summary.faction_count > 0, '/worlds/' + world.id|string),
+                ('创作上下文', summary.context_package_count > 0, '/worlds/' + world.id|string + '/context'),
+                ('全书演化', summary.novel_evolution_count > 0, '/worlds/' + world.id|string + '/novel/evolution'),
+                ('分卷大纲', summary.volume_outline_count > 0, '/worlds/' + world.id|string + '/novel/volume-outlines'),
+                ('章节大纲', summary.chapter_outline_count > 0, '/worlds/' + world.id|string + '/novel/chapter-outlines'),
+                ('正文草稿', summary.novel_draft_count > 0, '/worlds/' + world.id|string + '/novel/drafts'),
+            ] %}
+            {% for name, done, url in stages %}
+            <div class="novel-flow-step">
+                {% if done %}
+                <span class="novel-flow-badge novel-flow-badge--done">✅</span>
+                {% else %}
+                <span class="novel-flow-badge novel-flow-badge--none">⬜</span>
+                {% endif %}
+                <span class="novel-flow-label">{{ name }}</span>
+            </div>
+            {% if not loop.last %}
+            <span class="novel-flow-arrow">→</span>
+            {% endif %}
+            {% endfor %}
+            <!-- Future stages -->
+            <span class="novel-flow-arrow">→</span>
+            <div class="novel-flow-step">
+                <span class="novel-flow-badge novel-flow-badge--future">🔒</span>
+                <span class="novel-flow-label">质量检查</span>
+            </div>
+            <span class="novel-flow-arrow">→</span>
+            <div class="novel-flow-step">
+                <span class="novel-flow-badge novel-flow-badge--future">🔒</span>
+                <span class="novel-flow-label">润色定稿</span>
+            </div>
+            <span class="novel-flow-arrow">→</span>
+            <div class="novel-flow-step">
+                <span class="novel-flow-badge novel-flow-badge--future">🔒</span>
+                <span class="novel-flow-label">导出</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Status Cards -->
+    <section class="dashboard-section">
+        <h2>📊 各阶段状态</h2>
+        <div class="novel-status-grid">
+            <!-- 全书演化 -->
+            <a href="/worlds/{{ world.id }}/novel/evolution" class="novel-status-card">
+                <h4>📖 全书演化</h4>
+                <div class="count">{{ summary.novel_evolution_count }}</div>
+                <div class="meta">
+                    主线：{{ summary.mainline_evolution_count }} | 备选：{{ summary.candidate_evolution_count }}
+                </div>
+                {% if summary.mainline_evolution_count > 0 %}
+                <div class="novel-stage-done" style="margin-top:0.3rem">✅ 已有主线方案</div>
+                {% elif summary.novel_evolution_count > 0 %}
+                <div class="novel-stage-has" style="margin-top:0.3rem">📋 有候选方案待审核</div>
+                {% else %}
+                <div class="novel-stage-none" style="margin-top:0.3rem">⬜ 未开始</div>
+                {% endif %}
+            </a>
+
+            <!-- 分卷大纲 -->
+            <a href="/worlds/{{ world.id }}/novel/volume-outlines" class="novel-status-card">
+                <h4>📚 分卷大纲</h4>
+                <div class="count">{{ summary.volume_outline_count }}</div>
+                <div class="meta">主线：{{ summary.main_volume_outline_count }}</div>
+                {% if summary.volume_outline_count > 0 %}
+                <div class="novel-stage-done" style="margin-top:0.3rem">✅ 已生成分卷大纲</div>
+                {% else %}
+                <div class="novel-stage-none" style="margin-top:0.3rem">⬜ 未开始</div>
+                {% endif %}
+            </a>
+
+            <!-- 章节大纲 -->
+            <a href="/worlds/{{ world.id }}/novel/chapter-outlines" class="novel-status-card">
+                <h4>📝 章节大纲</h4>
+                <div class="count">{{ summary.chapter_outline_count }}</div>
+                <div class="meta">主线：{{ summary.main_chapter_outline_count }}</div>
+                {% if summary.chapter_outline_count > 0 %}
+                <div class="novel-stage-done" style="margin-top:0.3rem">✅ 已生成章节大纲</div>
+                {% else %}
+                <div class="novel-stage-none" style="margin-top:0.3rem">⬜ 未开始</div>
+                {% endif %}
+            </a>
+
+            <!-- 正文草稿 -->
+            <a href="/worlds/{{ world.id }}/novel/drafts" class="novel-status-card">
+                <h4>✍️ 正文草稿</h4>
+                <div class="count">{{ summary.novel_draft_count }}</div>
+                <div class="meta">已采纳：{{ summary.accepted_draft_count }}</div>
+                {% if summary.novel_draft_count > 0 %}
+                <div class="novel-stage-done" style="margin-top:0.3rem">✅ 已有正文草稿</div>
+                {% else %}
+                <div class="novel-stage-none" style="margin-top:0.3rem">⬜ 未开始</div>
+                {% endif %}
+            </a>
+
+            <!-- 质量检查（后续开放） -->
+            <div class="novel-status-card novel-status-card--future">
+                <h4>🔍 正文质量检查</h4>
+                <div class="count">—</div>
+                <div class="meta">后续版本开放</div>
+                <div class="novel-stage-none" style="margin-top:0.3rem">🔒 v2.1.0 开放</div>
+            </div>
+
+            <!-- 正文润色（后续开放） -->
+            <div class="novel-status-card novel-status-card--future">
+                <h4>✨ 正文润色</h4>
+                <div class="count">—</div>
+                <div class="meta">后续版本开放</div>
+                <div class="novel-stage-none" style="margin-top:0.3rem">🔒 后续开放</div>
+            </div>
+
+            <!-- 定稿导出（后续开放） -->
+            <div class="novel-status-card novel-status-card--future">
+                <h4>📤 定稿导出</h4>
+                <div class="count">—</div>
+                <div class="meta">后续版本开放</div>
+                <div class="novel-stage-none" style="margin-top:0.3rem">🔒 后续开放</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Next Steps -->
+    <section class="dashboard-section">
+        <h2>💡 下一步建议</h2>
+        {% if recommendations %}
+        <div class="item-list">
+            {% for rec in recommendations %}
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">{{ rec.title }}</div>
+                    <div class="item-meta">{{ rec.desc }}</div>
+                </div>
+                <a href="{{ rec.url }}" class="btn-sm">{{ rec.label }}</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-dash">
+            <p>各阶段进展顺利！可以继续推进下一阶段。</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Quick Links -->
+    <section class="dashboard-section">
+        <h2>⚡ 快捷入口</h2>
+        <div class="quick-actions" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem">
+            <a href="/worlds/{{ world.id }}/novel/evolution" class="quick-action-btn">
+                <span>📖</span> 全书演化
+            </a>
+            <a href="/worlds/{{ world.id }}/novel/evolutions" class="quick-action-btn">
+                <span>📋</span> 主线方案
+            </a>
+            <a href="/worlds/{{ world.id }}/novel/volume-outlines" class="quick-action-btn">
+                <span>📚</span> 分卷大纲
+            </a>
+            <a href="/worlds/{{ world.id }}/novel/chapter-outlines" class="quick-action-btn">
+                <span>📝</span> 章节大纲
+            </a>
+            <a href="/worlds/{{ world.id }}/novel/drafts" class="quick-action-btn">
+                <span>✍️</span> 正文草稿
+            </a>
+            <a href="/worlds/{{ world.id }}/context" class="quick-action-btn">
+                <span>📦</span> 创作上下文
+            </a>
+            <a href="/worlds/{{ world.id }}" class="quick-action-btn">
+                <span>🎛️</span> 世界控制台
+            </a>
+            <a href="/worlds/{{ world.id }}/checks" class="quick-action-btn">
+                <span>🔍</span> 质量检查
+            </a>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
