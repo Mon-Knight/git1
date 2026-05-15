@@ -1,5 +1,48 @@
 # Development Log — AI World Engine
 
+## 2026-05-15 — v1.9.0: 基于主线分卷方案的章节大纲生成
+
+### 为什么 v1.9.0 开始做章节大纲
+
+v1.8.0 完成了"全书演化方案 → 分卷大纲候选 → 主线分卷方案"的闭环。分卷大纲已稳定可用，为章节大纲生成提供了框架基础。
+
+章节大纲是连接"分卷大纲"与"正文生成"的关键桥梁。
+
+### 章节大纲依赖资产
+
+- **必选**：主线分卷方案（volume_outline_id）、目标分卷（volume_index）
+- **可选**：写作风格方案、剧情时间点、创作上下文包
+- **自动读取**：已采纳角色/势力/地点/规则/正史事件、主线分卷方案详情
+
+### 为什么不直接生成正文
+
+章节大纲需要先于正文存在，为每章提供明确的剧情目标、冲突、事件和钩子。没有章节大纲，正文生成会缺乏方向。
+
+### 章节大纲状态流转
+
+```
+candidate → main（设为主线）
+candidate → discarded（废弃）
+candidate → candidate（编辑保存仍为候选）
+main → candidate（同卷被新主线替代时自动降级）
+main → discarded（允许但需确认）
+discarded 不可设为主线 / 不可编辑
+```
+
+### 同卷主线章节方案唯一性
+
+- 同一世界、同一 volume_index 最多只能有一个 is_main=True
+- 设置新的主线时，旧主线自动取消（is_main=False, status="candidate"）
+- 不同卷可以各自拥有主线章节方案
+
+### Mock 模式验证
+
+Mock 模式返回 20 个模板章节，包含完整字段（chapter_index, title, goal, conflict, POV, characters, locations, events, emotional_beat, foreshadowing, ending_hook, estimated_words, notes）。
+
+### EXE 验证
+
+通过 `python scripts/verify_desktop_build.py --all` 验证源文件和打包文件完整性。
+
 ## 2026-05-11 — v1.8.0: 基于主线全书演化方案的分卷大纲生成
 
 ### 为什么 v1.8.0 开始做分卷大纲

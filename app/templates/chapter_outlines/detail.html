@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard' %}
+{% block title %}{{ outline.title }} — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}章节大纲详情{% endblock %}
+
+{% block head_extra %}
+<style>
+.co-detail-header{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.co-detail-header h2{font-size:1.2rem;margin-bottom:0.3rem}
+.co-detail-meta{font-size:0.82rem;color:var(--color-text-muted)}
+.co-ch-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:0.75rem}
+.co-ch-card h3{font-size:1rem;color:var(--color-primary);margin-bottom:0.5rem}
+.co-ch-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.85rem}
+@media(max-width:700px){.co-ch-grid{grid-template-columns:1fr}}
+.co-ch-item{}
+.co-ch-item .label{color:var(--color-text-muted);font-size:0.75rem;display:block}
+.co-ch-item .value{color:var(--color-text)}
+.co-ch-events{grid-column:1/-1}
+.co-ch-events .value{white-space:pre-wrap}
+.btn-row{display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap}
+.co-raw{background:var(--color-bg);border:1px solid var(--color-border);border-radius:6px;padding:0.75rem;margin-top:0.5rem;font-size:0.8rem;white-space:pre-wrap;max-height:300px;overflow-y:auto;display:none}
+details summary{cursor:pointer;font-size:0.82rem;color:var(--color-text-muted);margin-top:0.5rem}
+.co-status{display:inline-block;padding:0.15rem 0.55rem;border-radius:10px;font-size:0.72rem;font-weight:600}
+.co-status.candidate{background:rgba(52,152,219,0.15);color:#3498db}
+.co-status.main{background:rgba(0,212,170,0.15);color:var(--color-accent)}
+.co-status.discarded{background:rgba(149,165,166,0.15);color:#95a5a6}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard" style="max-width:1200px">
+    {% if error %}<div style="color:#e74c3c;margin-bottom:1rem">❌ {{ error }}</div>{% endif %}
+
+    <div class="co-detail-header">
+        <h2>{{ outline.title }}</h2>
+        <div class="co-detail-meta">
+            <span class="co-status {{ outline.status }}">{{ {'candidate':'候选','main':'主线','discarded':'已废弃'}.get(outline.status, outline.status) }}</span>
+            {% if outline.is_main %}<span style="color:var(--color-accent);font-weight:600;margin-left:0.3rem">★ 主线章节方案</span>{% endif %}
+            · 第{{ outline.volume_index }}卷：{{ outline.volume_title or '?' }}
+            · {{ outline.chapter_count }} 章
+            · {{ outline.created_at.strftime('%Y-%m-%d %H:%M') }}
+            {% if outline.volume_outline_id %}
+            · 来源分卷方案：
+            {% if source_vo_exists %}
+            <a href="/worlds/{{ world.id }}/novel/volume-outlines/{{ outline.volume_outline_id }}">#{{ outline.volume_outline_id }}</a>
+            {% else %}
+            <span style="color:#95a5a6">#{{ outline.volume_outline_id }}（来源分卷方案已不可用）</span>
+            {% endif %}
+            {% endif %}
+            {% if outline.style_profile_id %} · 风格方案 #{{ outline.style_profile_id }}{% endif %}
+            {% if outline.context_package_id %} · 上下文包 #{{ outline.context_package_id }}{% endif %}
+        </div>
+
+        <div class="btn-row">
+            {% if outline.status != 'discarded' %}
+            <form action="/worlds/{{ world.id }}/novel/chapter-outlines/{{ outline.id }}/set-main" method="post" style="display:inline">
+                <button type="submit" class="btn-primary" onclick="return confirm('设为第{{ outline.volume_index }}卷的主线章节方案？{% if outline.is_main %}这将取消当前主线状态。{% else %}如同卷已有主线方案，将被替换。{% endif %}')">
+                    ★ 设为主线方案
+                </button>
+            </form>
+            <a href="/worlds/{{ world.id }}/novel/chapter-outlines/{{ outline.id }}/edit" class="btn-secondary">✏️ 编辑</a>
+            <form action="/worlds/{{ world.id }}/novel/chapter-outlines/{{ outline.id }}/discard" method="post" style="display:inline">
+                <button type="submit" class="btn-secondary" style="color:#e74c3c" onclick="return confirm('确定要废弃此章节方案吗？废弃后不能编辑或设为主线。')">🗑️ 废弃</button>
+            </form>
+            {% endif %}
+            <a href="/worlds/{{ world.id }}/novel/chapter-outlines" class="btn-secondary">← 返回列表</a>
+        </div>
+    </div>
+
+    {% if parse_error and not chapters %}
+    <div class="empty-state-dash">
+        <div class="empty-icon">⚠️</div>
+        <p>章节数据解析失败，AI 返回可能非标准 JSON。</p>
+        {% if outline.raw_text %}
+        <details>
+            <summary>📋 查看原始输出</summary>
+            <div class="co-raw" style="display:block;max-height:500px">{{ outline.raw_text[:5000] }}</div>
+        </details>
+        {% endif %}
+    </div>
+    {% elif chapters %}
+    {% for ch in chapters %}
+    <div class="co-ch-card">
+        <h3>{{ ch.title or ('第' + (ch.chapter_index|string) + '章') }}</h3>
+        <div class="co-ch-grid">
+            <div class="co-ch-item"><span class="label">章节目标</span><span class="value">{{ ch.chapter_goal or '-' }}</span></div>
+            <div class="co-ch-item"><span class="label">主要冲突</span><span class="value">{{ ch.main_conflict or '-' }}</span></div>
+            <div class="co-ch-item"><span class="label">视角角色</span><span class="value">{{ ch.pov_character or '-' }}</span></div>
+            <div class="co-ch-item"><span class="label">预计字数</span><span class="value">{{ ch.estimated_words or '?' }} 字</span></div>
+            <div class="co-ch-item"><span class="label">关键角色</span><span class="value">{{ ch.key_characters|join(', ') if ch.key_characters else '-' }}</span></div>
+            <div class="co-ch-item"><span class="label">关键地点</span><span class="value">{{ ch.key_locations|join(', ') if ch.key_locations else '-' }}</span></div>
+            <div class="co-ch-item"><span class="label">情绪推进</span><span class="value">{{ ch.emotional_beat or '-' }}</span></div>
+            <div class="co-ch-item"><span class="label">伏笔</span><span class="value">{{ ch.foreshadowing or '-' }}</span></div>
+            <div class="co-ch-item"><span class="label">章末钩子</span><span class="value">{{ ch.ending_hook or '-' }}</span></div>
+            <div class="co-ch-item co-ch-events"><span class="label">剧情事件</span><span class="value">{{ ch.plot_events|join('\n') if ch.plot_events else '-' }}</span></div>
+            {% if ch.notes %}
+            <div class="co-ch-item" style="grid-column:1/-1"><span class="label">备注</span><span class="value">{{ ch.notes }}</span></div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state-dash"><p>暂无章节数据。</p></div>
+    {% endif %}
+
+    {% if outline.generation_requirement %}
+    <details>
+        <summary>📝 生成要求</summary>
+        <div class="co-raw" style="display:block">{{ outline.generation_requirement }}</div>
+    </details>
+    {% endif %}
+
+    {% if outline.prompt %}
+    <details>
+        <summary>📋 生成 Prompt（折叠）</summary>
+        <div class="co-raw" style="display:block">{% if outline.prompt|length > 2000 %}{{ outline.prompt[:2000] }}...(截断){% else %}{{ outline.prompt }}{% endif %}</div>
+    </details>
+    {% endif %}
+
+    {% if outline.raw_text and outline.raw_text != outline.result_json %}
+    <details>
+        <summary>🗒️ AI 原始输出</summary>
+        <div class="co-raw" style="display:block">{% if outline.raw_text|length > 2000 %}{{ outline.raw_text[:2000] }}...(截断){% else %}{{ outline.raw_text }}{% endif %}</div>
+    </details>
+    {% endif %}
+</div>
+{% endblock %}

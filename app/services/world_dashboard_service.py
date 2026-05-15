@@ -18,6 +18,7 @@ class WorldDashboardService:
             Character, Faction, Location, WorldRule,
             HistoricalEvent, SimulationRecord, Branch,
             ContextPackage, StyleProfile, PlotAnchor,
+            NovelVolumeOutline, NovelChapterOutline,
         )
 
         return {
@@ -59,6 +60,14 @@ class WorldDashboardService:
                 SimulationRecord.world_id == world_id,
                 SimulationRecord.simulation_type == "novel_evolution",
                 SimulationRecord.status == "discarded",
+            ).scalar() or 0,
+            "volume_outline_count": _count(db, NovelVolumeOutline, world_id),
+            "main_volume_outline_count": db.query(func.count(NovelVolumeOutline.id)).filter(
+                NovelVolumeOutline.world_id == world_id, NovelVolumeOutline.is_main == True
+            ).scalar() or 0,
+            "chapter_outline_count": _count(db, NovelChapterOutline, world_id),
+            "main_chapter_outline_count": db.query(func.count(NovelChapterOutline.id)).filter(
+                NovelChapterOutline.world_id == world_id, NovelChapterOutline.is_main == True
             ).scalar() or 0,
         }
 
@@ -250,6 +259,8 @@ class WorldDashboardService:
             {"label": "创作上下文", "url": f"/worlds/{world_id}/context", "icon": "📦"},
             {"label": "全书演化", "url": f"/worlds/{world_id}/novel/evolution", "icon": "📖"},
             {"label": "演化方案列表", "url": f"/worlds/{world_id}/novel/evolutions", "icon": "📋"},
+            {"label": "分卷大纲", "url": f"/worlds/{world_id}/novel/volume-outlines", "icon": "📚"},
+            {"label": "章节大纲", "url": f"/worlds/{world_id}/novel/chapter-outlines", "icon": "📝"},
             {"label": "检查中心", "url": f"/worlds/{world_id}/checks", "icon": "🔍"},
             {"label": "数据管理", "url": "/data", "icon": "💾"},
         ]
@@ -323,15 +334,15 @@ class WorldDashboardService:
                 "anchor": "novel-engineering",
                 "stats": [
                     {"label": "演化方案", "count": summary["novel_evolution_count"]},
+                    {"label": "分卷大纲", "count": summary["volume_outline_count"]},
+                    {"label": "章节大纲", "count": summary["chapter_outline_count"]},
                     {"label": "主线方案", "count": summary["mainline_evolution_count"]},
-                    {"label": "备选方案", "count": summary["candidate_evolution_count"]},
-                    {"label": "待确认方案", "count": summary["pending_simulation_count"]},
                 ],
                 "links": [
                     {"label": "全书演化推演", "url": f"/worlds/{world_id}/novel/evolution", "disabled": False},
                     {"label": "演化方案列表", "url": f"/worlds/{world_id}/novel/evolutions", "disabled": False},
                     {"label": "📚 分卷大纲", "url": f"/worlds/{world_id}/novel/volume-outlines", "disabled": False},
-                    {"label": "章节大纲", "url": "", "disabled": True, "hint": "后续版本开放"},
+                    {"label": "📝 章节大纲", "url": f"/worlds/{world_id}/novel/chapter-outlines", "disabled": False},
                     {"label": "正文生成", "url": "", "disabled": True, "hint": "后续版本开放"},
                 ],
             },

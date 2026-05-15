@@ -88,6 +88,7 @@
                 ('全书演化', summary.novel_evolution_count > 0, '/worlds/' + world.id|string + '/novel/evolution'),
                 ('主线方案', summary.mainline_evolution_count > 0, '/worlds/' + world.id|string + '/novel/evolutions'),
                 ('分卷大纲', false, ''),
+                ('章节大纲', false, ''),
             ] %}
             {% for name, done, url in stages %}
             <a href="{{ url if url else '#' }}" style="text-decoration:none;{% if not url %}opacity:0.5;cursor:default{% endif %}">

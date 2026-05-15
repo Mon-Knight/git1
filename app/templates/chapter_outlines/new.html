@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}新建章节大纲 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}新建章节大纲{% endblock %}
+
+{% block head_extra %}
+<style>
+.co-form-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.5rem 2rem;max-width:800px;margin:0 auto}
+.co-form-card .fg{margin-bottom:1rem}
+.co-form-card label{display:block;font-weight:600;font-size:0.88rem;margin-bottom:0.3rem;color:var(--color-text)}
+.co-form-card input,.co-form-card select,.co-form-card textarea{width:100%;padding:0.6rem 0.8rem;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg);color:var(--color-text);font-size:0.9rem;box-sizing:border-box;font-family:inherit}
+.co-form-card input:focus,.co-form-card select:focus,.co-form-card textarea:focus{outline:none;border-color:var(--color-primary);box-shadow:0 0 0 2px rgba(108,99,255,0.2)}
+.co-form-card .hint{font-size:0.78rem;color:var(--color-text-muted);margin-top:0.25rem}
+.co-form-card .warning{font-size:0.8rem;color:#f39c12;margin-top:0.25rem}
+.btn-row{display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap}
+.loading-text{display:none;color:var(--color-text-muted);font-size:0.85rem}
+form.submitting .loading-text{display:inline}
+form.submitting button[type=submit]{opacity:0.6;pointer-events:none}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard" style="max-width:960px">
+    <h1>📝 新建章节大纲</h1>
+    <p style="color:var(--color-text-muted);margin-bottom:1.5rem">
+        基于主线分卷方案中的某一卷，AI 生成详细章节大纲。当前世界：<strong>{{ world.name }}</strong>
+    </p>
+
+    {% if error %}
+    <div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem;border-radius:var(--radius);margin-bottom:1rem">❌ {{ error }}</div>
+    {% endif %}
+
+    {% if 'main_volume_outline' in missing_prereqs %}
+    <div class="empty-state-dash" style="border:1px solid rgba(243,156,18,0.3);background:rgba(243,156,18,0.05);margin-bottom:1.5rem">
+        <div class="empty-icon">📚</div>
+        <p style="color:#f39c12">⚠️ 请先生成并确认一个主线分卷方案。</p>
+        <p style="font-size:0.82rem;color:var(--color-text-muted)">章节大纲生成依赖主线分卷方案。请先在分卷大纲中确认一个主线方案。</p>
+        <a href="/worlds/{{ world.id }}/novel/volume-outlines" class="btn-primary">前往分卷大纲 →</a>
+    </div>
+    {% elif 'no_volumes' in missing_prereqs %}
+    <div class="empty-state-dash" style="border:1px solid rgba(243,156,18,0.3);background:rgba(243,156,18,0.05);margin-bottom:1.5rem">
+        <div class="empty-icon">📚</div>
+        <p style="color:#f39c12">⚠️ 当前主线分卷方案缺少分卷结构。</p>
+        <p style="font-size:0.82rem;color:var(--color-text-muted)">请先修复或重新生成分卷大纲，确保其中包含 volumes 数组。</p>
+        <a href="/worlds/{{ world.id }}/novel/volume-outlines" class="btn-primary">前往分卷大纲 →</a>
+    </div>
+    {% else %}
+    <div class="co-form-card">
+        <form action="/worlds/{{ world.id }}/novel/chapter-outlines" method="post" onsubmit="this.classList.add('submitting')">
+
+            <div class="fg">
+                <label>主线分卷方案 <span style="color:#e74c3c">*</span></label>
+                <select name="volume_outline_id" required>
+                    <option value="">-- 请选择 --</option>
+                    {% for vo in all_volume_outlines %}
+                    <option value="{{ vo.id }}" {% if form_data and form_data.volume_outline_id == vo.id|string %}selected{% elif main_volume_outline and vo.id == main_volume_outline.id %}selected{% endif %}>
+                        {{ vo.title or ('方案 #'+vo.id|string) }} {% if vo.is_main %}★ 主线{% endif %} ({{ vo.created_at.strftime('%m-%d') }})
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if main_volume_outline %}<div class="hint">已默认选择当前主线分卷方案</div>{% endif %}
+            </div>
+
+            <div class="fg">
+                <label>选择分卷 <span style="color:#e74c3c">*</span></label>
+                <select name="volume_index" required>
+                    <option value="">-- 请选择 --</option>
+                    {% for vol in volumes %}
+                    <option value="{{ vol.volume_index }}" {% if form_data and form_data.volume_index == vol.volume_index|string %}selected{% endif %}>
+                        第{{ vol.volume_index }}卷：{{ vol.title or '?' }} (预计{{ vol.estimated_chapters or '?' }}章)
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if not volumes %}
+                <div class="warning">⚠️ 未找到分卷数据，请确认主线分卷方案包含 volumes 结构。</div>
+                {% endif %}
+            </div>
+
+            <div class="fg">
+                <label>写作风格方案（可选）</label>
+                <select name="style_profile_id">
+                    <option value="">-- 不选择（使用默认风格）--</option>
+                    {% for s in styles %}
+                    <option value="{{ s.id }}" {% if form_data and form_data.style_profile_id == s.id|string %}selected{% endif %}>{{ s.name }}{% if s.genre %} ({{ s.genre }}){% endif %}</option>
+                    {% endfor %}
+                </select>
+                {% if not styles %}
+                <div class="hint">暂无风格方案，将使用默认风格。可在<a href="/worlds/{{ world.id }}/context/styles">创作资产 → 风格方案</a> 中创建。</div>
+                {% else %}
+                <div class="hint">未选择时将使用默认风格生成。</div>
+                {% endif %}
+            </div>
+
+            <div class="fg">
+                <label>剧情时间点（可选）</label>
+                <select name="plot_anchor_id">
+                    <option value="">-- 不选择 --</option>
+                    {% for a in anchors %}
+                    <option value="{{ a.id }}" {% if form_data and form_data.plot_anchor_id == a.id|string %}selected{% endif %}>{{ a.name }} ({{ a.stage or '?' }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="fg">
+                <label>创作上下文包（可选）</label>
+                <select name="context_package_id">
+                    <option value="">-- 不选择（AI 基于当前世界资料生成）--</option>
+                    {% for p in packages %}
+                    <option value="{{ p.id }}" {% if form_data and form_data.context_package_id == p.id|string %}selected{% endif %}>{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+                {% if not packages %}
+                <div class="hint">暂无上下文包，AI 将基于当前世界和主线分卷方案生成。可在<a href="/worlds/{{ world.id }}/context/packages">创作资产 → 上下文包</a> 中创建。</div>
+                {% endif %}
+            </div>
+
+            <div class="fg">
+                <label>章节数量</label>
+                <input type="number" name="chapter_count" value="{{ form_data.chapter_count if form_data else '8' }}" min="4" max="60">
+                <div class="hint">建议 8-40 章，默认 8 章</div>
+            </div>
+
+            <div class="fg">
+                <label>补充要求（可选）</label>
+                <textarea name="extra_requirements" rows="3" placeholder="例如：每章控制在 3000 字左右，强调主角心理变化，每章结尾要有悬念…">{{ form_data.extra_requirements if form_data else '' }}</textarea>
+            </div>
+
+            <div class="btn-row">
+                <button type="submit" class="btn-primary">🤖 生成章节大纲</button>
+                <span class="loading-text">⏳ AI 正在生成章节大纲，请稍候…</span>
+                <a href="/worlds/{{ world.id }}/novel/chapter-outlines" class="btn-secondary">← 返回列表</a>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

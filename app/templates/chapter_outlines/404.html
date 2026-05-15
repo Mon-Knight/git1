@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard' %}
+{% block title %}章节大纲未找到 — AI World Engine{% endblock %}
+{% block page_title %}404{% endblock %}
+
+{% block content %}
+<div class="dashboard" style="max-width:600px;text-align:center;padding-top:3rem">
+    <div class="empty-icon" style="font-size:3rem">📝</div>
+    <h2>章节大纲未找到</h2>
+    <p style="color:var(--color-text-muted)">
+        章节大纲 #{{ outline_id }} 不存在，或不属于当前世界。
+    </p>
+    <div style="margin-top:1.5rem">
+        <a href="/worlds/{{ world_id }}/novel/chapter-outlines" class="btn-primary">← 返回章节大纲列表</a>
+    </div>
+</div>
+{% endblock %}

@@ -372,3 +372,37 @@ class NovelVolumeOutline(Base):
 
     def __repr__(self):
         return f"<NovelVolumeOutline id={self.id} status='{self.status}'>"
+
+
+class NovelChapterOutline(Base):
+    """AI-generated chapter outline for novel engineering, bound to a volume outline."""
+    __tablename__ = "novel_chapter_outlines"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    world_id = Column(Integer, ForeignKey("worlds.id"), nullable=False)
+    volume_outline_id = Column(Integer, ForeignKey("novel_volume_outlines.id"), nullable=False)
+    volume_index = Column(Integer, nullable=False, default=0)
+    volume_title = Column(String(300), default="")
+    title = Column(String(300), nullable=False, default="")
+    style_profile_id = Column(Integer, ForeignKey("style_profiles.id"), nullable=True)
+    plot_anchor_id = Column(Integer, ForeignKey("plot_anchors.id"), nullable=True)
+    context_package_id = Column(Integer, ForeignKey("context_packages.id"), nullable=True)
+    generation_requirement = Column(Text, default="")
+    prompt = Column(Text, default="")
+    result_json = Column(Text, default="")
+    raw_text = Column(Text, default="")
+    chapter_count = Column(Integer, default=0)
+    status = Column(String(20), default="candidate")  # candidate / main / discarded
+    is_main = Column(Boolean, default=False)
+    confirmed_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+    world = relationship("World", foreign_keys=[world_id])
+    volume_outline = relationship("NovelVolumeOutline", foreign_keys=[volume_outline_id])
+    style_profile = relationship("StyleProfile", foreign_keys=[style_profile_id])
+    plot_anchor = relationship("PlotAnchor", foreign_keys=[plot_anchor_id])
+    context_package = relationship("ContextPackage", foreign_keys=[context_package_id])
+
+    def __repr__(self):
+        return f"<NovelChapterOutline id={self.id} status='{self.status}'>"

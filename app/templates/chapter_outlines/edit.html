@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}编辑章节大纲 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}编辑章节大纲{% endblock %}
+
+{% block head_extra %}
+<style>
+.co-edit-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.5rem 2rem;max-width:800px;margin:0 auto}
+.co-edit-card .fg{margin-bottom:1rem}
+.co-edit-card label{display:block;font-weight:600;font-size:0.88rem;margin-bottom:0.3rem;color:var(--color-text)}
+.co-edit-card input,.co-edit-card textarea{width:100%;padding:0.6rem 0.8rem;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg);color:var(--color-text);font-size:0.9rem;box-sizing:border-box;font-family:inherit}
+.co-edit-card input:focus,.co-edit-card textarea:focus{outline:none;border-color:var(--color-primary);box-shadow:0 0 0 2px rgba(108,99,255,0.2)}
+.co-edit-card .hint{font-size:0.78rem;color:var(--color-text-muted);margin-top:0.25rem}
+.co-ch-edit-section{border:1px solid var(--color-border);border-radius:8px;padding:1rem;margin-bottom:1rem;background:var(--color-bg)}
+.co-ch-edit-section h4{font-size:0.95rem;color:var(--color-primary);margin-bottom:0.75rem}
+.btn-row{display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard" style="max-width:960px">
+    <h1>✏️ 编辑章节大纲</h1>
+    <p style="color:var(--color-text-muted);margin-bottom:1.5rem">
+        方案标题：<strong>{{ outline.title }}</strong> | 第{{ outline.volume_index }}卷 | 当前世界：{{ world.name }}
+    </p>
+
+    {% if error %}
+    <div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem;border-radius:var(--radius);margin-bottom:1rem">❌ {{ error }}</div>
+    {% endif %}
+
+    <div class="co-edit-card">
+        <form action="/worlds/{{ world.id }}/novel/chapter-outlines/{{ outline.id }}/edit" method="post">
+
+            <div class="fg">
+                <label>方案标题</label>
+                <input type="text" name="title" value="{{ outline.title }}" placeholder="章节大纲方案标题">
+            </div>
+
+            <div class="fg">
+                <label>总体概述（summary）</label>
+                <textarea name="summary" rows="3" placeholder="本卷章节安排总览"></textarea>
+            </div>
+
+            {% if chapters %}
+            <h3 style="margin-top:1.5rem;margin-bottom:0.75rem;font-size:1rem">章节内容编辑</h3>
+            {% for ch in chapters %}
+            <div class="co-ch-edit-section">
+                <h4>第{{ ch.chapter_index }}章：{{ ch.title or '(无标题)' }}</h4>
+
+                <div class="fg">
+                    <label>章节标题</label>
+                    <input type="text" name="chapter_titles" value="{{ ch.title or '' }}" placeholder="章节标题">
+                </div>
+
+                <div class="fg">
+                    <label>章节目标 (chapter_goal)</label>
+                    <input type="text" name="chapter_goals" value="{{ ch.chapter_goal or '' }}" placeholder="本章剧情目标">
+                </div>
+
+                <div class="fg">
+                    <label>主要冲突 (main_conflict)</label>
+                    <input type="text" name="chapter_conflicts" value="{{ ch.main_conflict or '' }}" placeholder="本章主要冲突">
+                </div>
+
+                <div class="fg">
+                    <label>剧情事件 (每行一个事件)</label>
+                    <textarea name="chapter_events" rows="3" placeholder="事件1&#10;事件2&#10;事件3">{% if ch.plot_events %}{{ ch.plot_events|join('\n') }}{% endif %}</textarea>
+                </div>
+
+                <div class="fg">
+                    <label>章末钩子 (ending_hook)</label>
+                    <input type="text" name="chapter_hooks" value="{{ ch.ending_hook or '' }}" placeholder="章末钩子">
+                </div>
+
+                <div class="fg">
+                    <label>预计字数 (estimated_words)</label>
+                    <input type="number" name="chapter_words" value="{{ ch.estimated_words or 3000 }}" min="500" max="20000">
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p style="color:var(--color-text-muted)">暂无章节数据可编辑。</p>
+            {% endif %}
+
+            <div class="btn-row">
+                <button type="submit" class="btn-primary">💾 保存修改</button>
+                <a href="/worlds/{{ world.id }}/novel/chapter-outlines/{{ outline.id }}" class="btn-secondary">← 返回详情</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -56,6 +56,16 @@ REQUIRED_TEMPLATES = [
     "app/templates/setting_suggestions/new.html",
     "app/templates/setting_suggestions/detail.html",
     "app/templates/setting_suggestions/edit_adopt.html",
+    # v1.8.0 Volume Outlines
+    "app/templates/volume_outlines/index.html",
+    "app/templates/volume_outlines/new.html",
+    "app/templates/volume_outlines/detail.html",
+    "app/templates/volume_outlines/edit.html",
+    # v1.9.0 Chapter Outlines
+    "app/templates/chapter_outlines/index.html",
+    "app/templates/chapter_outlines/new.html",
+    "app/templates/chapter_outlines/detail.html",
+    "app/templates/chapter_outlines/edit.html",
 ]
 
 # Sidebar related checks (in base.html)
@@ -81,6 +91,12 @@ AI_MODULES = [
     "app/services/ai/model_router.py",
     "app/services/ai/prompt_builder.py",
     "app/services/ai/response_parser.py",
+    # v1.8.0 Volume Outlines
+    "app/routes/volume_outlines.py",
+    "app/services/volume_outline_service.py",
+    # v1.9.0 Chapter Outlines
+    "app/routes/chapter_outlines.py",
+    "app/services/chapter_outline_service.py",
 ]
 
 
@@ -145,6 +161,12 @@ def check_source_templates():
         else:
             print("  FAIL: world detail page missing creative context entry")
             errors.append("World detail missing /context entry")
+        # v1.9.0 Chapter Outlines
+        if "章节大纲" in detail_html:
+            print("  OK: world detail page has chapter outlines entry")
+        else:
+            print("  FAIL: world detail page missing chapter outlines entry")
+            errors.append("World detail missing: 章节大纲")
 
     # Check sidebar and settings features
     base_path = os.path.join(PROJECT_ROOT, "app", "templates", "base.html")
