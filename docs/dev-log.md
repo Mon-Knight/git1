@@ -14,6 +14,10 @@ StyleSourceAnalysis 模型、style_import_service (编码检测/清洗/分块/�
 ### 版权安全
 不保存原文、不复制人物/设定/专有名词、只提取抽象风格规则。
 
+### 修复
+- 路由顺序修复：`/styles/{style_id}` 移至所有具体路径（/new, /edit, /delete）之后，避免 FastAPI 将 "new"/"edit" 误匹配为路径参数。
+- pre-push hook 修复：使用 Conda Python 替代默认系统 Python，解决 pytest 找不到模块的问题。
+
 ### 测试
 pytest: 1651 passed, 15 xfailed
 
