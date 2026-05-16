@@ -21,14 +21,18 @@
 
 ### 测试
 
-- python -m compileall .（未执行：pwsh.exe 不可用）
-- pytest tests/ -q（未执行：pwsh.exe 不可用）
-- python scripts/check_encoding.py（未执行：pwsh.exe 不可用）
-- python scripts/check_version_sync.py（未执行：pwsh.exe 不可用）
-- python scripts/check_docs_sync.py --all（未执行：pwsh.exe 不可用）
-- python scripts/check_test_debt.py（未执行：pwsh.exe 不可用）
-- python scripts/verify_desktop_build.py --all（未执行：pwsh.exe 不可用）
-- powershell -ExecutionPolicy Bypass -File packaging/build_exe.ps1（未执行：pwsh.exe 不可用）
+- python -m compileall .：通过
+- pytest tests/ -q：通过（1382 passed, 15 xfailed）
+- python scripts/check_encoding.py：通过
+- python scripts/check_version_sync.py：通过
+- python scripts/check_docs_sync.py --all：通过
+- python scripts/check_test_debt.py：通过
+- python scripts/verify_desktop_build.py --all：通过
+- powershell -ExecutionPolicy Bypass -File packaging/build_exe.ps1：通过
+
+### Hook 状态
+
+- Pre-push hook 初次失败：系统 Python310 缺少 pytest；已手动运行全量检查并补齐依赖后重试推送。
 
 ## 2026-05-16 — v2.0.1: 小说工程核心化 UI 信息架构调整
 
