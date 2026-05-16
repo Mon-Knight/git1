@@ -34,13 +34,17 @@ def _get_ai_mode_info(db: Session) -> str:
 
 
 def _render_template(request, template, db=None, status_code=200, **kwargs):
-    """Helper to always pass ai_mode_info, active_nav, and app_version."""
+    """Helper to always pass ai_mode_info, active_nav, current_world, and app_version."""
     db = db or kwargs.pop("db")
+    world = kwargs.get("world")
     defaults = {
         "ai_mode_info": _get_ai_mode_info(db),
         "active_nav": "simulation",
         "app_version": settings.VERSION,
     }
+    # v2.0.1.3: Ensure current_world is always passed for sidebar context
+    if "current_world" not in kwargs and world is not None:
+        defaults["current_world"] = world
     defaults.update(kwargs)
     return templates.TemplateResponse(request, template, defaults, status_code=status_code)
 

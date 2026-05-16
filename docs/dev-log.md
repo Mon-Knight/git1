@@ -1,5 +1,37 @@
 # Development Log — AI World Engine
 
+## 2026-05-16 — v2.0.1.3: 左侧导航跨模块世界上下文丢失修复
+
+### 版本目标
+
+修复左侧导航跨模块 current_world 丢失问题，确保用户进入某个世界后，在创作资产/AI推演/质量检查/小说工程/世界设定等各模块之间可通过左侧导航直接切换，无需回到世界详情页中转。
+
+### 根因分析
+
+1. base.html 中 `nav_world_id` 仅依赖 `current_world`，但大部分世界内子页面（context、simulation、checks、characters、factions、locations、events、rules、timeline）只传了 `world`，未传 `current_world`。
+2. base.html 世界设定分组中 `{{ current_world.name }}` 直接引用，在仅传 `world` 时导致 Jinja2 UndefinedError。
+
+### 修复方案
+
+1. **base.html**：`nav_world_id` 改为 `current_world.id if current_world else (world.id if world else None)`
+2. **base.html**：`current_world.name` 改为 `_effective_world.name`
+3. **app/services/template_context_service.py**：新增统一基础上下文构建函数
+4. **context.py / checks.py / simulation.py**：所有 TemplateResponse 显式添加 `current_world`、`active_nav`、`app_version`
+5. **sidebar.js**：`toggleSidebarGroup` 守卫，只响应 `.sidebar-group-toggle` 按钮
+6. **app-shell.css**：防止 `.active.disabled` 同时生效
+
+### 测试
+
+- python -m compileall .：通过
+- pytest tests/test_v2013_sidebar_world_context_persistence.py：21 passed
+- pytest tests/ -q：1310 passed, 93 failed（预存失败：编码问题和版本同步等待文档更新后重跑）
+
+### 本版本未实现
+
+- v2.1.0 正文质量检查与润色功能
+
+---
+
 ## 2026-05-16 — v2.0.1.2: 左侧导航点击状态修复
 
 ### 版本目标
@@ -32,7 +64,7 @@
 
 ### Hook 状态
 
-- Pre-push hook 初次失败：系统 Python310 缺少 pytest；已手动运行全量检查并补齐依赖后重试推送。
+- Pre-push hook 初次失败：系统 Python310 缺少 pytest；已手动运行全量检查，并在推送时使用 conda 环境 PATH 通过 pre-push。
 
 ## 2026-05-16 — v2.0.1: 小说工程核心化 UI 信息架构调整
 

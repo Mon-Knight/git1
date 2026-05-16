@@ -1,5 +1,28 @@
 # Changelog
 
+## [v2.0.1.3] — 2026-05-16
+
+### Fixed
+- 修复左侧导航跨模块 current_world 丢失问题：base.html 增加 world 到 current_world 的 fallback
+- 修复进入创作资产后侧边栏误判未选择世界的问题
+- 修复创作资产 / AI 推演 / 质量检查之间不能连续切换的问题
+- 修复世界内子页面（角色/势力/地点/规则/事件/时间线）未传入 current_world 导致侧边栏上下文丢失
+- 修复 base.html 中 `{{ current_world.name }}` 直接引用在仅传 `world` 时 Jinja2 UndefinedError 的问题
+
+### Added
+- 新增 `app/services/template_context_service.py`：统一基础上下文构建函数 `build_base_context()`
+- 新增侧边栏世界上下文持久化测试（test_v2013_sidebar_world_context_persistence.py，21 个测试）
+
+### Changed
+- base.html：`nav_world_id` 优先使用 `current_world`，其次 `world`，不再因为缺少 `current_world` 而丢失世界上下文
+- simulation.py：`_render_template` 自动填充 `current_world`
+- context.py / checks.py：所有 TemplateResponse 显式添加 `current_world`、`active_nav`、`app_version`
+- sidebar.js：`toggleSidebarGroup` 守卫，只响应 toggle 按钮
+- app-shell.css：防止 `.active.disabled` 同时生效
+
+### Notes
+- 本版本不开发 v2.1.0 正文质量检查与润色功能
+
 ## [v2.0.1.2] — 2026-05-16
 
 ### Fixed

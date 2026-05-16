@@ -10,6 +10,7 @@ from pathlib import Path
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.config import settings
 from app.services.world_service import WorldService
 from app.services.character_service import CharacterService
 from app.services.check_service import CheckService
@@ -48,6 +49,9 @@ async def checks_index(request: Request, world_id: int, db: Session = Depends(ge
         )
     return templates.TemplateResponse(request, "checks/index.html", {
         "world": world,
+        "current_world": world,
+        "active_nav": "checks",
+        "app_version": settings.VERSION,
         "ai_hint": _get_ai_hint(db),
     })
 
@@ -62,6 +66,9 @@ async def conflict_check_form(request: Request, world_id: int, db: Session = Dep
         )
     return templates.TemplateResponse(request, "checks/conflicts.html", {
         "world": world, "errors": {}, "result": None,
+        "current_world": world,
+        "active_nav": "checks",
+        "app_version": settings.VERSION,
         "ai_hint": _get_ai_hint(db),
     })
 
@@ -94,6 +101,9 @@ async def run_conflict_check(
     if errors:
         return templates.TemplateResponse(request, "checks/conflicts.html", {
             "world": world, "errors": errors,
+            "current_world": world,
+            "active_nav": "checks",
+            "app_version": settings.VERSION,
             "form_data": {"content": content},
             "ai_hint": _get_ai_hint(db),
         }, status_code=422)
@@ -114,12 +124,18 @@ async def run_conflict_check(
         )
         return templates.TemplateResponse(request, "checks/conflicts.html", {
             "world": world, "errors": {}, "result": result,
+            "current_world": world,
+            "active_nav": "checks",
+            "app_version": settings.VERSION,
             "form_data": {"content": content},
             "ai_hint": _get_ai_hint(db),
         })
     except Exception as e:
         return templates.TemplateResponse(request, "checks/conflicts.html", {
             "world": world, "errors": {"submit": f"检查出错: {str(e)}"},
+            "current_world": world,
+            "active_nav": "checks",
+            "app_version": settings.VERSION,
             "form_data": {"content": content}, "result": None,
             "ai_hint": _get_ai_hint(db),
         }, status_code=500)
@@ -136,6 +152,9 @@ async def behavior_check_form(request: Request, world_id: int, db: Session = Dep
     characters = CharacterService.list_characters(db, world_id)
     return templates.TemplateResponse(request, "checks/behavior.html", {
         "world": world, "characters": characters, "errors": {}, "result": None,
+        "current_world": world,
+        "active_nav": "checks",
+        "app_version": settings.VERSION,
         "ai_hint": _get_ai_hint(db),
     })
 
@@ -169,6 +188,9 @@ async def run_behavior_check(
     if errors:
         return templates.TemplateResponse(request, "checks/behavior.html", {
             "world": world, "characters": characters, "errors": errors,
+            "current_world": world,
+            "active_nav": "checks",
+            "app_version": settings.VERSION,
             "form_data": {"character_id": character_id, "behavior": behavior, "context": context},
             "ai_hint": _get_ai_hint(db),
         }, status_code=422)
@@ -180,12 +202,18 @@ async def run_behavior_check(
         )
         return templates.TemplateResponse(request, "checks/behavior.html", {
             "world": world, "characters": characters, "errors": {}, "result": result,
+            "current_world": world,
+            "active_nav": "checks",
+            "app_version": settings.VERSION,
             "form_data": {"character_id": character_id, "behavior": behavior, "context": context},
             "ai_hint": _get_ai_hint(db),
         })
     except Exception as e:
         return templates.TemplateResponse(request, "checks/behavior.html", {
             "world": world, "characters": characters, "errors": {"submit": f"检查出错: {str(e)}"},
+            "current_world": world,
+            "active_nav": "checks",
+            "app_version": settings.VERSION,
             "form_data": {"character_id": character_id, "behavior": behavior, "context": context},
             "result": None,
             "ai_hint": _get_ai_hint(db),

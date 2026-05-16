@@ -13,11 +13,11 @@
     <header class="topbar">
         <div class="topbar-left">
             <span class="topbar-logo">📖 AI World Engine</span>
-            <span class="topbar-version">v{{ app_version or '2.0.1.2' }}</span>
+            <span class="topbar-version">v{{ app_version or '2.0.1.3' }}</span>
         </div>
         <div class="topbar-center">
-            {% if current_world %}
-            <span class="topbar-world">📖 {{ current_world.name }}</span>
+            {% if _effective_world %}
+            <span class="topbar-world">📖 {{ _effective_world.name }}</span>
             {% endif %}
             <span class="topbar-page-title">{% block page_title %}{% endblock %}</span>
         </div>
@@ -32,7 +32,9 @@
     <!-- ===== Sidebar (v2.0.1: 小说工程核心化 + 可折叠/可点击优化) ===== -->
     <nav class="sidebar" aria-label="主导航">
         <ul class="sidebar-nav">
-            {% set nav_world_id = current_world.id if current_world else None %}
+            {# v2.0.1.3: Fallback from current_world to world to prevent sidebar context loss #}
+            {% set _effective_world = current_world or world %}
+            {% set nav_world_id = _effective_world.id if _effective_world else None %}
             {% set has_world = nav_world_id or recent_world_id %}
             {% set target_world_id = nav_world_id or recent_world_id or 0 %}
             {% set active = active_nav or '' %}
@@ -116,7 +118,7 @@
 
                     {% if nav_world_id %}
                     <li class="sidebar-world-current">
-                        <span class="sidebar-sublink world-label">📖 当前世界：{{ current_world.name }}</span>
+                        <span class="sidebar-sublink world-label">📖 当前世界：{{ _effective_world.name }}</span>
                     </li>
                     <li><a href="/worlds/{{ nav_world_id }}" class="sidebar-sublink" data-nav="worlds">🎛️ 世界控制台</a></li>
                     <li class="sidebar-subnav-divider"></li>

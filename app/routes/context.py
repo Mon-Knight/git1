@@ -10,6 +10,7 @@ from pathlib import Path
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.config import settings
 from app.services.world_service import WorldService
 from app.services.style_profile_service import StyleProfileService
 from app.services.plot_anchor_service import PlotAnchorService
@@ -45,6 +46,9 @@ async def context_index(request: Request, world_id: int, db: Session = Depends(g
 
     return templates.TemplateResponse(request, "context/index.html", {
         "world": world,
+        "current_world": world,
+        "active_nav": "assets",
+        "app_version": settings.VERSION,
         "style_count": style_count,
         "anchor_count": anchor_count,
         "package_count": package_count,
@@ -68,6 +72,9 @@ async def list_styles(request: Request, world_id: int, db: Session = Depends(get
 
     return templates.TemplateResponse(request, "context/styles.html", {
         "world": world,
+        "current_world": world,
+        "active_nav": "assets",
+        "app_version": settings.VERSION,
         "profiles": profiles,
     })
 
@@ -83,6 +90,9 @@ async def new_style_form(request: Request, world_id: int, db: Session = Depends(
 
     return templates.TemplateResponse(request, "context/style_form.html", {
         "world": world,
+        "current_world": world,
+        "active_nav": "assets",
+        "app_version": settings.VERSION,
         "profile": None,
         "errors": {},
         "form_data": {},
@@ -120,6 +130,9 @@ async def create_style(
     if errors:
         return templates.TemplateResponse(request, "context/style_form.html", {
             "world": world,
+            "current_world": world,
+            "active_nav": "assets",
+            "app_version": settings.VERSION,
             "profile": None,
             "errors": errors,
             "form_data": {
@@ -172,6 +185,9 @@ async def edit_style_form(
 
     return templates.TemplateResponse(request, "context/style_form.html", {
         "world": world,
+        "current_world": world,
+        "active_nav": "assets",
+        "app_version": settings.VERSION,
         "profile": profile,
         "errors": {},
         "form_data": {},
@@ -216,6 +232,9 @@ async def update_style(
     if errors:
         return templates.TemplateResponse(request, "context/style_form.html", {
             "world": world,
+            "current_world": world,
+            "active_nav": "assets",
+            "app_version": settings.VERSION,
             "profile": profile,
             "errors": errors,
             "form_data": {
@@ -267,6 +286,9 @@ async def delete_style(
         profiles = StyleProfileService.list_available_style_profiles_for_world(db, world_id)
         return templates.TemplateResponse(request, "context/styles.html", {
             "world": world,
+            "current_world": world,
+            "active_nav": "assets",
+            "app_version": settings.VERSION,
             "profiles": profiles,
             "error": "无法删除该风格方案：它正在被某个创作上下文包引用。请先移除引用后再删除。",
         })

@@ -10,11 +10,16 @@
 
     /**
      * v2.0.1: Toggle a sidebar group expand/collapse.
-     * Works with both &lt;a&gt; and &lt;button&gt; toggle elements.
+     * Works with both <a> and <button> toggle elements.
+     * v2.0.1.3: Guard — only operates on toggle buttons, never on main links.
      */
     window.toggleSidebarGroup = function (event) {
-        event.preventDefault();
+        // Guard: only respond to toggle buttons, not main links
         var toggle = event.currentTarget;
+        if (!toggle.classList.contains('sidebar-group-toggle')) {
+            return; // Let main links navigate normally
+        }
+        event.preventDefault();
         var group = toggle.closest('.sidebar-group');
         if (!group) return;
 
