@@ -1,5 +1,29 @@
 # Development Log — AI World Engine
 
+## 2026-05-16 — v2.4.3: 全局入口健康巡检与旧模块兼容收口
+
+### 为什么不是新功能版本
+v2.4.3 是进入 v2.5.0（章节连续性检查）前的稳定性收口。
+v2.4.1/v2.4.2 已修复多数 500，但需要系统性确认所有入口无误。
+
+### 巡检结果
+- 39 条主要 GET 路由全部返回 200（新增 test_v243_global_route_health.py）
+- 19 条侧边栏入口全部存在且链接正确（新增 test_v243_sidebar_full_entry_links.py）
+- 无新增 /worlds/None、/worlds// 问题
+- 无新增 Internal Server Error
+- schema 自愈逻辑正常（无新的缺失列告警）
+
+### 修复
+- 公共层：base.html、sidebar.js、model_formatters.py 均无回归
+- 模板：旧页面 current_world 传入正常
+- 数据库：_migrate_schema 自动补齐全表检测正常
+
+### 测试
+- 新增 30 tests（test_v243_*）
+- 全量: 1744 passed, 15 xfailed
+
+---
+
 ## 2026-05-16 — v2.4.2: 修复创作资产与设定库字段兼容错误
 
 ### 问题定位

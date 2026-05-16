@@ -2,7 +2,7 @@
 
 AI 小说工程工作台 — 从世界设定到全书演化、分卷大纲、章节大纲、正文草稿的完整创作流程。
 
-> **当前版本**: v2.4.2 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
+> **当前版本**: v2.4.3 | **GitHub**: [Mon-Knight/git1](https://github.com/Mon-Knight/git1)
 >
 > **当前阶段**: 正文润色候选 — 基于质量检查报告生成润色候选稿。
 

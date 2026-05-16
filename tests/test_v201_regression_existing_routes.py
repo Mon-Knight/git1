@@ -62,7 +62,7 @@ class TestV201RegressionExistingRoutes:
         resp = client.get("/health")
         assert resp.status_code == 200
         data = resp.json()
-        assert data["version"] == "2.4.2"
+        assert data["version"] == "2.4.3"
 
     # ---- World-specific routes ----
     def test_route_world_detail(self, client, test_world):

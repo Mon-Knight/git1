@@ -1,5 +1,21 @@
 # Changelog
 
+## [v2.4.3] — 2026-05-16
+
+### Fixed
+- 全局主要入口巡检：确认所有 39 条 GET 路由不返回 500
+- 左侧导航全部入口链接验证：无 /worlds/None、无 /worlds//
+- 旧模块（角色/势力/地点/规则/事件/时间线）与新型字段兼容确认
+
+### Changed
+- 新增 tests/test_v243_global_route_health.py（39 路由全覆盖）
+- 新增 tests/test_v243_sidebar_full_entry_links.py（19 侧边栏入口验证）
+- 强化设定库 AI 推演、创作资产、正文链路回归
+
+### Notes
+- 本版本不新增业务功能，是进入 v2.5.0 前的稳定性收口
+- 全部主要入口不再出现 500
+
 ## [v2.4.2] — 2026-05-16
 
 ### Fixed
