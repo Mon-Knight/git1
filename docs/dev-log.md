@@ -1,5 +1,22 @@
 # Development Log — AI World Engine
 
+## 2026-05-16 — v2.4.1: 修复设定库 AI 推演 500 错误
+
+### 问题定位
+- **报错 URL**: `/worlds/{id}/setting-suggestions`
+- **根因**: `setting_suggestions` 表缺少 `adopted_target_id`、`adopted_target_type`、`adopted_at` 三列
+- **原因**: 模型在 v1.7.10 新增了采纳相关字段，但 `init_db` 未注册 SettingSuggestion 模型，且缺少数据库迁移机制
+
+### 修复
+- `app/database.py`: 新增 `_migrate_schema()` 自动检测并添加缺失列
+- `app/database.py`: `init_db` 补全 9 个未注册模型的导入
+- 设定库 AI 推演首页、新建、生成、详情、采纳等全部返回 200
+
+### 测试
+pytest: 1640 passed, 15 xfailed (版本引用更新后预期 all pass)
+
+---
+
 ## 2026-05-16 — v2.4.0: TXT 小说风格导入与风格画像应用
 
 ### 版本目标

@@ -1,5 +1,12 @@
 # Changelog
 
+## [v2.4.1] — 2026-05-16
+
+### Fixed
+- **设定库 AI 推演**: 修复 Internal Server Error（`setting_suggestions` 表缺少 `adopted_target_id` 列）
+- **数据库迁移**: 新增 `_migrate_schema()` 在启动时自动添加缺失列
+- **init_db 注册**: 补全所有模型（SettingSuggestion、StyleSourceAnalysis、NovelVolumeOutline 等）
+
 ## [v2.4.0] — 2026-05-16
 
 ### Added
