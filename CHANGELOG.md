@@ -1,5 +1,15 @@
 # Changelog
 
+## [v2.6.1] — 2026-05-17
+
+### Fixed
+- 修复 TXT 风格导入调用不存在的 `ModelRouter.generate` 导致分析失败
+- 修复 novel_quality_service、novel_revision_service 中同样的 `ModelRouter.generate` 错误
+- 统一 AI 调用为 `get_client(db).generate(prompt=..., max_tokens=...)` 模式
+
+### Notes
+- 不新增业务功能，仅修复 AI 调用接口兼容
+
 ## [v2.6.0] — 2026-05-16
 
 ### Added

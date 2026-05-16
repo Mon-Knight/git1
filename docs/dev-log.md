@@ -1,5 +1,24 @@
 # Development Log — AI World Engine
 
+## 2026-05-17 — v2.6.1: 修复 TXT 风格导入 AI 调用接口错误
+
+### 问题定位
+- **报错**: `type object 'ModelRouter' has no attribute 'generate'`
+- **根因**: `style_import_service.py`、`novel_quality_service.py`、`novel_revision_service.py` 调用了不存在的 `ModelRouter.generate()`
+- **ModelRouter 实际方法**: `get_client(db, task_type)` → 返回 `AIClient` 对象，由 `client.generate(prompt=..., max_tokens=...)` 调用
+- **正确模式**: `get_client(db).generate(prompt=prompt, max_tokens=4000)`
+
+### 修复
+- `style_import_service.py`: `ModelRouter.generate(p)` → `get_ai_client(db).generate(prompt=p)`
+- `novel_quality_service.py`: 同上
+- `novel_revision_service.py`: 同上
+- 新增 test_v261_style_import_ai_call.py (12 tests)
+
+### 测试
+1834 passed, 15 xfailed
+
+---
+
 ## 2026-05-16 — v2.6.0: 卷内正文管理与基础导出
 
 ### 为什么做 v2.6.0
