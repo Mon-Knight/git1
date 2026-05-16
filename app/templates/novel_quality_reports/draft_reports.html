@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% set page_class = 'page-list' %}
+{% block title %}质量检查 — {{ draft.title or '正文草稿' }} — AI World Engine{% endblock %}
+{% block page_title %}正文质量检查报告{% endblock %}
+
+{% block head_extra %}
+<style>
+.report-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.6rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem}
+.report-info{flex:1;min-width:220px}
+.report-title{font-weight:600;font-size:0.95rem;color:var(--color-text)}
+.report-meta{font-size:0.78rem;color:var(--color-text-muted);margin-top:0.2rem}
+.report-score{display:inline-flex;align-items:center;gap:0.25rem;font-size:0.85rem;font-weight:700}
+.score-high{color:var(--color-accent)}
+.score-mid{color:#f0ad4e}
+.score-low{color:#e74c3c}
+.report-status{display:inline-block;padding:0.15rem 0.55rem;border-radius:10px;font-size:0.72rem;font-weight:600}
+.report-status.candidate{background:rgba(52,152,219,0.15);color:#3498db}
+.report-status.current{background:rgba(0,212,170,0.15);color:var(--color-accent)}
+.report-status.discarded{background:rgba(149,165,166,0.15);color:#95a5a6}
+.report-actions{display:flex;gap:0.4rem;flex-wrap:wrap}
+.draft-summary{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:0.8rem 1rem;margin-bottom:1rem}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard" style="max-width:1200px">
+    <h1>🔍 正文质量检查报告</h1>
+    <div class="draft-summary">
+        <span style="color:var(--color-text-muted)">正文草稿：</span>
+        <strong>{{ draft.title or draft.chapter_title or '(无标题)' }}</strong>
+        · 状态：<span class="report-status {{ draft.status }}">{{ {'candidate':'候选','accepted':'采用稿','discarded':'已废弃'}.get(draft.status, draft.status) }}</span>
+        · 第{{ draft.volume_index }}卷 · 第{{ draft.chapter_index }}章
+        · {{ draft.word_count }} 字
+    </div>
+
+    {% if reports %}
+    <div class="report-list">
+        {% for r in reports %}
+        <div class="report-card">
+            <div class="report-info">
+                <div class="report-title">
+                    <a href="/worlds/{{ world.id }}/novel/quality-reports/{{ r.id }}">{{ r.title or '正文质量检查报告' }}</a>
+                </div>
+                <div class="report-meta">
+                    <span class="report-status {{ r.status }}">{{ {'candidate':'候选','current':'当前参考','discarded':'已废弃'}.get(r.status, r.status) }}</span>
+                    {% if r.is_current %}<span style="color:var(--color-accent);font-weight:600;margin-left:0.3rem">★ 当前参考报告</span>{% endif %}
+                    {% if r.overall_score %}
+                    · <span class="report-score {% if r.overall_score >= 80 %}score-high{% elif r.overall_score >= 60 %}score-mid{% else %}score-low{% endif %}">{{ r.overall_score }} 分</span>
+                    {% endif %}
+                    · {{ r.created_at.strftime('%m-%d %H:%M') }}
+                </div>
+            </div>
+            <div class="report-actions">
+                <a href="/worlds/{{ world.id }}/novel/quality-reports/{{ r.id }}" class="btn-sm">查看详情</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state-dash">
+        <div class="empty-icon">🔍</div>
+        <p>还没有质量检查报告。</p>
+        <a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/quality-reports/new" class="btn-primary">生成质量检查报告</a>
+    </div>
+    {% endif %}
+
+    <div style="margin-top:1rem;display:flex;gap:0.5rem">
+        {% if draft.status != 'discarded' %}
+        <a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/quality-reports/new" class="btn-primary">➕ 新建检查报告</a>
+        {% endif %}
+        <a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}" class="btn-outline">返回草稿详情</a>
+        <a href="/worlds/{{ world.id }}/novel/quality-reports" class="btn-outline">全部检查报告</a>
+    </div>
+</div>
+{% endblock %}

@@ -443,3 +443,39 @@ class NovelDraft(Base):
 
     def __repr__(self):
         return f"<NovelDraft id={self.id} status='{self.status}'>"
+
+
+class NovelDraftQualityReport(Base):
+    """AI-generated quality check report for a novel draft."""
+    __tablename__ = "novel_draft_quality_reports"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    world_id = Column(Integer, ForeignKey("worlds.id"), nullable=False)
+    draft_id = Column(Integer, ForeignKey("novel_drafts.id"), nullable=False)
+    chapter_outline_id = Column(Integer, ForeignKey("novel_chapter_outlines.id"), nullable=True)
+    volume_index = Column(Integer, default=0)
+    chapter_index = Column(Integer, default=0)
+    title = Column(String(300), default="")
+    prompt = Column(Text, default="")
+    result_json = Column(Text, default="")
+    raw_text = Column(Text, default="")
+    overall_score = Column(Integer, default=0)
+    outline_alignment_score = Column(Integer, default=0)
+    world_consistency_score = Column(Integer, default=0)
+    character_consistency_score = Column(Integer, default=0)
+    plot_coherence_score = Column(Integer, default=0)
+    pacing_score = Column(Integer, default=0)
+    prose_score = Column(Integer, default=0)
+    hook_score = Column(Integer, default=0)
+    status = Column(String(20), default="candidate")  # candidate / current / discarded
+    is_current = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+    confirmed_at = Column(DateTime, nullable=True)
+
+    world = relationship("World", foreign_keys=[world_id])
+    draft = relationship("NovelDraft", foreign_keys=[draft_id])
+    chapter_outline = relationship("NovelChapterOutline", foreign_keys=[chapter_outline_id])
+
+    def __repr__(self):
+        return f"<NovelDraftQualityReport id={self.id} status='{self.status}'>"

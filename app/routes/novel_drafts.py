@@ -265,6 +265,13 @@ async def novel_drafts_detail(request: Request, world_id: int, draft_id: int, db
 
     status_labels = {"candidate": "候选", "accepted": "采用稿", "discarded": "已废弃"}
 
+    # v2.1.0: Quality report summary
+    from app.services.novel_quality_service import NovelQualityService
+    quality_reports = NovelQualityService.list_quality_reports(db, world_id, draft_id=draft_id)
+    quality_reports_count = len(quality_reports)
+    current_quality_report = next((r for r in quality_reports if r.is_current), None)
+    latest_quality_report = quality_reports[0] if quality_reports else None
+
     return templates.TemplateResponse(request, "novel_drafts/detail.html", {
         "world": world,
         "draft": draft,
@@ -274,6 +281,9 @@ async def novel_drafts_detail(request: Request, world_id: int, draft_id: int, db
         "active_nav": "novel",
         "current_world": world,
         "app_version": settings.VERSION,
+        "quality_reports_count": quality_reports_count,
+        "current_quality_report": current_quality_report,
+        "latest_quality_report": latest_quality_report,
     })
 
 

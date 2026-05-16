@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard' %}
+{% block title %}{{ report.title or '质量检查报告' }} — AI World Engine{% endblock %}
+{% block page_title %}{{ report.title or '正文质量检查报告' }}{% endblock %}
+
+{% block head_extra %}
+<style>
+.detail-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem}
+.detail-title-area{flex:1;min-width:250px}
+.score-big{font-size:2.5rem;font-weight:700;line-height:1}
+.score-label{font-size:0.78rem;color:var(--color-text-muted)}
+.score-bar{height:10px;background:var(--color-border);border-radius:5px;margin-top:0.2rem;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:5px;transition:width 0.3s}
+.score-high .score-bar-fill{background:var(--color-accent)}
+.score-mid .score-bar-fill{background:#f0ad4e}
+.score-low .score-bar-fill{background:#e74c3c}
+
+.status-badge{display:inline-block;padding:0.25rem 0.75rem;border-radius:12px;font-size:0.78rem;font-weight:600}
+.status-badge.candidate{background:rgba(52,152,219,0.15);color:#3498db}
+.status-badge.current{background:rgba(0,212,170,0.15);color:var(--color-accent)}
+.status-badge.discarded{background:rgba(149,165,166,0.15);color:#95a5a6}
+
+.section-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:0.8rem}
+.section-title{font-weight:700;font-size:0.9rem;color:var(--color-text);margin-bottom:0.6rem;display:flex;align-items:center;gap:0.4rem}
+
+.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.6rem}
+.score-item{text-align:center;padding:0.6rem}
+.score-item-value{font-size:1.2rem;font-weight:700}
+.score-item-label{font-size:0.72rem;color:var(--color-text-muted);margin-top:0.15rem}
+
+.issue-card{background:var(--color-bg);border-left:3px solid var(--color-border);padding:0.7rem 1rem;margin-bottom:0.5rem;border-radius:0 6px 6px 0}
+.issue-card.high{border-left-color:#e74c3c}
+.issue-card.medium{border-left-color:#f0ad4e}
+.issue-card.low{border-left-color:#3498db}
+.issue-category{font-weight:600;font-size:0.82rem}
+.issue-severity{font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:4px;margin-left:0.4rem}
+.issue-severity.high{background:rgba(231,76,60,0.15);color:#e74c3c}
+.issue-severity.medium{background:rgba(243,156,18,0.15);color:#f39c12}
+.issue-severity.low{background:rgba(52,152,219,0.15);color:#3498db}
+.issue-desc{font-size:0.8rem;color:var(--color-text-muted);margin-top:0.25rem}
+.issue-evidence{font-size:0.75rem;color:var(--color-text-muted);font-style:italic;margin-top:0.15rem}
+.issue-suggestion{font-size:0.78rem;color:var(--color-primary);margin-top:0.2rem}
+
+.strength-item{padding:0.3rem 0;font-size:0.82rem}
+.strength-item::before{content:'✅ '}
+
+.risk-item{padding:0.3rem 0;font-size:0.82rem;color:#e67e22}
+.risk-item::before{content:'⚠️ '}
+
+.suggestion-item{background:var(--color-bg);padding:0.6rem 0.8rem;margin-bottom:0.4rem;border-radius:6px;font-size:0.82rem}
+.suggestion-priority{display:inline-block;font-size:0.65rem;padding:0.1rem 0.4rem;border-radius:4px;font-weight:600;margin-right:0.4rem}
+.suggestion-priority.high{background:rgba(231,76,60,0.15);color:#e74c3c}
+.suggestion-priority.medium{background:rgba(243,156,18,0.15);color:#f39c12}
+.suggestion-priority.low{background:rgba(52,152,219,0.15);color:#3498db}
+
+.next-step-box{background:rgba(108,99,255,0.06);border:1px solid rgba(108,99,255,0.2);border-radius:8px;padding:0.8rem 1rem;font-size:0.85rem;color:var(--color-primary);margin-top:0.5rem}
+
+.raw-collapse{max-height:0;overflow:hidden;transition:max-height 0.3s}
+.raw-collapse.open{max-height:600px;overflow-y:auto}
+.raw-toggle{cursor:pointer;font-size:0.78rem;color:var(--color-primary);user-select:none}
+.raw-content{background:var(--color-bg);border:1px solid var(--color-border);border-radius:6px;padding:0.75rem;font-size:0.75rem;font-family:monospace;white-space:pre-wrap;max-height:400px;overflow-y:auto}
+
+.alert-error{background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:#c0392b}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app-main-inner" style="max-width:1100px">
+
+    {% if action_error %}
+    <div class="alert-error">{{ action_error }}</div>
+    {% endif %}
+
+    {% if parse_warning %}
+    <div class="alert-error">{{ parse_warning }}</div>
+    {% endif %}
+
+    <!-- Header -->
+    <div class="detail-header">
+        <div class="detail-title-area">
+            <h1 style="margin:0 0 0.5rem 0;font-size:1.25rem">
+                {{ parsed.title or report.title or '正文质量检查报告' }}
+            </h1>
+            <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+                <span class="status-badge {{ report.status }}">{{ {'candidate':'候选','current':'当前参考','discarded':'已废弃'}.get(report.status, report.status) }}</span>
+                {% if report.is_current %}<span style="color:var(--color-accent);font-weight:600;font-size:0.8rem">★ 当前参考报告</span>{% endif %}
+                <span style="font-size:0.78rem;color:var(--color-text-muted)">
+                    · 第{{ report.volume_index }}卷 · 第{{ report.chapter_index }}章
+                    · {{ report.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    {% if report.confirmed_at %} · 确认于 {{ report.confirmed_at.strftime('%m-%d %H:%M') }}{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div style="text-align:center;min-width:100px">
+            <div class="score-big {% if report.overall_score >= 80 %}score-high{% elif report.overall_score >= 60 %}score-mid{% else %}score-low{% endif %}">
+                {{ report.overall_score or parsed.overall_score or '—' }}
+            </div>
+            <div class="score-label">综合评分</div>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    {% if parsed.summary %}
+    <div class="section-card">
+        <div class="section-title">📝 整体评价</div>
+        <div style="font-size:0.85rem;color:var(--color-text-muted);line-height:1.6">{{ parsed.summary }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Scores -->
+    {% if parsed.scores and parsed.scores|length > 0 %}
+    <div class="section-card">
+        <div class="section-title">📊 各维度评分</div>
+        <div class="score-grid">
+            {% set score_labels = {
+                'outline_alignment': '章节匹配度',
+                'world_consistency': '世界一致性',
+                'character_consistency': '人物一致性',
+                'plot_coherence': '剧情连贯性',
+                'pacing': '节奏控制',
+                'prose': '文风一致性',
+                'ending_hook': '章末钩子'
+            } %}
+            {% for key, label in score_labels.items() %}
+            {% if parsed.scores.get(key) is not none %}
+            <div class="score-item">
+                <div class="score-item-value {% if parsed.scores[key] >= 80 %}score-high{% elif parsed.scores[key] >= 60 %}score-mid{% else %}score-low{% endif %}">
+                    {{ parsed.scores[key] }}
+                </div>
+                <div class="score-bar">
+                    <div class="score-bar-fill {% if parsed.scores[key] >= 80 %}score-high{% elif parsed.scores[key] >= 60 %}score-mid{% else %}score-low{% endif %}"
+                         style="width:{{ parsed.scores[key] }}%"></div>
+                </div>
+                <div class="score-item-label">{{ label }}</div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Strengths -->
+    {% if parsed.strengths and parsed.strengths|length > 0 %}
+    <div class="section-card">
+        <div class="section-title">✅ 优点</div>
+        {% for s in parsed.strengths %}
+        <div class="strength-item">{{ s }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Issues -->
+    {% if parsed.issues and parsed.issues|length > 0 %}
+    <div class="section-card">
+        <div class="section-title">⚠️ 发现的问题</div>
+        {% for issue in parsed.issues %}
+        <div class="issue-card {{ issue.severity or 'medium' }}">
+            <div class="issue-category">
+                {{ issue.category or '未分类' }}
+                <span class="issue-severity {{ issue.severity or 'medium' }}">{{ {'high':'高','medium':'中','low':'低'}.get(issue.severity, issue.severity) }}</span>
+            </div>
+            {% if issue.description %}
+            <div class="issue-desc">{{ issue.description }}</div>
+            {% endif %}
+            {% if issue.evidence %}
+            <div class="issue-evidence">📌 {{ issue.evidence }}</div>
+            {% endif %}
+            {% if issue.suggestion %}
+            <div class="issue-suggestion">💡 {{ issue.suggestion }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Revision Suggestions -->
+    {% if parsed.revision_suggestions and parsed.revision_suggestions|length > 0 %}
+    <div class="section-card">
+        <div class="section-title">💡 修改建议</div>
+        {% for sug in parsed.revision_suggestions %}
+        <div class="suggestion-item">
+            <span class="suggestion-priority {{ sug.priority or 'medium' }}">{{ {'high':'高优先','medium':'中优先','low':'低优先'}.get(sug.priority, sug.priority) }}</span>
+            {% if sug.target %}<strong>{{ sug.target }}</strong>：{% endif %}
+            {{ sug.suggestion }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Risk Flags -->
+    {% if parsed.risk_flags and parsed.risk_flags|length > 0 %}
+    <div class="section-card">
+        <div class="section-title">🚩 风险提示</div>
+        {% for flag in parsed.risk_flags %}
+        <div class="risk-item">{{ flag }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Next Step -->
+    {% if parsed.next_step %}
+    <div class="next-step-box">
+        <strong>📌 下一步建议：</strong>{{ parsed.next_step }}
+    </div>
+    {% endif %}
+
+    <!-- Draft reference -->
+    {% if report.draft %}
+    <div class="section-card" style="margin-top:1rem">
+        <div class="section-title">📄 关联草稿</div>
+        <div style="font-size:0.85rem">
+            <a href="/worlds/{{ world.id }}/novel/drafts/{{ report.draft.id }}">
+                {{ report.draft.title or report.draft.chapter_title or '(无标题)' }}
+            </a>
+            · 第{{ report.draft.volume_index }}卷 · 第{{ report.draft.chapter_index }}章
+            · {{ report.draft.word_count }} 字
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Prompt (collapsible) -->
+    {% if report.prompt %}
+    <div class="section-card">
+        <span class="raw-toggle" onclick="var el=this.nextElementSibling;el.classList.toggle('open');this.textContent=el.classList.contains('open')?'📋 Prompt ▲':'📋 Prompt ▼'">
+            📋 Prompt ▼
+        </span>
+        <div class="raw-collapse">
+            <div class="raw-content">{{ report.prompt }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Raw text (collapsible) -->
+    {% if report.raw_text and report.raw_text != report.result_json %}
+    <div class="section-card">
+        <span class="raw-toggle" onclick="var el=this.nextElementSibling;el.classList.toggle('open');this.textContent=el.classList.contains('open')?'📄 原始返回 ▲':'📄 原始返回 ▼'">
+            📄 原始返回 ▼
+        </span>
+        <div class="raw-collapse">
+            <div class="raw-content">{{ report.raw_text }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--color-border)">
+        {% if report.status != 'discarded' and not report.is_current %}
+        <form method="post" action="/worlds/{{ world.id }}/novel/quality-reports/{{ report.id }}/set-current" style="display:inline">
+            <button type="submit" class="btn-primary">⭐ 标记为当前参考报告</button>
+        </form>
+        {% endif %}
+
+        {% if report.status != 'discarded' %}
+        <form method="post" action="/worlds/{{ world.id }}/novel/quality-reports/{{ report.id }}/discard" style="display:inline"
+              onsubmit="return confirm('确定要废弃此检查报告吗？废弃后不可恢复。')">
+            <button type="submit" class="btn-outline" style="color:#e74c3c;border-color:#e74c3c">🗑️ 废弃报告</button>
+        </form>
+        {% endif %}
+
+        {% if report.draft_id %}
+        <a href="/worlds/{{ world.id }}/novel/drafts/{{ report.draft_id }}" class="btn-outline">返回草稿</a>
+        {% endif %}
+        <a href="/worlds/{{ world.id }}/novel/quality-reports" class="btn-outline">报告列表</a>
+    </div>
+
+</div>
+{% endblock %}

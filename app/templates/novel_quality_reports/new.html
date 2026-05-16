@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}生成质量检查报告 — AI World Engine{% endblock %}
+{% block page_title %}生成正文质量检查报告{% endblock %}
+
+{% block head_extra %}
+<style>
+.form-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.form-label{display:block;font-weight:600;font-size:0.85rem;color:var(--color-text);margin-bottom:0.35rem}
+.form-hint{font-size:0.75rem;color:var(--color-text-muted);margin-top:0.2rem}
+.form-input,.form-textarea{width:100%;padding:0.55rem 0.7rem;border:1px solid var(--color-border);border-radius:6px;font-size:0.85rem;background:var(--color-bg);color:var(--color-text)}
+.form-textarea{min-height:100px;resize:vertical}
+.field-error{color:#e74c3c;font-size:0.78rem;margin-top:0.2rem}
+.alert-info{background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.25);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.8rem;font-size:0.82rem;color:var(--color-text-muted)}
+.alert-warning{background:rgba(243,156,18,0.1);border:1px solid rgba(243,156,18,0.25);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.8rem;font-size:0.82rem;color:#e67e22}
+.alert-danger{background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:#c0392b}
+.draft-preview{background:var(--color-bg);border:1px solid var(--color-border);border-radius:6px;padding:0.75rem;max-height:200px;overflow-y:auto;font-size:0.8rem;color:var(--color-text-muted);white-space:pre-wrap;margin-top:0.5rem}
+.check-focus-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.4rem;margin-top:0.3rem}
+.focus-chip{display:flex;align-items:center;gap:0.3rem;padding:0.3rem 0.6rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:6px;font-size:0.78rem;cursor:pointer;user-select:none}
+.focus-chip:hover{background:var(--color-surface-hover)}
+.focus-chip input[type="checkbox"]{margin:0}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard" style="max-width:1000px">
+    <h1>🔍 生成正文质量检查报告</h1>
+
+    <div class="form-card">
+        <div style="margin-bottom:0.8rem">
+            <span style="color:var(--color-text-muted)">正文草稿：</span>
+            <strong>{{ draft.title or draft.chapter_title or '(无标题)' }}</strong>
+            · 第{{ draft.volume_index }}卷 · 第{{ draft.chapter_index }}章
+            · {{ draft.word_count }} 字
+            · 状态：{{ {'candidate':'候选','accepted':'采用稿','discarded':'已废弃'}.get(draft.status, draft.status) }}
+        </div>
+
+        {% if draft.content %}
+        <div class="form-label">正文预览</div>
+        <div class="draft-preview">{{ draft.content[:500] }}{% if draft.content|length > 500 %}...{% endif %}</div>
+        {% endif %}
+    </div>
+
+    {% if draft_empty %}
+    <div class="alert-danger">
+        ⚠️ 当前正文草稿内容为空，无法生成质量检查报告。请先编辑草稿并填写正文内容。
+    </div>
+    <div style="display:flex;gap:0.5rem">
+        <a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/edit" class="btn-primary">编辑草稿</a>
+        <a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}" class="btn-outline">返回草稿</a>
+    </div>
+    {% else %}
+    {% if missing_chapter_outline %}
+    <div class="alert-info">
+        ℹ️ 当前草稿缺少来源章节方案，章节匹配度检查可能不完整。
+    </div>
+    {% endif %}
+    {% if missing_style %}
+    <div class="alert-info">
+        ℹ️ 未关联写作风格方案，将按通用网文质量标准检查。
+    </div>
+    {% endif %}
+    {% if missing_context_package %}
+    <div class="alert-info">
+        ℹ️ 未关联创作上下文包，世界一致性检查可能不完整。
+    </div>
+    {% endif %}
+
+    {% if errors and errors.submit %}
+    <div class="alert-danger">{{ errors.submit }}</div>
+    {% endif %}
+
+    <form method="post" action="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/quality-reports">
+        <div class="form-card">
+            <div class="form-label">检查重点（可多选）</div>
+            <div class="check-focus-grid">
+                {% set focus_options = [
+                    ('章节目标', '章节目标匹配'),
+                    ('世界一致性', '世界设定一致性'),
+                    ('人物行为', '人物行为合理性'),
+                    ('剧情连贯', '剧情连贯性'),
+                    ('节奏', '节奏控制'),
+                    ('信息释放', '信息释放清晰度'),
+                    ('章末钩子', '章末钩子有效性'),
+                    ('文风', '文风一致性'),
+                    ('对话描写', '对话与描写比例'),
+                ] %}
+                {% for val, label in focus_options %}
+                <label class="focus-chip">
+                    <input type="checkbox" name="check_focus" value="{{ val }}"
+                           {% if val in (form_data.get('check_focus', '')) %}checked{% endif %}>
+                    {{ label }}
+                </label>
+                {% endfor %}
+            </div>
+            <div class="form-hint">勾选需要重点检查的维度，不勾选则全面检查。</div>
+        </div>
+
+        <div class="form-card">
+            <label class="form-label" for="extra_requirements">补充检查要求</label>
+            <textarea id="extra_requirements" name="extra_requirements" class="form-textarea"
+                      placeholder="例如：重点检查主角在第5章的行为是否与之前设定的能力等级一致...">{{ form_data.get('extra_requirements', '') }}</textarea>
+            <div class="form-hint">可选，最多 2000 字</div>
+            {% if errors.extra_requirements %}<div class="field-error">{{ errors.extra_requirements }}</div>{% endif %}
+        </div>
+
+        <div class="alert-info">
+            📋 <strong>检查维度说明：</strong>系统将基于正文草稿、章节大纲、世界设定、角色设定、风格方案等资产，生成包含综合评分、各维度评分、优点、问题列表、修改建议和风险提示的结构化质量检查报告。AI 只生成检查报告，不会自动修改正文。
+        </div>
+
+        <div style="display:flex;gap:0.5rem;margin-top:1rem">
+            <button type="submit" class="btn-primary">🤖 生成质量检查报告</button>
+            <a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}" class="btn-outline">取消</a>
+        </div>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
