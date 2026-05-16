@@ -83,7 +83,7 @@ Copy-Item ".env.example" "dist/AIWorldEngine/.env.example" -Force
 Copy-Item "packaging/README-Desktop.txt" "dist/AIWorldEngine/README-Desktop.txt" -Force
 Write-Host "[6/7] Build summary..." -ForegroundColor Yellow
 $exeSize = (Get-Item "dist/AIWorldEngine/AIWorldEngine.exe").Length / 1MB
-Write-Host "  EXE: dist/AIWorldEngine/AIWorldEngine.exe ({0:N1} MB)" -f $exeSize
+Write-Host ("  EXE: dist/AIWorldEngine/AIWorldEngine.exe ({0:N1} MB)" -f $exeSize)
 Write-Host "[7/7] Build complete!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Run: .\dist\AIWorldEngine\AIWorldEngine.exe" -ForegroundColor Cyan

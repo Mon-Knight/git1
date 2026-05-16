@@ -1,5 +1,21 @@
 # Changelog
 
+## [v2.0.1.2] — 2026-05-16
+
+### Fixed
+- 左侧导航主链接与折叠按钮分离，分组主文字可点击进入默认入口
+- 高亮项保持可点击，active 不再被视为 disabled
+- 无 current_world 时不生成 /worlds/None 或 /worlds//
+- 禁用/后续开放项保持不可点击且带后续开放提示
+- 打包校验：首页模板包含 /settings/ai 标记，确保 build_exe 校验通过
+- build_exe.ps1：修复 Write-Host 格式化输出导致脚本退出的问题
+
+### Added
+- 新增侧边栏可点击状态测试（test_v201_sidebar_clickable_states.py）
+
+### Notes
+- 本版本不开发 v2.1.0 正文质量检查与润色功能
+
 ## [v2.0.1] — 2026-05-16
 
 ### Added

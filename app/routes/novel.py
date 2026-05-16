@@ -114,7 +114,7 @@ async def novel_overview_page(
         "summary": summary,
         "recommendations": recommendations,
         "active_nav": "novel",
-        "app_version": "2.0.1",
+        "app_version": settings.VERSION,
     })
 
 

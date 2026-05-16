@@ -121,8 +121,8 @@ class TestV201NavigationStructure:
         )
 
     def test_app_version_in_html(self, client):
-        """HTML 中应显示 2.0.1 版本号。"""
+        """HTML 中应显示 2.0.1.2 版本号。"""
         resp = client.get("/")
         assert resp.status_code == 200
         html = resp.text
-        assert "2.0.1" in html, "页面应包含版本号 2.0.1"
+        assert "2.0.1.2" in html, "页面应包含版本号 2.0.1.2"

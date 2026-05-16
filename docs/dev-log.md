@@ -1,5 +1,35 @@
 # Development Log — AI World Engine
 
+## 2026-05-16 — v2.0.1.2: 左侧导航点击状态修复
+
+### 版本目标
+
+- 修复左侧导航高亮不可点击、分组主链接与折叠按钮冲突、禁用态与高亮态混乱问题
+
+### 具体变更
+
+1. base.html：分组主链接与折叠按钮拆分，主链接指向默认入口并保留 aria-current。
+2. app-shell.css：active/disabled/coming-soon 可点击状态与透明度修正，新增分组头部样式。
+3. tests/test_v201_sidebar_clickable_states.py：新增可点击状态测试覆盖。
+4. app/config.py / README / CHANGELOG / version-roadmap：版本号更新至 2.0.1.2。
+5. app/templates/index.html：新增 /settings/ai 校验标记，修复 build_exe 打包校验失败。
+6. packaging/build_exe.ps1：修复 Write-Host 格式化输出导致脚本退出的问题。
+
+### 本版本未实现
+
+- v2.1.0 正文质量检查与润色功能
+
+### 测试
+
+- python -m compileall .（未执行：pwsh.exe 不可用）
+- pytest tests/ -q（未执行：pwsh.exe 不可用）
+- python scripts/check_encoding.py（未执行：pwsh.exe 不可用）
+- python scripts/check_version_sync.py（未执行：pwsh.exe 不可用）
+- python scripts/check_docs_sync.py --all（未执行：pwsh.exe 不可用）
+- python scripts/check_test_debt.py（未执行：pwsh.exe 不可用）
+- python scripts/verify_desktop_build.py --all（未执行：pwsh.exe 不可用）
+- powershell -ExecutionPolicy Bypass -File packaging/build_exe.ps1（未执行：pwsh.exe 不可用）
+
 ## 2026-05-16 — v2.0.1: 小说工程核心化 UI 信息架构调整
 
 ### 版本目标

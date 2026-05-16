@@ -13,7 +13,7 @@
     <header class="topbar">
         <div class="topbar-left">
             <span class="topbar-logo">📖 AI World Engine</span>
-            <span class="topbar-version">v{{ app_version or '2.0.1' }}</span>
+            <span class="topbar-version">v{{ app_version or '2.0.1.2' }}</span>
         </div>
         <div class="topbar-center">
             {% if current_world %}
@@ -53,15 +53,22 @@
 
             <!-- 2. 小说工程（核心入口） -->
             <li class="sidebar-group">
-                <button type="button"
-                   class="sidebar-link sidebar-group-toggle {% if is_novel_page %}active{% endif %}"
-                   data-nav="novel"
-                   onclick="toggleSidebarGroup(event)"
-                   aria-expanded="{{ 'true' if is_novel_page else 'false' }}"
-                   aria-controls="subnav-novel">
-                    <span class="sidebar-icon">📖</span> 小说工程
-                    <span class="sidebar-arrow {% if is_novel_page %}open{% endif %}" aria-hidden="true">▾</span>
-                </button>
+                <div class="sidebar-group-header">
+                    <a href="{{ '/worlds/' ~ nav_world_id ~ '/novel' if nav_world_id else '/worlds' }}"
+                       class="sidebar-link sidebar-group-main-link {% if is_novel_page %}active{% endif %}"
+                       data-nav="novel" {% if is_novel_page %}aria-current="page"{% endif %}>
+                        <span class="sidebar-icon">📖</span> 小说工程
+                    </a>
+                    <button type="button"
+                       class="sidebar-group-toggle"
+                       data-nav="novel"
+                       onclick="toggleSidebarGroup(event)"
+                       aria-expanded="{{ 'true' if is_novel_page else 'false' }}"
+                       aria-controls="subnav-novel"
+                       aria-label="展开小说工程">
+                        <span class="sidebar-arrow {% if is_novel_page %}open{% endif %}" aria-hidden="true">▾</span>
+                    </button>
+                </div>
                 <ul id="subnav-novel" class="sidebar-subnav {% if not is_novel_page %}collapsed{% endif %}" role="group">
                     {% if nav_world_id %}
                     <li>
@@ -87,15 +94,22 @@
 
             <!-- 3. 世界设定 -->
             <li class="sidebar-group">
-                <button type="button"
-                   class="sidebar-link sidebar-group-toggle {% if is_world_page %}active{% endif %}"
-                   data-nav="worlds"
-                   onclick="toggleSidebarGroup(event)"
-                   aria-expanded="{{ 'true' if is_world_page else 'false' }}"
-                   aria-controls="subnav-worlds">
-                    <span class="sidebar-icon">🌍</span> 世界设定
-                    <span class="sidebar-arrow {% if is_world_page %}open{% endif %}" aria-hidden="true">▾</span>
-                </button>
+                <div class="sidebar-group-header">
+                    <a href="{{ '/worlds/' ~ nav_world_id if nav_world_id else '/worlds' }}"
+                       class="sidebar-link sidebar-group-main-link {% if is_world_page %}active{% endif %}"
+                       data-nav="worlds" {% if is_world_page %}aria-current="page"{% endif %}>
+                        <span class="sidebar-icon">🌍</span> 世界设定
+                    </a>
+                    <button type="button"
+                       class="sidebar-group-toggle"
+                       data-nav="worlds"
+                       onclick="toggleSidebarGroup(event)"
+                       aria-expanded="{{ 'true' if is_world_page else 'false' }}"
+                       aria-controls="subnav-worlds"
+                       aria-label="展开世界设定">
+                        <span class="sidebar-arrow {% if is_world_page %}open{% endif %}" aria-hidden="true">▾</span>
+                    </button>
+                </div>
                 <ul id="subnav-worlds" class="sidebar-subnav {% if not is_world_page %}collapsed{% endif %}" role="group">
                     <li><a href="/worlds" class="sidebar-sublink" data-nav="worlds">📋 世界列表</a></li>
                     <li><a href="/worlds/new" class="sidebar-sublink">➕ 新建世界</a></li>
@@ -126,15 +140,22 @@
 
             <!-- 4. 创作资产 -->
             <li class="sidebar-group">
-                <button type="button"
-                   class="sidebar-link sidebar-group-toggle {% if is_assets_page %}active{% endif %}"
-                   data-nav="assets"
-                   onclick="toggleSidebarGroup(event)"
-                   aria-expanded="{{ 'true' if is_assets_page else 'false' }}"
-                   aria-controls="subnav-assets">
-                    <span class="sidebar-icon">📦</span> 创作资产
-                    <span class="sidebar-arrow {% if is_assets_page %}open{% endif %}" aria-hidden="true">▾</span>
-                </button>
+                <div class="sidebar-group-header">
+                    <a href="{{ '/worlds/' ~ nav_world_id ~ '/context' if nav_world_id else '/worlds' }}"
+                       class="sidebar-link sidebar-group-main-link {% if is_assets_page %}active{% endif %}"
+                       data-nav="assets" {% if is_assets_page %}aria-current="page"{% endif %}>
+                        <span class="sidebar-icon">📦</span> 创作资产
+                    </a>
+                    <button type="button"
+                       class="sidebar-group-toggle"
+                       data-nav="assets"
+                       onclick="toggleSidebarGroup(event)"
+                       aria-expanded="{{ 'true' if is_assets_page else 'false' }}"
+                       aria-controls="subnav-assets"
+                       aria-label="展开创作资产">
+                        <span class="sidebar-arrow {% if is_assets_page %}open{% endif %}" aria-hidden="true">▾</span>
+                    </button>
+                </div>
                 <ul id="subnav-assets" class="sidebar-subnav {% if not is_assets_page %}collapsed{% endif %}" role="group">
                     {% if nav_world_id %}
                     <li><a href="/worlds/{{ nav_world_id }}/context" class="sidebar-sublink" data-nav="assets">📦 创作上下文包</a></li>
@@ -155,15 +176,22 @@
 
             <!-- 5. AI 推演 -->
             <li class="sidebar-group">
-                <button type="button"
-                   class="sidebar-link sidebar-group-toggle {% if is_simulation_page %}active{% endif %}"
-                   data-nav="simulation"
-                   onclick="toggleSidebarGroup(event)"
-                   aria-expanded="{{ 'true' if is_simulation_page else 'false' }}"
-                   aria-controls="subnav-simulation">
-                    <span class="sidebar-icon">🤖</span> AI 推演
-                    <span class="sidebar-arrow {% if is_simulation_page %}open{% endif %}" aria-hidden="true">▾</span>
-                </button>
+                <div class="sidebar-group-header">
+                    <a href="{{ '/worlds/' ~ nav_world_id ~ '/simulation' if nav_world_id else '/worlds' }}"
+                       class="sidebar-link sidebar-group-main-link {% if is_simulation_page %}active{% endif %}"
+                       data-nav="simulation" {% if is_simulation_page %}aria-current="page"{% endif %}>
+                        <span class="sidebar-icon">🤖</span> AI 推演
+                    </a>
+                    <button type="button"
+                       class="sidebar-group-toggle"
+                       data-nav="simulation"
+                       onclick="toggleSidebarGroup(event)"
+                       aria-expanded="{{ 'true' if is_simulation_page else 'false' }}"
+                       aria-controls="subnav-simulation"
+                       aria-label="展开 AI 推演">
+                        <span class="sidebar-arrow {% if is_simulation_page %}open{% endif %}" aria-hidden="true">▾</span>
+                    </button>
+                </div>
                 <ul id="subnav-simulation" class="sidebar-subnav {% if not is_simulation_page %}collapsed{% endif %}" role="group">
                     {% if nav_world_id %}
                     <li><a href="/worlds/{{ nav_world_id }}/simulation" class="sidebar-sublink" data-nav="simulation">🌍 世界推演</a></li>
@@ -178,15 +206,22 @@
 
             <!-- 6. 质量检查 -->
             <li class="sidebar-group">
-                <button type="button"
-                   class="sidebar-link sidebar-group-toggle {% if is_checks_page %}active{% endif %}"
-                   data-nav="checks"
-                   onclick="toggleSidebarGroup(event)"
-                   aria-expanded="{{ 'true' if is_checks_page else 'false' }}"
-                   aria-controls="subnav-checks">
-                    <span class="sidebar-icon">🔍</span> 质量检查
-                    <span class="sidebar-arrow {% if is_checks_page %}open{% endif %}" aria-hidden="true">▾</span>
-                </button>
+                <div class="sidebar-group-header">
+                    <a href="{{ '/worlds/' ~ nav_world_id ~ '/checks' if nav_world_id else '/worlds' }}"
+                       class="sidebar-link sidebar-group-main-link {% if is_checks_page %}active{% endif %}"
+                       data-nav="checks" {% if is_checks_page %}aria-current="page"{% endif %}>
+                        <span class="sidebar-icon">🔍</span> 质量检查
+                    </a>
+                    <button type="button"
+                       class="sidebar-group-toggle"
+                       data-nav="checks"
+                       onclick="toggleSidebarGroup(event)"
+                       aria-expanded="{{ 'true' if is_checks_page else 'false' }}"
+                       aria-controls="subnav-checks"
+                       aria-label="展开质量检查">
+                        <span class="sidebar-arrow {% if is_checks_page %}open{% endif %}" aria-hidden="true">▾</span>
+                    </button>
+                </div>
                 <ul id="subnav-checks" class="sidebar-subnav {% if not is_checks_page %}collapsed{% endif %}" role="group">
                     {% if nav_world_id %}
                     <li><a href="/worlds/{{ nav_world_id }}/checks" class="sidebar-sublink" data-nav="checks">⚠️ 设定矛盾检查</a></li>
@@ -213,15 +248,22 @@
 
             <!-- 8. 设置 -->
             <li class="sidebar-group">
-                <button type="button"
-                   class="sidebar-link sidebar-group-toggle {% if is_settings_page %}active{% endif %}"
-                   data-nav="settings"
-                   onclick="toggleSidebarGroup(event)"
-                   aria-expanded="{{ 'true' if is_settings_page else 'false' }}"
-                   aria-controls="subnav-settings">
-                    <span class="sidebar-icon">⚙️</span> 设置
-                    <span class="sidebar-arrow {% if is_settings_page %}open{% endif %}" aria-hidden="true">▾</span>
-                </button>
+                <div class="sidebar-group-header">
+                    <a href="/settings/ai"
+                       class="sidebar-link sidebar-group-main-link {% if is_settings_page %}active{% endif %}"
+                       data-nav="settings" {% if is_settings_page %}aria-current="page"{% endif %}>
+                        <span class="sidebar-icon">⚙️</span> 设置
+                    </a>
+                    <button type="button"
+                       class="sidebar-group-toggle"
+                       data-nav="settings"
+                       onclick="toggleSidebarGroup(event)"
+                       aria-expanded="{{ 'true' if is_settings_page else 'false' }}"
+                       aria-controls="subnav-settings"
+                       aria-label="展开设置">
+                        <span class="sidebar-arrow {% if is_settings_page %}open{% endif %}" aria-hidden="true">▾</span>
+                    </button>
+                </div>
                 <ul id="subnav-settings" class="sidebar-subnav {% if not is_settings_page %}collapsed{% endif %}" role="group">
                     <li>
                         <a href="/settings/ai" class="sidebar-sublink" data-nav="settings"
@@ -268,7 +310,7 @@
     (function() {
         var path = window.location.pathname;
         var hash = window.location.hash;
-        var links = document.querySelectorAll('.sidebar-link, .sidebar-sublink');
+        var links = document.querySelectorAll('.sidebar-link, .sidebar-group-main-link, .sidebar-sublink');
 
         // Priority-based matching (most specific first)
         var patterns = [

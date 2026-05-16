@@ -121,12 +121,12 @@
     margin: 0;
 }
 
-.sidebar-link {
+.sidebar-link,
+.sidebar-group-main-link {
     display: flex;
     align-items: center;
     gap: 0.6rem;
     padding: 0.55rem 1rem;
-    margin: 0.1rem 0.5rem;
     border-radius: 8px;
     color: var(--color-text-muted);
     font-size: 0.88rem;
@@ -136,30 +136,50 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: pointer;
+    pointer-events: auto;
 }
 
-.sidebar-link:hover {
+.sidebar-link {
+    margin: 0.1rem 0.5rem;
+}
+
+.sidebar-group-main-link {
+    flex: 1;
+    margin: 0;
+    border-radius: 8px 0 0 8px;
+}
+
+.sidebar-link:hover,
+.sidebar-group-main-link:hover {
     background: var(--color-surface-hover);
     color: var(--color-text);
     border-left-color: var(--color-border);
 }
 
-.sidebar-link.active {
+.sidebar-link.active,
+.sidebar-group-main-link.active {
     background: rgba(108, 99, 255, 0.12);
     color: var(--color-primary);
     border-left-color: var(--color-primary);
     font-weight: 600;
+    cursor: pointer;
+    pointer-events: auto;
+    opacity: 1;
 }
 
-.sidebar-link.active:hover {
+.sidebar-link.active:hover,
+.sidebar-group-main-link.active:hover {
     background: rgba(108, 99, 255, 0.18);
 }
 
 /* Disabled sidebar link (no world selected, etc.) */
 .sidebar-link.disabled,
-.sidebar-link.disabled:hover {
-    opacity: 0.4;
-    cursor: default;
+.sidebar-link.disabled:hover,
+.sidebar-group-main-link.disabled,
+.sidebar-group-main-link.disabled:hover {
+    opacity: 0.5;
+    cursor: not-allowed;
     background: transparent;
     border-left-color: transparent;
     color: var(--color-text-muted);
@@ -178,9 +198,36 @@
     position: relative;
 }
 
+.sidebar-group-header {
+    display: flex;
+    align-items: center;
+    margin: 0.1rem 0.5rem;
+    border-radius: 8px;
+}
+
+.sidebar-group-header:hover {
+    background: var(--color-surface-hover);
+}
+
+.sidebar-group-main-link.active + .sidebar-group-toggle {
+    color: var(--color-primary);
+}
+
 .sidebar-group-toggle {
+    background: none;
+    border: none;
+    padding: 0.55rem 0.75rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    border-radius: 0 8px 8px 0;
     cursor: pointer;
     user-select: none;
+    pointer-events: auto;
+}
+
+.sidebar-group-toggle:hover {
+    background: var(--color-surface-hover);
 }
 
 .sidebar-arrow {
@@ -236,16 +283,6 @@
     font-weight: 600;
 }
 
-.sidebar-sublink.disabled,
-.sidebar-sublink.disabled:hover {
-    opacity: 0.4;
-    cursor: default;
-    background: transparent;
-    border-left-color: transparent;
-    color: var(--color-text-muted);
-    pointer-events: none;
-}
-
 /* Current world label in sidebar */
 .sidebar-world-current {
     pointer-events: none;
@@ -264,7 +301,7 @@
 /* ===== v2.0.1: Sidebar Future/Disabled Links ===== */
 .sidebar-sublink.coming-soon,
 .sidebar-sublink.future-link {
-    opacity: 0.48;
+    opacity: 0.5;
     cursor: default;
     user-select: none;
     pointer-events: none;
@@ -298,50 +335,13 @@ a.sidebar-nav-cta {
 }
 
 /* Disabled sidebar group toggle (DEPRECATED in v2.0.1 — no longer applied to group headers) */
-.sidebar-link.disabled,
-.sidebar-link.disabled:hover {
-    opacity: 0.5;
-    cursor: default;
-    color: var(--color-text-muted);
-    pointer-events: none;
-}
-
 /* Disabled sidebar sublink (only for truly unavailable items) */
 .sidebar-sublink.disabled {
-    opacity: 0.45;
-    cursor: default;
+    opacity: 0.5;
+    cursor: not-allowed;
     pointer-events: none;
     color: var(--color-text-muted);
     font-size: 0.78rem;
-}
-
-/* v2.0.1: Sidebar group toggle — always clickable, clear appearance */
-.sidebar-group-toggle {
-    opacity: 1 !important;
-    color: var(--color-text) !important;
-    cursor: pointer !important;
-    pointer-events: auto !important;
-}
-
-/* Reset button styles for sidebar group toggles */
-button.sidebar-group-toggle {
-    background: none;
-    border: none;
-    width: 100%;
-    text-align: left;
-    font-family: inherit;
-    font-size: inherit;
-    padding: 0.6rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    border-left: 3px solid transparent;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-
-button.sidebar-group-toggle:hover {
-    background: var(--color-surface-hover);
-    color: var(--color-text);
 }
 
 /* ===== Sidebar Subnav Divider ===== */
