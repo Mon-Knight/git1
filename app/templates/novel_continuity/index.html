@@ -1,0 +1,37 @@
+{% extends "base.html" %}{% set page_class = 'page-list' %}{% block title %}章节连续性检查 — {{ world.name }} — AI World Engine{% endblock %}{% block page_title %}章节连续性检查{% endblock %}
+{% block content %}
+<h1>🔗 章节连续性检查 — {{ world.name }}</h1>
+<p style="color:var(--color-text-muted);margin-bottom:1.5rem">基于已有章节大纲、最终采用稿（或正文草稿）和世界设定，生成章节连续性检查报告。报告只检查问题，不修改正文。</p>
+
+<div style="margin-bottom:1rem;display:flex;gap:0.5rem;flex-wrap:wrap">
+    <a href="/worlds/{{ world.id }}/novel/continuity/new" class="btn-primary">➕ 新建连续性检查</a>
+    <a href="/worlds/{{ world.id }}/novel/drafts" class="btn-sm">📝 正文草稿</a>
+    <a href="/worlds/{{ world.id }}/novel/final-drafts" class="btn-sm">📋 最终采用稿</a>
+</div>
+
+{% if reports %}
+<div class="item-list">
+{% for r in reports %}
+{% set sl = {'candidate':'候选','current':'当前参考','discarded':'已废弃'} %}
+{% set sc = {'candidate':'status-pending','current':'status-adopted','discarded':'status-discarded'} %}
+<div class="item-row" style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;padding:0.6rem 1rem;margin-bottom:0.4rem">
+    <div class="item-info" style="flex:1">
+        <div class="item-title" style="font-weight:500">📊 {{ r.title or '连续性检查报告' }}
+            {% if r.overall_score is not none %}<span style="color:var(--color-accent);margin-left:0.5rem">{{ r.overall_score }}分</span>{% endif %}
+        </div>
+        <div class="item-meta" style="font-size:0.75rem;color:var(--color-text-muted)">
+            {{ r.range_type }} · <span class="item-status {{ sc.get(r.status,'') }}">{{ sl.get(r.status,r.status) }}</span> · {{ r.created_at.strftime('%m-%d %H:%M') }}
+        </div>
+    </div>
+    <a href="/worlds/{{ world.id }}/novel/continuity/{{ r.id }}" class="btn-sm">查看</a>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div style="text-align:center;padding:3rem;background:var(--color-surface);border:1px dashed var(--color-border);border-radius:var(--radius);color:var(--color-text-muted)">
+    <p style="font-size:1.5rem;margin-bottom:0.5rem">📊</p>
+    <p>暂无连续性检查报告。</p>
+    <p style="font-size:0.85rem">点击上方按钮开始首次连续性检查。</p>
+</div>
+{% endif %}
+{% endblock %}

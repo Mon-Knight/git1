@@ -581,3 +581,43 @@ class NovelFinalDraft(Base):
 
     def __repr__(self):
         return f"<NovelFinalDraft id={self.id} active={self.is_active}>"
+
+
+class NovelContinuityReport(Base):
+    """Chapter continuity and cross-chapter consistency check report. v2.5.0"""
+    __tablename__ = "novel_continuity_reports"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    world_id = Column(Integer, ForeignKey("worlds.id"), nullable=False)
+    volume_outline_id = Column(Integer, ForeignKey("novel_volume_outlines.id"), nullable=True)
+    chapter_outline_id = Column(Integer, ForeignKey("novel_chapter_outlines.id"), nullable=True)
+    volume_index = Column(Integer, nullable=True)
+    range_type = Column(String(30), default="chapter_range")  # adjacent / chapter_range / volume / recent
+    start_chapter_index = Column(Integer, nullable=True)
+    end_chapter_index = Column(Integer, nullable=True)
+    selected_chapter_indexes_json = Column(Text, default="[]")
+    used_final_draft_ids_json = Column(Text, default="[]")
+    used_draft_ids_json = Column(Text, default="[]")
+    used_revision_ids_json = Column(Text, default="[]")
+    style_profile_id = Column(Integer, ForeignKey("style_profiles.id"), nullable=True)
+    title = Column(String(300), default="")
+    prompt = Column(Text, default="")
+    result_json = Column(Text, default="")
+    raw_text = Column(Text, default="")
+    overall_score = Column(Integer, nullable=True)
+    timeline_score = Column(Integer, nullable=True)
+    character_state_score = Column(Integer, nullable=True)
+    plot_causality_score = Column(Integer, nullable=True)
+    setting_consistency_score = Column(Integer, nullable=True)
+    foreshadowing_score = Column(Integer, nullable=True)
+    style_consistency_score = Column(Integer, nullable=True)
+    status = Column(String(20), default="candidate")  # candidate / current / discarded
+    is_current = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+    confirmed_at = Column(DateTime, nullable=True)
+
+    world = relationship("World", foreign_keys=[world_id])
+
+    def __repr__(self):
+        return f"<NovelContinuityReport id={self.id} status='{self.status}'>"

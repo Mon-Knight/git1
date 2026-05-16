@@ -123,6 +123,7 @@ def init_db():
         NovelDraftQualityReport,
         NovelDraftRevision,
         NovelFinalDraft,
+        NovelContinuityReport,
     )
     Base.metadata.create_all(bind=engine)
     _migrate_schema()

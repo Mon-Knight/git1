@@ -1,6 +1,24 @@
 # Development Log — AI World Engine
 
-## 2026-05-16 — v2.4.4: 正文质量检查/TXT风格导入/废弃删除修复
+## 2026-05-16 — v2.5.0: 章节连续性与前后文一致性检查
+
+### 为什么做 v2.5.0
+单章创作闭环(v2.3.1)已稳定，但多章节长篇创作需检查前后一致性。
+本版本只生成报告，不自动修改任何内容。
+
+### 核心设计
+- **最终采用稿优先**: 检查时优先读取 NovelFinalDraft.content_snapshot
+- **Fallback 链**: 最终稿→润色稿→正文草稿→原始草稿
+- **9 大检查维度**: 时间线/人物状态/地点/剧情因果/伏笔/设定/动机/冲突/风格
+- **Mock 稳定**: 固定分数(82分) + 3 issues + 3 threads
+
+### 新增文件
+model / service / routes / 3 templates / 4 test files (41 tests)
+
+### 测试
+1805 passed, 15 xfailed
+
+--- 正文质量检查/TXT风格导入/废弃删除修复
 
 ### 问题定位
 1. 正文质量检查被锁定：world_dashboard_service 缺 quality-reports 链接

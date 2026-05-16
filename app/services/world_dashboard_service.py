@@ -353,6 +353,7 @@ class WorldDashboardService:
                     {"label": "🔍 正文质量检查", "url": f"/worlds/{world_id}/novel/quality-reports", "disabled": False},
                     {"label": "✨ 正文润色", "url": f"/worlds/{world_id}/novel/revisions", "disabled": False},
                     {"label": "📋 版本管理", "url": f"/worlds/{world_id}/novel/final-drafts", "disabled": False},
+                    {"label": "🔗 章节连续性检查", "url": f"/worlds/{world_id}/novel/continuity", "disabled": False},
                     {"label": "整卷生成", "url": "", "disabled": True, "hint": "后续版本开放"},
                     {"label": "整书导出", "url": "", "disabled": True, "hint": "后续版本开放"},
                 ],

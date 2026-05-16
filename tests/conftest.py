@@ -55,3 +55,14 @@ def client():
     """Create a test client."""
     with TestClient(app) as c:
         yield c
+
+
+@pytest.fixture
+def db():
+    """Create a database session for model/service tests."""
+    from app.database import SessionLocal
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()

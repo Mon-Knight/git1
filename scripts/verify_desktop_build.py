@@ -147,6 +147,12 @@ AI_MODULES = [
     # v2.3.0 Novel Versions
     "app/routes/novel_versions.py",
     "app/services/novel_version_service.py",
+    # v2.5.0 Novel Continuity
+    "app/services/novel_continuity_service.py",
+    "app/routes/novel_continuity.py",
+    "app/templates/novel_continuity/index.html",
+    "app/templates/novel_continuity/new.html",
+    "app/templates/novel_continuity/detail.html",
     # v2.4.0 Style Import
     "app/services/style_import_service.py",
     # v2.4.2 Model Formatters

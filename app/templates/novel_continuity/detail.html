@@ -1,0 +1,82 @@
+{% extends "base.html" %}{% set page_class = 'page-dashboard' %}{% block title %}{{ report.title or '连续性报告' }} — {{ world.name }} — AI World Engine{% endblock %}{% block page_title %}连续性报告详情{% endblock %}
+{% block content %}
+{% set sc = {'candidate':'status-pending','current':'status-adopted','discarded':'status-discarded'} %}
+<h1>📊 {{ result_data.title or report.title or '章节连续性检查报告' }}</h1>
+<div style="display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0;font-size:0.85rem;color:var(--color-text-muted)">
+    <span>状态：<span class="item-status {{ sc.get(report.status,'') }}" style="display:inline-block;padding:0.1rem 0.45rem;border-radius:10px;font-size:0.72rem;font-weight:600">{{ status_label }}</span></span>
+    <span>范围：{{ range_label }}</span>
+    {% if report.overall_score is not none %}<span>综合评分：<strong style="color:var(--color-accent)">{{ report.overall_score }}分</strong></span>{% endif %}
+    <span>创建：{{ report.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+</div>
+{% if error %}<div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem;border-radius:var(--radius);margin-bottom:1rem">❌ {{ error }}</div>{% endif %}
+
+{% if result_data.scores %}
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-bottom:1.5rem">
+    {% set dims = [('timeline','⏱️ 时间线'),('character_state','👤 人物状态'),('plot_causality','📖 剧情因果'),('setting_consistency','🌍 设定一致性'),('foreshadowing','🔮 伏笔回收'),('style_consistency','🎨 风格一致性')] %}
+    {% for key,label in dims %}{% if result_data.scores.get(key) is not none %}
+    <div style="text-align:center;padding:1rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius)">
+        <div style="font-size:1.5rem;font-weight:700;color:{% if result_data.scores[key] >= 80 %}var(--color-accent){% elif result_data.scores[key] >= 60 %}#f39c12{% else %}#e74c3c{% endif %}">{{ result_data.scores[key] }}</div>
+        <div style="font-size:0.78rem;color:var(--color-text-muted)">{{ label }}</div>
+    </div>{% endif %}{% endfor %}
+</div>
+{% endif %}
+
+{% if result_data.summary %}
+<div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem;margin-bottom:1rem">
+    <h3>📝 整体评价</h3><p>{{ result_data.summary }}</p>
+</div>
+{% endif %}
+
+{% if result_data.strengths %}
+<div style="margin-bottom:1rem"><h3>✅ 优点</h3><ul>{% for s in result_data.strengths %}<li>{{ s }}</li>{% endfor %}</ul></div>
+{% endif %}
+
+{% if result_data.issues %}
+<div style="margin-bottom:1rem"><h3>⚠️ 发现的问题</h3>
+{% for issue in result_data.issues %}
+<div style="margin:0.5rem 0;padding:0.75rem;background:var(--color-surface);border:1px solid var(--color-border);border-left:3px solid {% if issue.severity=='high' %}#e74c3c{% elif issue.severity=='medium' %}#f39c12{% else %}var(--color-border){% endif %};border-radius:4px">
+    <strong>[{{ issue.severity }}] {{ issue.category }}</strong>
+    {% if issue.chapters %}<span style="font-size:0.78rem;color:var(--color-text-muted)"> (章节 {{ issue.chapters|join(', ') }})</span>{% endif %}
+    <p style="margin:0.3rem 0;font-size:0.9rem">{{ issue.description }}</p>
+    {% if issue.suggestion %}<p style="font-size:0.85rem;color:var(--color-accent)">💡 {{ issue.suggestion }}</p>{% endif %}
+</div>{% endfor %}</div>
+{% endif %}
+
+{% if result_data.continuity_threads %}
+<div style="margin-bottom:1rem"><h3>🧵 连续性线索</h3>
+{% for t in result_data.continuity_threads %}
+<div style="margin:0.5rem 0;padding:0.5rem 0.75rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px;display:flex;justify-content:space-between">
+    <span>{{ t.name }}</span><span style="font-size:0.78rem;color:{% if t.status=='stable' %}var(--color-accent){% else %}#f39c12{% endif %}">{{ t.status }}</span>
+</div>{% endfor %}</div>
+{% endif %}
+
+{% if result_data.missing_context %}
+<div style="margin-bottom:1rem;padding:1rem;background:rgba(243,156,18,0.08);border:1px solid rgba(243,156,18,0.3);border-radius:var(--radius)">
+    <h3>⚠️ 缺失上下文</h3><ul>{% for m in result_data.missing_context %}<li>{{ m }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+{% if result_data.revision_suggestions %}
+<div style="margin-bottom:1rem"><h3>💡 修改建议</h3>
+{% for s in result_data.revision_suggestions %}
+<div style="margin:0.3rem 0;font-size:0.9rem">[{{ s.priority }}] 第{{ s.target_chapter }}章: {{ s.suggestion }}</div>
+{% endfor %}</div>
+{% endif %}
+
+{% if result_data.next_step %}
+<div style="margin-bottom:1rem;padding:1rem;background:rgba(0,212,170,0.08);border:1px solid rgba(0,212,170,0.3);border-radius:var(--radius)">
+    <strong>📌 下一步</strong><p style="margin-top:0.25rem">{{ result_data.next_step }}</p>
+</div>
+{% endif %}
+
+<details style="margin:1rem 0"><summary>📋 Prompt 摘要</summary><pre style="font-size:0.75rem;background:var(--color-bg);padding:0.75rem;border-radius:4px;max-height:200px;overflow:auto;white-space:pre-wrap">{{ report.prompt[:500] }}{% if report.prompt|length > 500 %}...{% endif %}</pre></details>
+
+<div style="margin-top:1.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
+    <a href="/worlds/{{ world.id }}/novel/continuity" class="btn-sm">← 返回列表</a>
+    <a href="/worlds/{{ world.id }}/novel/continuity/new" class="btn-primary">➕ 新建检查</a>
+    {% if report.status != 'discarded' %}
+    <form action="/worlds/{{ world.id }}/novel/continuity/{{ report.id }}/set-current" method="post" style="display:inline"><button type="submit" class="btn-sm" style="background:var(--color-accent);color:#000;border:none;cursor:pointer">⭐ 设为当前参考</button></form>
+    <form action="/worlds/{{ world.id }}/novel/continuity/{{ report.id }}/discard" method="post" onsubmit="return confirm('确定要废弃这份报告吗？')" style="display:inline"><button type="submit" class="btn-sm" style="background:var(--color-bg);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;cursor:pointer">🗑️ 废弃</button></form>
+    {% endif %}
+</div>
+{% endblock %}
