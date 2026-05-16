@@ -48,6 +48,10 @@ class SettingSuggestionService:
     ) -> str:
         """Build a prompt for AI setting suggestion generation with originality constraints."""
         from app.models import World, Character, Faction, Location, WorldRule
+        from app.services.model_formatters import (
+            format_character_summary, format_faction_summary,
+            format_location_summary, format_rule_summary,
+        )
 
         world = db.query(World).filter(World.id == world_id).first()
         world_name = world.name if world else "未知世界"
@@ -59,10 +63,10 @@ class SettingSuggestionService:
         locations = db.query(Location).filter(Location.world_id == world_id).limit(10).all()
         rules = db.query(WorldRule).filter(WorldRule.world_id == world_id).limit(10).all()
 
-        char_summary = "\n".join([f"- {c.name}（{c.identity or ''}，{c.personality or ''}）" for c in chars]) or "（暂无角色）"
-        faction_summary = "\n".join([f"- {f.name}（{f.faction_type or ''}，领袖：{f.leader or '无'}）" for f in factions]) or "（暂无势力）"
-        location_summary = "\n".join([f"- {l.name}（{l.location_type or ''}，{l.region or ''}）" for l in locations]) or "（暂无地点）"
-        rule_summary = "\n".join([f"- {r.name}（{r.rule_type or ''}）" for r in rules]) or "（暂无规则）"
+        char_summary = "\n".join([format_character_summary(c) for c in chars]) or "（暂无角色）"
+        faction_summary = "\n".join([format_faction_summary(f) for f in factions]) or "（暂无势力）"
+        location_summary = "\n".join([format_location_summary(l) for l in locations]) or "（暂无地点）"
+        rule_summary = "\n".join([format_rule_summary(r) for r in rules]) or "（暂无规则）"
 
         sug_type = request_data.get("suggestion_type", "character")
         sug_type_cn = {"character": "角色", "faction": "势力", "location": "地点", "rule": "规则"}.get(sug_type, "角色")

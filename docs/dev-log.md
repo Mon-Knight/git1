@@ -1,5 +1,31 @@
 # Development Log — AI World Engine
 
+## 2026-05-16 — v2.4.2: 修复创作资产与设定库字段兼容错误
+
+### 问题定位
+1. **设定库 AI 推演**: `Character` 无 `identity` 字段 → `'Character' object has no attribute 'identity'`
+2. **创作资产**: `style_profiles` 表缺 `source_type` 等6列 → 500
+3. **上下文包新建**: `simulation_records` 表缺 `simulation_type`/`updated_at` 等列 → 500
+4. **其他表**: `plot_anchors`、`context_packages` 等多表缺列
+
+### 修复
+- `app/services/model_formatters.py`: 新增安全格式化函数（`safe_get` + 8个格式化函数）
+- `app/services/setting_suggestion_service.py`: `c.identity` → `c.role`，统一使用 formatter
+- `app/database.py`: 重写 `_migrate_schema()` 为自动检测（比较 SQLAlchemy metadata 与实际 schema）
+- 迁移自动修复所有缺失列（不再手动枚举）
+
+### 为什么不用 identity 字段
+- Character 模型已有 `role` 字段表示角色身份
+- 新增 `identity` 会破坏数据模型一致性
+- `safe_get(character, "role", "identity")` 优先取 role 兜底 identity
+
+### 测试
+- 新增 `test_v242_model_field_compatibility.py` (15 tests)
+- 新增 `test_v242_global_route_health.py` (18 tests)
+- 全量: 1713 passed, 15 xfailed
+
+---
+
 ## 2026-05-16 — v2.4.1: 修复设定库 AI 推演 500 错误
 
 ### 问题定位

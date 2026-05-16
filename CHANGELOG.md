@@ -1,5 +1,16 @@
 # Changelog
 
+## [v2.4.2] — 2026-05-16
+
+### Fixed
+- 修复设定库 AI 推演读取 `Character.identity` 导致的 `'Character' object has no attribute 'identity'` 错误
+- 新增 `_safe_char_summary()` 安全格式化函数，所有模型字段访问使用 `getattr` 兜底
+- Faction/Location/WorldRule 字段访问同步加固为 `getattr` 模式
+
+### Notes
+- 本版本不新增业务功能，不修改正式角色模型结构
+- 只修复设定库 AI 推演字段兼容问题
+
 ## [v2.4.1] — 2026-05-16
 
 ### Fixed

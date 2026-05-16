@@ -149,6 +149,8 @@ AI_MODULES = [
     "app/services/novel_version_service.py",
     # v2.4.0 Style Import
     "app/services/style_import_service.py",
+    # v2.4.2 Model Formatters
+    "app/services/model_formatters.py",
 ]
 
 
