@@ -279,6 +279,10 @@ async def novel_drafts_detail(request: Request, world_id: int, draft_id: int, db
     accepted_revision = next((r for r in revisions if r.is_accepted), None)
     latest_revision = revisions[0] if revisions else None
 
+    # v2.3.0: Final version
+    from app.services.novel_version_service import NovelVersionService
+    current_final = NovelVersionService.get_current_final_version(db, world_id, draft_id)
+
     return templates.TemplateResponse(request, "novel_drafts/detail.html", {
         "world": world,
         "draft": draft,
@@ -294,6 +298,7 @@ async def novel_drafts_detail(request: Request, world_id: int, draft_id: int, db
         "revisions_count": revisions_count,
         "accepted_revision": accepted_revision,
         "latest_revision": latest_revision,
+        "current_final": current_final,
     })
 
 

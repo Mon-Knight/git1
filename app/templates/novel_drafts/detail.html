@@ -150,6 +150,25 @@
         </div>
     </div>
 
+    <!-- v2.3.0: Version Management Section -->
+    <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--color-border)">
+        <h2 style="margin-bottom:0.5rem">📋 正文版本管理</h2>
+        {% if current_final is defined and current_final %}
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.75rem">
+            <span style="font-size:0.85rem;color:var(--color-text-muted)">当前最终采用稿：</span>
+            <a href="/worlds/{{ world.id }}/novel/final-drafts/{{ current_final.id }}" class="btn-sm" style="background:rgba(0,212,170,0.1);color:var(--color-accent);border:1px solid rgba(0,212,170,0.3)">
+                ⭐ {{ current_final.title }} · {{ current_final.word_count }}字
+            </a>
+        </div>
+        {% else %}
+        <p style="font-size:0.82rem;color:var(--color-text-muted);margin-bottom:0.75rem">暂无最终采用稿。可进入版本管理对比并确认最终采用稿。</p>
+        {% endif %}
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/versions" class="btn-primary">📋 版本管理</a>
+            <a href="/worlds/{{ world.id }}/novel/final-drafts" class="btn-outline">最终采用稿列表</a>
+        </div>
+    </div>
+
     <div class="action-row">
         {% if draft.status != 'discarded' and not draft.is_accepted %}
         <form action="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/set-accepted" method="post" {% if existing_accepted %}onsubmit="return confirm('该章节已有采用稿，确定要替换吗？')"{% endif %}>

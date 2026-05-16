@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard' %}
+{% block title %}正文版本管理 — {{ draft.title or '草稿' }} — AI World Engine{% endblock %}
+{% block page_title %}正文版本管理{% endblock %}
+{% block head_extra %}
+<style>
+.ver-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.6rem}
+.ver-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem}
+.ver-title{font-weight:600;font-size:0.95rem;color:var(--color-text)}
+.ver-meta{font-size:0.78rem;color:var(--color-text-muted);margin-top:0.2rem}
+.ver-status{display:inline-block;padding:0.12rem 0.5rem;border-radius:10px;font-size:0.7rem;font-weight:600}
+.ver-status.candidate{background:rgba(52,152,219,0.15);color:#3498db}
+.ver-status.accepted{background:rgba(0,212,170,0.15);color:var(--color-accent)}
+.ver-status.discarded{background:rgba(149,165,166,0.15);color:#95a5a6}
+.ver-actions{display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem}
+.final-badge{display:inline-block;padding:0.25rem 0.75rem;background:rgba(0,212,170,0.12);border:1px solid rgba(0,212,170,0.3);border-radius:12px;font-size:0.78rem;color:var(--color-accent);font-weight:600;margin-bottom:0.75rem}
+.alert-error{background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:#c0392b}
+.btn-sm{padding:0.25rem 0.6rem;font-size:0.75rem;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:0.2rem;border:1px solid var(--color-border);color:var(--color-text);background:var(--color-bg);cursor:pointer}
+.btn-sm:hover{background:var(--color-surface-hover)}
+.btn-sm.primary{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
+</style>
+{% endblock %}
+{% block content %}
+<div class="app-main-inner" style="max-width:1100px">
+<h1>📋 正文版本管理</h1>
+<div class="ver-card" style="margin-bottom:1rem">
+<div style="font-size:0.85rem"><span style="color:var(--color-text-muted)">正文草稿：</span><strong>{{ draft.title or draft.chapter_title or '(无标题)' }}</strong> · 第{{ draft.volume_index }}卷 第{{ draft.chapter_index }}章 · {{ draft.word_count }} 字</div>
+</div>
+
+{% if action_error %}<div class="alert-error">{{ action_error }}</div>{% endif %}
+
+{% if current_final %}
+<div class="final-badge">⭐ 当前最终采用稿：{{ current_final.title }} · {{ current_final.word_count }} 字 · {{ current_final.accepted_at.strftime('%m-%d %H:%M') if current_final.accepted_at else '' }}
+<form method="post" action="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/versions/final/revoke" style="display:inline;margin-left:0.5rem"><button type="submit" class="btn-sm" style="color:#e74c3c;border-color:#e74c3c" onclick="return confirm('确定要撤销当前最终采用稿吗？')">撤销</button></form>
+</div>
+{% else %}
+<div style="font-size:0.82rem;color:var(--color-text-muted);margin-bottom:0.75rem">暂无最终采用稿</div>
+{% endif %}
+
+{% for v in versions %}
+<div class="ver-card">
+<div class="ver-header">
+<div class="ver-title">
+<span class="ver-status {{ v.status }}">{{ v.label }}</span>
+{% if v.is_accepted %}<span style="color:var(--color-accent);font-weight:600;font-size:0.75rem;margin-left:0.3rem">★ 采用</span>{% endif %}
+{% if current_final and current_final.source_type == v.version_type and current_final.source_id == v.source_id %}<span style="color:var(--color-accent);font-weight:700;font-size:0.75rem;margin-left:0.3rem">⭐ 最终稿</span>{% endif %}
+</div>
+<div class="ver-meta">{{ v.word_count }} 字 · {{ v.created_at.strftime('%m-%d %H:%M') if v.created_at else '' }}</div>
+</div>
+<div style="font-size:0.8rem;color:var(--color-text-muted);margin:0.3rem 0">{{ v.content[:200] }}{% if v.content|length > 200 %}...{% endif %}</div>
+<div class="ver-actions">
+{% if v.can_be_final and (not current_final or current_final.source_id != v.source_id or current_final.source_type != v.version_type) %}
+<form method="post" action="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/versions/final" style="display:inline">
+<input type="hidden" name="source_type" value="{{ v.version_type }}"><input type="hidden" name="source_id" value="{{ v.source_id }}">
+<button type="submit" class="btn-sm primary">⭐ 设为最终采用稿</button>
+</form>
+{% endif %}
+{% for ov in versions %}
+{% if ov.version_type != v.version_type or ov.source_id != v.source_id %}
+<a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/versions/compare?left_type={{ v.version_type }}&left_id={{ v.source_id }}&right_type={{ ov.version_type }}&right_id={{ ov.source_id }}" class="btn-sm">↔ 与「{{ ov.label }}」对比</a>
+{% endif %}
+{% endfor %}
+</div>
+</div>
+{% endfor %}
+
+<div style="margin-top:1rem;display:flex;gap:0.5rem">
+<a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}" class="btn-outline">返回草稿详情</a>
+<a href="/worlds/{{ world.id }}/novel/final-drafts" class="btn-outline">最终采用稿列表</a>
+</div>
+</div>
+{% endblock %}

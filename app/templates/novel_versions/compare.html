@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard' %}
+{% block title %}版本对比 — {{ draft.title or '草稿' }} — AI World Engine{% endblock %}
+{% block page_title %}版本对比{% endblock %}
+{% block head_extra %}
+<style>
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:800px){.cmp-grid{grid-template-columns:1fr}}
+.cmp-pane{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem}
+.cmp-pane-title{font-weight:700;font-size:0.9rem;margin-bottom:0.4rem;color:var(--color-text)}
+.cmp-meta{font-size:0.75rem;color:var(--color-text-muted);margin-bottom:0.5rem}
+.cmp-content{white-space:pre-wrap;line-height:1.7;font-size:0.85rem;max-height:500px;overflow-y:auto;background:var(--color-bg);border:1px solid var(--color-border);border-radius:6px;padding:0.75rem}
+.cmp-summary{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:0.8rem;margin-top:1rem}
+.cmp-stat{display:flex;gap:1.5rem;flex-wrap:wrap;font-size:0.85rem}
+.cmp-stat-item{text-align:center}
+.cmp-stat-value{font-size:1.2rem;font-weight:700}
+.cmp-stat-label{font-size:0.7rem;color:var(--color-text-muted)}
+.diff-block{margin:0.3rem 0;padding:0.3rem 0.5rem;border-radius:4px;font-size:0.78rem;font-family:monospace;white-space:pre-wrap}
+.diff-same{background:var(--color-bg)}
+.diff-added{background:rgba(0,212,170,0.08);border-left:3px solid var(--color-accent)}
+.diff-removed{background:rgba(231,76,60,0.06);border-left:3px solid #e74c3c}
+.alert-info{background:rgba(52,152,219,0.08);border:1px solid rgba(52,152,219,0.2);border-radius:6px;padding:0.6rem 0.8rem;margin-bottom:0.75rem;font-size:0.8rem;color:var(--color-text-muted)}
+.alert-error{background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:#c0392b}
+</style>
+{% endblock %}
+{% block content %}
+<div class="app-main-inner" style="max-width:1200px">
+<h1>↔ 版本对比</h1>
+<div class="ver-card" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:0.8rem 1rem;margin-bottom:1rem;font-size:0.85rem">
+<span style="color:var(--color-text-muted)">草稿：</span><strong>{{ draft.title or draft.chapter_title or '(无标题)' }}</strong> · 第{{ draft.volume_index }}卷 第{{ draft.chapter_index }}章
+</div>
+
+{% if error %}<div class="alert-error">{{ error }}</div>{% endif %}
+
+{% if diff %}
+<div class="cmp-summary">
+<div class="cmp-stat">
+<div class="cmp-stat-item"><div class="cmp-stat-value">{{ diff.similarity }}%</div><div class="cmp-stat-label">相似度</div></div>
+<div class="cmp-stat-item"><div class="cmp-stat-value">{{ diff.left_word_count }}</div><div class="cmp-stat-label">左侧字数</div></div>
+<div class="cmp-stat-item"><div class="cmp-stat-value">{{ diff.right_word_count }}</div><div class="cmp-stat-label">右侧字数</div></div>
+<div class="cmp-stat-item"><div class="cmp-stat-value" style="color:{% if diff.word_count_delta > 0 %}var(--color-accent){% elif diff.word_count_delta < 0 %}#e74c3c{% else %}var(--color-text-muted){% endif %}">{{ '+' if diff.word_count_delta > 0 else '' }}{{ diff.word_count_delta }}</div><div class="cmp-stat-label">字数差</div></div>
+{% if diff.same_content %}<div class="cmp-stat-item"><div class="cmp-stat-value" style="color:var(--color-accent)">✓</div><div class="cmp-stat-label">完全相同</div></div>{% endif %}
+</div>
+</div>
+
+<div class="cmp-grid">
+<div class="cmp-pane">
+<div class="cmp-pane-title">📄 左侧：{{ left_version.title if left_version else (diff.left_title if diff else '') }}</div>
+<div class="cmp-meta">{{ {'draft':'原始正文草稿','revision':'润色候选稿'}.get(left_type, left_type) }} · {{ left_version.word_count if left_version else (diff.left_word_count if diff else 0) }} 字</div>
+<div class="cmp-content">{{ left_version.content if left_version else '' }}</div>
+</div>
+<div class="cmp-pane">
+<div class="cmp-pane-title">📝 右侧：{{ right_version.title if right_version else (diff.right_title if diff else '') }}</div>
+<div class="cmp-meta">{{ {'draft':'原始正文草稿','revision':'润色候选稿'}.get(right_type, right_type) }} · {{ right_version.word_count if right_version else (diff.right_word_count if diff else 0) }} 字</div>
+<div class="cmp-content">{{ right_version.content if right_version else '' }}</div>
+</div>
+</div>
+
+{% if not diff.same_content %}
+<h3 style="margin-top:1rem">📊 差异详情</h3>
+<div class="cmp-summary" style="max-height:400px;overflow-y:auto">
+{% for block in diff.diff_blocks %}
+<div class="diff-block {% if block.type == 'added' %}diff-added{% elif block.type == 'removed' %}diff-removed{% else %}diff-same{% endif %}">
+{{ {'added':'➕ 新增','removed':'➖ 移除','same':''}.get(block.type, block.type) }}{% if block.type != 'same' %}: {% endif %}{{ block.text[:500] }}
+</div>
+{% endfor %}
+</div>
+{% endif %}
+
+<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem">
+<form method="post" action="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/versions/final" style="display:inline"><input type="hidden" name="source_type" value="{{ left_type }}"><input type="hidden" name="source_id" value="{{ left_id }}"><button type="submit" class="btn-primary">⭐ 左侧设为最终采用稿</button></form>
+<form method="post" action="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/versions/final" style="display:inline"><input type="hidden" name="source_type" value="{{ right_type }}"><input type="hidden" name="source_id" value="{{ right_id }}"><button type="submit" class="btn-primary">⭐ 右侧设为最终采用稿</button></form>
+<a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/versions" class="btn-outline">返回版本管理</a>
+</div>
+{% else %}
+<div class="alert-info">请选择两个版本进行对比。从<a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/versions">版本管理</a>页面选择版本。</div>
+{% endif %}
+</div>
+{% endblock %}

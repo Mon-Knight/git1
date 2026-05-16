@@ -514,3 +514,35 @@ class NovelDraftRevision(Base):
 
     def __repr__(self):
         return f"<NovelDraftRevision id={self.id} status='{self.status}'>"
+
+
+class NovelFinalDraft(Base):
+    """User-confirmed final adopted version for a novel draft chapter."""
+    __tablename__ = "novel_final_drafts"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    world_id = Column(Integer, ForeignKey("worlds.id"), nullable=False)
+    draft_id = Column(Integer, ForeignKey("novel_drafts.id"), nullable=False)
+    source_type = Column(String(20), nullable=False)  # draft / revision
+    source_id = Column(Integer, nullable=False)
+    chapter_outline_id = Column(Integer, ForeignKey("novel_chapter_outlines.id"), nullable=True)
+    volume_index = Column(Integer, default=0)
+    chapter_index = Column(Integer, default=0)
+    title = Column(String(300), default="")
+    content_snapshot = Column(Text, default="")
+    word_count = Column(Integer, default=0)
+    source_title = Column(String(300), default="")
+    source_status = Column(String(20), default="")
+    note = Column(Text, default="")
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+    accepted_at = Column(DateTime, default=_utcnow)
+    revoked_at = Column(DateTime, nullable=True)
+
+    world = relationship("World", foreign_keys=[world_id])
+    draft = relationship("NovelDraft", foreign_keys=[draft_id])
+    chapter_outline = relationship("NovelChapterOutline", foreign_keys=[chapter_outline_id])
+
+    def __repr__(self):
+        return f"<NovelFinalDraft id={self.id} active={self.is_active}>"

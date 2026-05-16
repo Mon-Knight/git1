@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% set page_class = 'page-list' %}
+{% block title %}最终采用稿 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}最终采用稿{% endblock %}
+{% block head_extra %}
+<style>
+.fd-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.6rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem}
+.fd-info{flex:1;min-width:220px}
+.fd-title{font-weight:600;font-size:0.95rem;color:var(--color-text)}
+.fd-meta{font-size:0.78rem;color:var(--color-text-muted);margin-top:0.2rem}
+.fd-active{display:inline-block;padding:0.15rem 0.55rem;border-radius:10px;font-size:0.72rem;font-weight:600}
+.fd-active.true{background:rgba(0,212,170,0.15);color:var(--color-accent)}
+.fd-active.false{background:rgba(149,165,166,0.15);color:#95a5a6}
+.fd-actions{display:flex;gap:0.4rem;flex-wrap:wrap}
+</style>
+{% endblock %}
+{% block content %}
+<div class="dashboard" style="max-width:1200px">
+<h1>⭐ 最终采用稿</h1>
+<p style="color:var(--color-text-muted);margin-bottom:1rem">当前世界：<strong>{{ world.name }}</strong></p>
+{% if finals %}
+<div>{% for f in finals %}
+<div class="fd-card">
+<div class="fd-info">
+<div class="fd-title"><a href="/worlds/{{ world.id }}/novel/final-drafts/{{ f.id }}">{{ f.title or '(无标题)' }}</a></div>
+<div class="fd-meta">
+<span class="fd-active {{ 'true' if f.is_active else 'false' }}">{{ '当前采用' if f.is_active else '历史记录' }}</span>
+{% if f.is_active %}<span style="color:var(--color-accent);font-weight:600;margin-left:0.3rem">★ 当前最终采用稿</span>{% endif %}
+· {{ {'draft':'原始正文草稿','revision':'润色候选稿'}.get(f.source_type, f.source_type) }}
+· {{ f.word_count }} 字 · 第{{ f.volume_index }}卷 第{{ f.chapter_index }}章
+· {{ f.accepted_at.strftime('%m-%d %H:%M') if f.accepted_at else '' }}
+</div>
+</div>
+<div class="fd-actions">
+<a href="/worlds/{{ world.id }}/novel/final-drafts/{{ f.id }}" class="btn-sm">查看详情</a>
+{% if f.draft_id %}<a href="/worlds/{{ world.id }}/novel/drafts/{{ f.draft_id }}" class="btn-sm btn-outline">查看草稿</a>{% endif %}
+</div>
+</div>
+{% endfor %}</div>
+{% else %}
+<div class="empty-state-dash"><div class="empty-icon">⭐</div><p>还没有最终采用稿。</p><p style="font-size:0.82rem;color:var(--color-text-muted)">请在正文草稿的版本管理中设置最终采用稿。</p><a href="/worlds/{{ world.id }}/novel/drafts" class="btn-primary">查看正文草稿 →</a></div>
+{% endif %}
+</div>
+{% endblock %}

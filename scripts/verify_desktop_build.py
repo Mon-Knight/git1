@@ -85,6 +85,11 @@ REQUIRED_TEMPLATES = [
     "app/templates/novel_revisions/new.html",
     "app/templates/novel_revisions/detail.html",
     "app/templates/novel_revisions/edit.html",
+    # v2.3.0 Novel Versions
+    "app/templates/novel_versions/draft_versions.html",
+    "app/templates/novel_versions/compare.html",
+    "app/templates/novel_versions/final_drafts.html",
+    "app/templates/novel_versions/final_detail.html",
 ]
 
 # v2.0.1: Sidebar navigation keywords (base.html)
@@ -136,6 +141,9 @@ AI_MODULES = [
     # v2.2.0 Novel Revisions
     "app/routes/novel_revisions.py",
     "app/services/novel_revision_service.py",
+    # v2.3.0 Novel Versions
+    "app/routes/novel_versions.py",
+    "app/services/novel_version_service.py",
 ]
 
 

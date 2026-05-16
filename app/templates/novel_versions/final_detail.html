@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard' %}
+{% block title %}最终采用稿详情 — AI World Engine{% endblock %}
+{% block page_title %}最终采用稿详情{% endblock %}
+{% block head_extra %}
+<style>
+.fd-content{white-space:pre-wrap;line-height:1.8;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;font-size:0.9rem;max-height:500px;overflow-y:auto}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.5rem;margin-bottom:1rem}
+.info-item{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:0.6rem 0.8rem}
+.info-label{font-size:0.72rem;color:var(--color-text-muted)}
+.info-value{font-size:0.82rem;font-weight:600;margin-top:0.15rem}
+.fd-active-badge{display:inline-block;padding:0.25rem 0.75rem;border-radius:12px;font-size:0.78rem;font-weight:600}
+.fd-active-badge.true{background:rgba(0,212,170,0.15);color:var(--color-accent)}
+.fd-active-badge.false{background:rgba(149,165,166,0.15);color:#95a5a6}
+.action-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--color-border)}
+</style>
+{% endblock %}
+{% block content %}
+<div class="app-main-inner" style="max-width:1000px">
+<h1>⭐ {{ final.title or '(无标题)' }}</h1>
+<span class="fd-active-badge {{ 'true' if final.is_active else 'false' }}">{{ '当前最终采用稿' if final.is_active else '历史采用记录' }}</span>
+
+<div class="info-grid" style="margin-top:1rem">
+<div class="info-item"><div class="info-label">世界</div><div class="info-value">{{ world.name }}</div></div>
+<div class="info-item"><div class="info-label">卷/章</div><div class="info-value">第{{ final.volume_index }}卷 第{{ final.chapter_index }}章</div></div>
+<div class="info-item"><div class="info-label">来源类型</div><div class="info-value">{{ {'draft':'原始正文草稿','revision':'润色候选稿'}.get(final.source_type, final.source_type) }}</div></div>
+<div class="info-item"><div class="info-label">来源ID</div><div class="info-value">#{{ final.source_id }}</div></div>
+<div class="info-item"><div class="info-label">字数</div><div class="info-value">{{ final.word_count }} 字</div></div>
+<div class="info-item"><div class="info-label">采用时间</div><div class="info-value">{{ final.accepted_at.strftime('%Y-%m-%d %H:%M') if final.accepted_at else '-' }}</div></div>
+{% if final.revoked_at %}<div class="info-item"><div class="info-label">撤销时间</div><div class="info-value">{{ final.revoked_at.strftime('%Y-%m-%d %H:%M') }}</div></div>{% endif %}
+</div>
+
+{% if final.note %}
+<h3 style="margin-top:1rem">📝 采用备注</h3>
+<div style="font-size:0.85rem;color:var(--color-text-muted);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:0.8rem">{{ final.note }}</div>
+{% endif %}
+
+<h3 style="margin-top:1rem">📄 正文快照</h3>
+<div class="fd-content">{{ final.content_snapshot or '（快照为空）' }}</div>
+
+<div class="action-row">
+{% if final.is_active and final.draft_id %}
+<form method="post" action="/worlds/{{ world.id }}/novel/drafts/{{ final.draft_id }}/versions/final/revoke" style="display:inline" onsubmit="return confirm('确定要撤销当前最终采用稿吗？')"><button type="submit" class="btn-outline" style="color:#e74c3c;border-color:#e74c3c">🗑️ 撤销最终采用稿</button></form>
+{% endif %}
+{% if final.draft_id %}<a href="/worlds/{{ world.id }}/novel/drafts/{{ final.draft_id }}/versions" class="btn-outline">版本管理</a>
+<a href="/worlds/{{ world.id }}/novel/drafts/{{ final.draft_id }}" class="btn-outline">返回草稿</a>{% endif %}
+<a href="/worlds/{{ world.id }}/novel/final-drafts" class="btn-outline">最终采用稿列表</a>
+</div>
+</div>
+{% endblock %}

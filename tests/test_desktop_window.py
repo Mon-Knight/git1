@@ -46,11 +46,11 @@ class TestVersionConfig:
 
     def test_config_version_is_200(self):
         from app.config import settings
-        assert settings.VERSION == "2.2.0", (
-            f"Expected 2.2.0, got {settings.VERSION}"
+        assert settings.VERSION == "2.3.0", (
+            f"Expected 2.3.0, got {settings.VERSION}"
         )
 
     def test_desktop_test_version_matches(self):
-        # The test_desktop.py test should also reflect 2.2.0
+        # The test_desktop.py test should also reflect 2.3.0
         content = _read_root("tests/test_desktop.py")
-        assert "2.2.0" in content, "tests/test_desktop.py missing version 2.2.0"
+        assert "2.3.0" in content, "tests/test_desktop.py missing version 2.3.0"
