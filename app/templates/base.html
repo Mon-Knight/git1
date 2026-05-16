@@ -89,10 +89,12 @@
                     {% endif %}
                     {% if nav_world_id %}
                     <li><a href="/worlds/{{ nav_world_id }}/novel/quality-reports" class="sidebar-sublink" data-nav="novel">🔍 正文质量检查</a></li>
+                    <li><a href="/worlds/{{ nav_world_id }}/novel/revisions" class="sidebar-sublink" data-nav="novel">✨ 正文润色候选</a></li>
                     {% else %}
                     <li><span class="sidebar-sublink coming-soon" aria-disabled="true">🔍 正文质量检查 <small>(请先选择世界)</small></span></li>
+                    <li><span class="sidebar-sublink coming-soon" aria-disabled="true">✨ 正文润色候选 <small>(请先选择世界)</small></span></li>
                     {% endif %}
-                    <li><span class="sidebar-sublink coming-soon" aria-disabled="true">✨ 正文润色 <small>(后续开放)</small></span></li>
+                    <li><span class="sidebar-sublink coming-soon" aria-disabled="true">📊 版本对比 <small>(后续开放)</small></span></li>
                     <li><span class="sidebar-sublink coming-soon" aria-disabled="true">📕 整卷生成 <small>(后续开放)</small></span></li>
                     <li><span class="sidebar-sublink coming-soon" aria-disabled="true">📤 定稿导出 <small>(后续开放)</small></span></li>
                 </ul>

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}生成润色候选稿 — AI World Engine{% endblock %}
+{% block page_title %}生成正文润色候选稿{% endblock %}
+{% block head_extra %}
+<style>
+.form-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.form-label{display:block;font-weight:600;font-size:0.85rem;color:var(--color-text);margin-bottom:0.35rem}
+.form-hint{font-size:0.75rem;color:var(--color-text-muted);margin-top:0.2rem}
+.form-input,.form-textarea{width:100%;padding:0.55rem 0.7rem;border:1px solid var(--color-border);border-radius:6px;font-size:0.85rem;background:var(--color-bg);color:var(--color-text)}
+.form-textarea{min-height:80px;resize:vertical}
+.form-select{width:100%;padding:0.55rem 0.7rem;border:1px solid var(--color-border);border-radius:6px;font-size:0.85rem;background:var(--color-bg);color:var(--color-text)}
+.field-error{color:#e74c3c;font-size:0.78rem;margin-top:0.2rem}
+.alert-info{background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.25);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.8rem;font-size:0.82rem;color:var(--color-text-muted)}
+.alert-warning{background:rgba(243,156,18,0.1);border:1px solid rgba(243,156,18,0.25);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.8rem;font-size:0.82rem;color:#e67e22}
+.alert-danger{background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:#c0392b}
+.report-option{padding:0.4rem;border:1px solid var(--color-border);border-radius:6px;margin-bottom:0.3rem}
+.report-option:hover{background:var(--color-surface-hover)}
+.report-option input[type="radio"]{margin-right:0.4rem}
+.report-score{font-size:0.78rem;color:var(--color-text-muted)}
+</style>
+{% endblock %}
+{% block content %}
+<div class="dashboard" style="max-width:900px">
+<h1>✨ 生成正文润色候选稿</h1>
+<div class="form-card">
+<div style="margin-bottom:0.8rem"><span style="color:var(--color-text-muted)">正文草稿：</span><strong>{{ draft.title or draft.chapter_title or '(无标题)' }}</strong> · 第{{ draft.volume_index }}卷 第{{ draft.chapter_index }}章 · {{ draft.word_count }} 字 · {{ {'candidate':'候选','accepted':'采用稿','discarded':'已废弃'}.get(draft.status, draft.status) }}</div>
+</div>
+
+{% if draft_empty %}
+<div class="alert-danger">⚠️ 当前正文草稿内容为空，无法生成润色候选稿。请先编辑草稿并填写正文内容。</div>
+<div style="display:flex;gap:0.5rem"><a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/edit" class="btn-primary">编辑草稿</a><a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}" class="btn-outline">返回草稿</a></div>
+{% else %}
+{% if no_reports %}
+<div class="alert-warning">⚠️ 当前草稿没有质量检查报告。建议先生成质量检查报告，再基于报告润色。将基于原文进行通用润色。</div>
+{% endif %}
+{% if missing_outline %}<div class="alert-info">ℹ️ 缺少来源章节方案，章节匹配约束可能不完整。</div>{% endif %}
+{% if missing_style %}<div class="alert-info">ℹ️ 未关联写作风格方案，将按通用网文风格润色。</div>{% endif %}
+{% if errors.submit %}<div class="alert-danger">{{ errors.submit }}</div>{% endif %}
+
+<form method="post" action="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}/revisions">
+{% if quality_reports %}
+<div class="form-card">
+<div class="form-label">选择质量检查报告（可选）</div>
+<div class="form-hint" style="margin-bottom:0.5rem">基于质量检查报告进行润色可针对性修复已知问题。</div>
+{% for qr in quality_reports %}
+<label class="report-option" style="display:flex;align-items:center;cursor:pointer">
+<input type="radio" name="quality_report_id" value="{{ qr.id }}" {% if (form_data.get('quality_report_id', '')|string == qr.id|string) or (loop.first and not form_data.get('quality_report_id')) %}checked{% endif %} {% if qr.status == 'discarded' %}disabled{% endif %}>
+<div>
+<strong style="font-size:0.85rem">{{ qr.title or '报告 #' ~ qr.id }}</strong>
+<span class="rev-status {{ qr.status }}" style="margin-left:0.4rem">{{ {'candidate':'候选','current':'当前参考','discarded':'已废弃'}.get(qr.status, qr.status) }}</span>
+{% if qr.overall_score %}<span class="report-score"> · {{ qr.overall_score }}分</span>{% endif %}
+{% if qr.is_current %}<span style="color:var(--color-accent);font-size:0.75rem;margin-left:0.3rem">⭐ 推荐</span>{% endif %}
+{% if qr.status == 'discarded' %}<span style="color:#95a5a6;font-size:0.72rem">（不建议使用已废弃报告）</span>{% endif %}
+</div>
+</label>
+{% endfor %}
+</div>
+{% endif %}
+
+<div class="form-card">
+<label class="form-label" for="extra_requirements">补充润色要求</label>
+<textarea id="extra_requirements" name="extra_requirements" class="form-textarea" placeholder="例如：重点增强主角的心理描写，保持原有对话风格...">{{ form_data.get('extra_requirements', '') }}</textarea>
+<div class="form-hint">可选，最多 2000 字</div>
+{% if errors.extra_requirements %}<div class="field-error">{{ errors.extra_requirements }}</div>{% endif %}
+</div>
+
+<div class="alert-info">📋 <strong>润色说明：</strong>系统将基于原正文草稿、质量检查报告、章节大纲和世界设定，生成润色后的单章候选稿。AI 只生成润色候选稿，不会覆盖原正文草稿，不会自动替换采用稿。</div>
+
+<div style="display:flex;gap:0.5rem;margin-top:1rem"><button type="submit" class="btn-primary">✨ 生成润色候选稿</button><a href="/worlds/{{ world.id }}/novel/drafts/{{ draft.id }}" class="btn-outline">取消</a></div>
+</form>
+{% endif %}
+</div>
+{% endblock %}

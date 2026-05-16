@@ -79,6 +79,12 @@ REQUIRED_TEMPLATES = [
     "app/templates/novel_quality_reports/draft_reports.html",
     "app/templates/novel_quality_reports/new.html",
     "app/templates/novel_quality_reports/detail.html",
+    # v2.2.0 Novel Revisions
+    "app/templates/novel_revisions/index.html",
+    "app/templates/novel_revisions/draft_revisions.html",
+    "app/templates/novel_revisions/new.html",
+    "app/templates/novel_revisions/detail.html",
+    "app/templates/novel_revisions/edit.html",
 ]
 
 # v2.0.1: Sidebar navigation keywords (base.html)
@@ -127,6 +133,9 @@ AI_MODULES = [
     # v2.1.0 Novel Quality Reports
     "app/routes/novel_quality_reports.py",
     "app/services/novel_quality_service.py",
+    # v2.2.0 Novel Revisions
+    "app/routes/novel_revisions.py",
+    "app/services/novel_revision_service.py",
 ]
 
 

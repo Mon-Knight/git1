@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}编辑润色候选稿 — AI World Engine{% endblock %}
+{% block page_title %}编辑润色候选稿{% endblock %}
+{% block head_extra %}
+<style>
+.form-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.form-label{display:block;font-weight:600;font-size:0.85rem;color:var(--color-text);margin-bottom:0.35rem}
+.form-input,.form-textarea{width:100%;padding:0.55rem 0.7rem;border:1px solid var(--color-border);border-radius:6px;font-size:0.85rem;background:var(--color-bg);color:var(--color-text)}
+.form-textarea.large{min-height:350px;resize:vertical;line-height:1.6;font-size:0.88rem}
+.form-textarea.medium{min-height:100px;resize:vertical}
+.field-error{color:#e74c3c;font-size:0.78rem;margin-top:0.2rem}
+.alert-error{background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:#c0392b}
+.form-hint{font-size:0.75rem;color:var(--color-text-muted);margin-top:0.2rem}
+</style>
+{% endblock %}
+{% block content %}
+<div class="dashboard" style="max-width:1000px">
+<h1>✏️ 编辑润色候选稿</h1>
+<div class="form-card"><span style="color:var(--color-text-muted)">原草稿：</span><strong>{{ revision.original_title or revision.draft.title or '(无标题)' }}</strong> · 第{{ revision.volume_index }}卷 第{{ revision.chapter_index }}章</div>
+{% if errors.submit %}<div class="alert-error">{{ errors.submit }}</div>{% endif %}
+
+<form method="post" action="/worlds/{{ world.id }}/novel/revisions/{{ revision.id }}/edit">
+<div class="form-card">
+<label class="form-label" for="title">标题</label>
+<input type="text" id="title" name="title" class="form-input" value="{{ form_data.get('title', revision.title or '') }}">
+</div>
+<div class="form-card">
+<label class="form-label" for="content">润色正文</label>
+<textarea id="content" name="content" class="form-textarea large">{{ form_data.get('content', revision.content or '') }}</textarea>
+{% if errors.content %}<div class="field-error">{{ errors.content }}</div>{% endif %}
+<div class="form-hint">纯文本编辑，不支持富文本。</div>
+</div>
+<div class="form-card">
+<label class="form-label" for="revision_summary">润色说明</label>
+<textarea id="revision_summary" name="revision_summary" class="form-textarea medium">{{ form_data.get('revision_summary', revision.revision_summary or '') }}</textarea>
+</div>
+<div style="display:flex;gap:0.5rem;margin-top:1rem"><button type="submit" class="btn-primary">💾 保存</button><a href="/worlds/{{ world.id }}/novel/revisions/{{ revision.id }}" class="btn-outline">取消</a></div>
+</form>
+</div>
+{% endblock %}

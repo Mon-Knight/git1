@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard' %}
+{% block title %}{{ revision.title or '润色候选稿' }} — AI World Engine{% endblock %}
+{% block page_title %}{{ revision.title or '润色候选稿' }}{% endblock %}
+{% block head_extra %}
+<style>
+.rev-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1rem}
+.rev-status{display:inline-block;padding:0.2rem 0.6rem;border-radius:10px;font-size:0.75rem;font-weight:600}
+.rev-status.candidate{background:rgba(52,152,219,0.15);color:#3498db}
+.rev-status.accepted{background:rgba(0,212,170,0.15);color:var(--color-accent)}
+.rev-status.discarded{background:rgba(149,165,166,0.15);color:#95a5a6}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.5rem;margin-bottom:1rem}
+.info-item{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:0.6rem 0.8rem}
+.info-label{font-size:0.72rem;color:var(--color-text-muted)}
+.info-value{font-size:0.82rem;font-weight:600;margin-top:0.15rem}
+.rev-content{white-space:pre-wrap;line-height:1.8;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;font-size:0.9rem}
+.rev-summary{background:rgba(108,99,255,0.04);border:1px solid rgba(108,99,255,0.15);border-radius:var(--radius);padding:0.8rem 1rem;margin-top:0.75rem;font-size:0.82rem;color:var(--color-text-muted);white-space:pre-wrap}
+.raw-collapse{max-height:0;overflow:hidden;transition:max-height 0.3s}
+.raw-collapse.open{max-height:400px;overflow-y:auto}
+.raw-toggle{cursor:pointer;font-size:0.78rem;color:var(--color-primary);user-select:none}
+.raw-content{background:var(--color-bg);border:1px solid var(--color-border);border-radius:6px;padding:0.75rem;font-size:0.75rem;font-family:monospace;white-space:pre-wrap;max-height:300px;overflow-y:auto}
+.alert-error{background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:#c0392b}
+.action-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--color-border)}
+</style>
+{% endblock %}
+{% block content %}
+<div class="app-main-inner" style="max-width:1100px">
+{% if action_error %}<div class="alert-error">{{ action_error }}</div>{% endif %}
+
+<div class="rev-header">
+<div>
+<h1 style="margin:0 0 0.5rem 0;font-size:1.25rem">{{ revision.title or '润色候选稿' }}</h1>
+<div><span class="rev-status {{ revision.status }}">{{ {'candidate':'候选','accepted':'采用润色稿','discarded':'已废弃'}.get(revision.status, revision.status) }}</span>{% if revision.is_accepted %}<span style="color:var(--color-accent);font-weight:600;margin-left:0.4rem">★ 当前采用润色稿</span>{% endif %}<span style="font-size:0.78rem;color:var(--color-text-muted);margin-left:0.5rem">· {{ revision.created_at.strftime('%Y-%m-%d %H:%M') }}{% if revision.accepted_at %} · 采用于 {{ revision.accepted_at.strftime('%m-%d %H:%M') }}{% endif %}</span></div>
+</div>
+</div>
+
+<div class="info-grid">
+<div class="info-item"><div class="info-label">原草稿</div><div class="info-value">{% if revision.draft %}<a href="/worlds/{{ world.id }}/novel/drafts/{{ revision.draft.id }}">{{ revision.original_title or revision.draft.title or '查看' }}</a>{% else %}-{% endif %}</div></div>
+<div class="info-item"><div class="info-label">质量报告</div><div class="info-value">{% if revision.quality_report %}<a href="/worlds/{{ world.id }}/novel/quality-reports/{{ revision.quality_report.id }}">{{ revision.quality_report.overall_score }}分</a>{% else %}未关联{% endif %}</div></div>
+<div class="info-item"><div class="info-label">卷/章</div><div class="info-value">第{{ revision.volume_index }}卷 第{{ revision.chapter_index }}章</div></div>
+<div class="info-item"><div class="info-label">润色字数</div><div class="info-value">{{ revision.word_count }} 字</div></div>
+</div>
+
+{% if revision.revision_summary %}
+<h3 style="margin-top:1rem">📝 润色说明</h3>
+<div class="rev-summary">{{ revision.revision_summary }}</div>
+{% endif %}
+
+<h3 style="margin-top:1rem">📄 润色正文</h3>
+<div class="rev-content">{{ revision.content or '（正文为空）' }}</div>
+
+{% if revision.prompt %}
+<details style="margin-top:1rem"><summary style="cursor:pointer;font-size:0.8rem;color:var(--color-primary)">📋 Prompt 摘要</summary><div class="raw-content" style="margin-top:0.5rem">{{ revision.prompt }}</div></details>
+{% endif %}
+{% if revision.raw_text and revision.raw_text != revision.content %}
+<details style="margin-top:0.75rem"><summary style="cursor:pointer;font-size:0.8rem;color:var(--color-primary)">📄 原始返回</summary><div class="raw-content" style="margin-top:0.5rem">{{ revision.raw_text }}</div></details>
+{% endif %}
+
+<div class="action-row">
+{% if revision.status != 'discarded' and not revision.is_accepted %}
+<form method="post" action="/worlds/{{ world.id }}/novel/revisions/{{ revision.id }}/set-accepted" style="display:inline"><button type="submit" class="btn-primary">⭐ 标记为采用润色稿</button></form>
+{% endif %}
+{% if revision.status != 'discarded' %}
+<a href="/worlds/{{ world.id }}/novel/revisions/{{ revision.id }}/edit" class="btn-outline">✏️ 编辑</a>
+{% endif %}
+{% if revision.status != 'discarded' %}
+<form method="post" action="/worlds/{{ world.id }}/novel/revisions/{{ revision.id }}/discard" style="display:inline" onsubmit="return confirm('确定要废弃此润色候选稿吗？')"><button type="submit" class="btn-outline" style="color:#e74c3c;border-color:#e74c3c">🗑️ 废弃</button></form>
+{% endif %}
+{% if revision.draft_id %}<a href="/worlds/{{ world.id }}/novel/drafts/{{ revision.draft_id }}" class="btn-outline">返回草稿</a>{% endif %}
+<a href="/worlds/{{ world.id }}/novel/revisions" class="btn-outline">润色列表</a>
+</div>
+</div>
+{% endblock %}

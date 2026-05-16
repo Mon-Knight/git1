@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% set page_class = 'page-list' %}
+{% block title %}正文润色候选 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}正文润色候选{% endblock %}
+{% block head_extra %}
+<style>
+.rev-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.6rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem}
+.rev-info{flex:1;min-width:220px}
+.rev-title{font-weight:600;font-size:0.95rem;color:var(--color-text)}
+.rev-meta{font-size:0.78rem;color:var(--color-text-muted);margin-top:0.2rem}
+.rev-status{display:inline-block;padding:0.15rem 0.55rem;border-radius:10px;font-size:0.72rem;font-weight:600}
+.rev-status.candidate{background:rgba(52,152,219,0.15);color:#3498db}
+.rev-status.accepted{background:rgba(0,212,170,0.15);color:var(--color-accent)}
+.rev-status.discarded{background:rgba(149,165,166,0.15);color:#95a5a6}
+.rev-actions{display:flex;gap:0.4rem;flex-wrap:wrap}
+</style>
+{% endblock %}
+{% block content %}
+<div class="dashboard" style="max-width:1200px">
+<h1>✨ 正文润色候选</h1>
+<p style="color:var(--color-text-muted);margin-bottom:1rem">当前世界：<strong>{{ world.name }}</strong></p>
+{% if revisions %}
+<div>
+{% for r in revisions %}
+<div class="rev-card">
+<div class="rev-info">
+<div class="rev-title"><a href="/worlds/{{ world.id }}/novel/revisions/{{ r.id }}">{{ r.title or '(无标题)' }}</a></div>
+<div class="rev-meta">
+<span class="rev-status {{ r.status }}">{{ {'candidate':'候选','accepted':'采用润色稿','discarded':'已废弃'}.get(r.status, r.status) }}</span>
+{% if r.is_accepted %}<span style="color:var(--color-accent);font-weight:600;margin-left:0.3rem">★ 当前采用润色稿</span>{% endif %}
+· {{ r.word_count }} 字 · 第{{ r.volume_index }}卷 第{{ r.chapter_index }}章
+· {{ r.created_at.strftime('%m-%d %H:%M') }}
+</div>
+</div>
+<div class="rev-actions">
+<a href="/worlds/{{ world.id }}/novel/revisions/{{ r.id }}" class="btn-sm">查看详情</a>
+{% if r.draft_id %}<a href="/worlds/{{ world.id }}/novel/drafts/{{ r.draft_id }}" class="btn-sm btn-outline">查看草稿</a>{% endif %}
+</div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="empty-state-dash"><div class="empty-icon">✨</div><p>还没有润色候选稿。</p><p style="font-size:0.82rem;color:var(--color-text-muted)">请在正文草稿详情页或质量检查报告详情页生成润色候选稿。</p><a href="/worlds/{{ world.id }}/novel/drafts" class="btn-primary">查看正文草稿 →</a></div>
+{% endif %}
+</div>
+{% endblock %}

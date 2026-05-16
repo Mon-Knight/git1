@@ -479,3 +479,38 @@ class NovelDraftQualityReport(Base):
 
     def __repr__(self):
         return f"<NovelDraftQualityReport id={self.id} status='{self.status}'>"
+
+
+class NovelDraftRevision(Base):
+    """AI-generated polished revision candidate for a novel draft."""
+    __tablename__ = "novel_draft_revisions"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    world_id = Column(Integer, ForeignKey("worlds.id"), nullable=False)
+    draft_id = Column(Integer, ForeignKey("novel_drafts.id"), nullable=False)
+    quality_report_id = Column(Integer, ForeignKey("novel_draft_quality_reports.id"), nullable=True)
+    chapter_outline_id = Column(Integer, ForeignKey("novel_chapter_outlines.id"), nullable=True)
+    volume_index = Column(Integer, default=0)
+    chapter_index = Column(Integer, default=0)
+    title = Column(String(300), default="")
+    original_title = Column(String(300), default="")
+    original_content_snapshot = Column(Text, default="")
+    prompt = Column(Text, default="")
+    content = Column(Text, default="")
+    raw_text = Column(Text, default="")
+    word_count = Column(Integer, default=0)
+    revision_summary = Column(Text, default="")
+    applied_suggestions_json = Column(Text, default="")
+    status = Column(String(20), default="candidate")  # candidate / accepted / discarded
+    is_accepted = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+    accepted_at = Column(DateTime, nullable=True)
+
+    world = relationship("World", foreign_keys=[world_id])
+    draft = relationship("NovelDraft", foreign_keys=[draft_id])
+    quality_report = relationship("NovelDraftQualityReport", foreign_keys=[quality_report_id])
+    chapter_outline = relationship("NovelChapterOutline", foreign_keys=[chapter_outline_id])
+
+    def __repr__(self):
+        return f"<NovelDraftRevision id={self.id} status='{self.status}'>"

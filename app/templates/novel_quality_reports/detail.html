@@ -243,6 +243,18 @@
     </div>
     {% endif %}
 
+    <!-- v2.2.0: Generate revision from this report -->
+    {% if report.draft_id and report.status != 'discarded' %}
+    <div style="margin-top:1rem;padding:0.8rem 1rem;background:rgba(108,99,255,0.04);border:1px solid rgba(108,99,255,0.15);border-radius:var(--radius)">
+        <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.4rem">✨ 基于本报告生成润色候选稿</div>
+        <p style="font-size:0.78rem;color:var(--color-text-muted);margin-bottom:0.5rem">基于此质量检查报告的结果生成润色候选稿，系统将针对性修复报告中指出的问题。</p>
+        <div style="display:flex;gap:0.5rem">
+            <a href="/worlds/{{ world.id }}/novel/drafts/{{ report.draft_id }}/revisions/new" class="btn-primary btn-sm">✨ 生成润色候选稿</a>
+            <a href="/worlds/{{ world.id }}/novel/drafts/{{ report.draft_id }}/revisions" class="btn-outline btn-sm">查看润色候选</a>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Actions -->
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--color-border)">
         {% if report.status != 'discarded' and not report.is_current %}

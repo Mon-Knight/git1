@@ -272,6 +272,13 @@ async def novel_drafts_detail(request: Request, world_id: int, draft_id: int, db
     current_quality_report = next((r for r in quality_reports if r.is_current), None)
     latest_quality_report = quality_reports[0] if quality_reports else None
 
+    # v2.2.0: Revision summary
+    from app.services.novel_revision_service import NovelRevisionService
+    revisions = NovelRevisionService.list_revisions(db, world_id, draft_id=draft_id)
+    revisions_count = len(revisions)
+    accepted_revision = next((r for r in revisions if r.is_accepted), None)
+    latest_revision = revisions[0] if revisions else None
+
     return templates.TemplateResponse(request, "novel_drafts/detail.html", {
         "world": world,
         "draft": draft,
@@ -284,6 +291,9 @@ async def novel_drafts_detail(request: Request, world_id: int, draft_id: int, db
         "quality_reports_count": quality_reports_count,
         "current_quality_report": current_quality_report,
         "latest_quality_report": latest_quality_report,
+        "revisions_count": revisions_count,
+        "accepted_revision": accepted_revision,
+        "latest_revision": latest_revision,
     })
 
 

@@ -1,5 +1,5 @@
 """
-v2.1.0 — Sidebar Clickable State Tests
+v2.2.0 — Sidebar Clickable State Tests
 验证左侧导航高亮可点击、分组主链接与折叠按钮分离、禁用态正确。
 """
 
