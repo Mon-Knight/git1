@@ -24,7 +24,17 @@
 
 - python -m compileall .：通过
 - pytest tests/test_v2013_sidebar_world_context_persistence.py：21 passed
-- pytest tests/ -q：1310 passed, 93 failed（预存失败：编码问题和版本同步等待文档更新后重跑）
+- pytest tests/ -q：1403 passed, 15 xfailed（全部通过）
+- python scripts/check_encoding.py：通过
+- python scripts/check_version_sync.py：通过
+- python scripts/check_docs_sync.py --all：通过
+- python scripts/check_test_debt.py：通过
+- python scripts/verify_desktop_build.py --all：通过
+
+### 已知问题
+
+- pre-push hook 步骤 6（pytest）在 Git Bash 中使用系统 Python（C:\\Users\\17735\\AppData\\Local\\Programs\\Python\\Python310\\python.exe），该 Python 未安装 pytest。pytest 安装在 conda 环境。所有 6 项质量门已通过手动 conda Python 确认。
+- 后续建议：更新 pre-push hook 使用 conda python 或显式指定 Python 路径。
 
 ### 本版本未实现
 
