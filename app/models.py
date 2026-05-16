@@ -243,6 +243,13 @@ class StyleProfile(Base):
     ending_hook_style = Column(Text, default="")
     forbidden_patterns = Column(Text, default="")
     extra_instructions = Column(Text, default="")
+    # v2.4.0: TXT analysis source fields
+    source_type = Column(String(30), default="manual")  # manual / txt_analysis / imported / system
+    source_analysis_id = Column(Integer, nullable=True)
+    style_rules_json = Column(Text, default="")
+    do_rules = Column(Text, default="")
+    avoid_rules = Column(Text, default="")
+    generation_prompt_snippet = Column(Text, default="")
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=_utcnow)
     updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
@@ -251,6 +258,34 @@ class StyleProfile(Base):
 
     def __repr__(self):
         return f"<StyleProfile id={self.id} name='{self.name}'>"
+
+
+class StyleSourceAnalysis(Base):
+    """Records the analysis process of a TXT source file for style extraction."""
+    __tablename__ = "style_source_analyses"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    world_id = Column(Integer, ForeignKey("worlds.id"), nullable=False)
+    style_profile_id = Column(Integer, ForeignKey("style_profiles.id"), nullable=True)
+    source_filename = Column(String(500), default="")
+    source_file_hash = Column(String(64), default="")
+    source_file_size = Column(Integer, default=0)
+    source_char_count = Column(Integer, default=0)
+    encoding = Column(String(20), default="")
+    chunk_count = Column(Integer, default=0)
+    sample_strategy = Column(String(100), default="")
+    analysis_status = Column(String(20), default="pending")  # pending / analyzing / completed / failed / discarded
+    chunk_summaries_json = Column(Text, default="")
+    final_analysis_json = Column(Text, default="")
+    raw_ai_summary = Column(Text, default="")
+    error_message = Column(Text, default="")
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+    world = relationship("World", foreign_keys=[world_id])
+
+    def __repr__(self):
+        return f"<StyleSourceAnalysis id={self.id} file='{self.source_filename}'>"
 
 
 class PlotAnchor(Base):

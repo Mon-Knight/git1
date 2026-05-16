@@ -13,8 +13,10 @@ from app.database import get_db
 from app.config import settings
 from app.services.world_service import WorldService
 from app.services.style_profile_service import StyleProfileService
+from app.services.style_import_service import StyleImportService
 from app.services.plot_anchor_service import PlotAnchorService
 from app.services.context_package_service import ContextPackageService
+from app.models import StyleProfile
 
 router = APIRouter(prefix="/worlds/{world_id}/context")
 
@@ -77,6 +79,59 @@ async def list_styles(request: Request, world_id: int, db: Session = Depends(get
         "app_version": settings.VERSION,
         "profiles": profiles,
     })
+
+
+# v2.4.0: TXT Style Import
+@router.get("/styles/import", response_class=HTMLResponse)
+async def style_import_form(request: Request, world_id: int, db: Session = Depends(get_db)):
+    world = _get_world_or_404(db, world_id)
+    if not world:
+        return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+    return templates.TemplateResponse(request, "context/style_import.html", {
+        "world": world, "current_world": world, "active_nav": "assets",
+        "app_version": settings.VERSION, "errors": {}, "form_data": {},
+    })
+
+
+@router.post("/styles/import", response_class=HTMLResponse)
+async def style_import_upload(request: Request, world_id: int, db: Session = Depends(get_db)):
+    world = _get_world_or_404(db, world_id)
+    if not world:
+        return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+
+    form = await request.form()
+    uploaded = form.get("file")
+    profile_name = form.get("profile_name", "")
+
+    errors = {}
+    if not uploaded:
+        errors["file"] = "请选择要上传的 TXT 文件"
+        return templates.TemplateResponse(request, "context/style_import.html", {
+            "world": world, "current_world": world, "active_nav": "assets",
+            "app_version": settings.VERSION, "errors": errors, "form_data": {"profile_name": profile_name},
+        }, status_code=422)
+
+    filename = getattr(uploaded, 'filename', 'unknown.txt')
+    if not filename.lower().endswith('.txt'):
+        errors["file"] = "仅支持 .txt 文件"
+        return templates.TemplateResponse(request, "context/style_import.html", {
+            "world": world, "current_world": world, "active_nav": "assets",
+            "app_version": settings.VERSION, "errors": errors, "form_data": {"profile_name": profile_name},
+        }, status_code=422)
+
+    try:
+        file_bytes = await uploaded.read()
+        from io import BytesIO
+        profile, analysis = StyleImportService.generate_style_profile_from_txt(
+            db, world_id, BytesIO(file_bytes), filename, {"profile_name": profile_name}
+        )
+        return RedirectResponse(url=f"/worlds/{world_id}/context/styles/{profile.id}", status_code=303)
+    except Exception as e:
+        errors["submit"] = str(e)
+        return templates.TemplateResponse(request, "context/style_import.html", {
+            "world": world, "current_world": world, "active_nav": "assets",
+            "app_version": settings.VERSION, "errors": errors, "form_data": {"profile_name": profile_name},
+        }, status_code=500)
 
 
 @router.get("/styles/new", response_class=HTMLResponse)
@@ -296,6 +351,47 @@ async def delete_style(
     return RedirectResponse(
         url=f"/worlds/{world_id}/context/styles", status_code=303
     )
+
+
+# v2.4.0: Style detail page
+@router.get("/styles/{style_id}", response_class=HTMLResponse)
+async def style_detail(request: Request, world_id: int, style_id: int, db: Session = Depends(get_db)):
+    world = _get_world_or_404(db, world_id)
+    if not world:
+        return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+    profile = db.query(StyleProfile).filter_by(id=style_id).first()
+    if not profile or (profile.world_id and profile.world_id != world_id):
+        return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+    import json
+    style_rules = []
+    try:
+        if profile.style_rules_json:
+            style_rules = json.loads(profile.style_rules_json)
+    except: pass
+    do_rules = profile.do_rules.split('\n') if profile.do_rules else []
+    avoid_rules = profile.avoid_rules.split('\n') if profile.avoid_rules else []
+    source_label = {"manual":"手动创建","txt_analysis":"TXT 分析导入","imported":"外部导入","system":"系统默认"}.get(profile.source_type, profile.source_type)
+    return templates.TemplateResponse(request, "context/style_detail.html", {
+        "world": world, "current_world": world, "active_nav": "assets",
+        "app_version": settings.VERSION, "profile": profile,
+        "style_rules": style_rules, "do_rules": do_rules, "avoid_rules": avoid_rules,
+        "source_label": source_label,
+    })
+
+
+# v2.4.0: Set active/default style
+@router.post("/styles/{style_id}/set-active")
+async def set_active_style(request: Request, world_id: int, style_id: int, db: Session = Depends(get_db)):
+    world = _get_world_or_404(db, world_id)
+    if not world:
+        return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+    profile = db.query(StyleProfile).filter_by(id=style_id).first()
+    if not profile:
+        return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+    db.query(StyleProfile).filter(StyleProfile.world_id == world_id, StyleProfile.id != style_id).update({"is_active": False})
+    profile.is_active = True
+    db.commit()
+    return RedirectResponse(url=f"/worlds/{world_id}/context/styles/{style_id}", status_code=303)
 
 
 # ============================================================

@@ -90,6 +90,9 @@ REQUIRED_TEMPLATES = [
     "app/templates/novel_versions/compare.html",
     "app/templates/novel_versions/final_drafts.html",
     "app/templates/novel_versions/final_detail.html",
+    # v2.4.0 Style Import
+    "app/templates/context/style_import.html",
+    "app/templates/context/style_detail.html",
 ]
 
 # v2.0.1: Sidebar navigation keywords (base.html)
@@ -144,6 +147,8 @@ AI_MODULES = [
     # v2.3.0 Novel Versions
     "app/routes/novel_versions.py",
     "app/services/novel_version_service.py",
+    # v2.4.0 Style Import
+    "app/services/style_import_service.py",
 ]
 
 

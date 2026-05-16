@@ -83,7 +83,7 @@ class TestDetailPage:
         resp = client.post(f"/worlds/{w_id}/setting-suggestions",
             data={"suggestion_type":"character","world_type":"western_fantasy","reference_style":"heroic_epic","generation_count":2,"user_requirement":""},
             follow_redirects=True)
-        assert "v2.3.1" in resp.text
+        assert "v2.4.0" in resp.text
 
     def test_detail_has_app_shell(self, client):
         w_id = _create_world(client)

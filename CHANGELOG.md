@@ -1,5 +1,23 @@
 # Changelog
 
+## [v2.4.0] — 2026-05-16
+
+### Added
+- 新增 TXT 小说风格导入 (Upload→Encode→Clean→Chunk→Analyze→Profile)
+- 新增 AI 风格画像提取 (编码检测/清洗/分块/汇总)
+- 新增 StyleSourceAnalysis 分析记录模型
+- 新增风格画像详情页、默认风格设置
+- 新增风格导入相关 6 个测试文件 (39 tests)
+
+### Changed
+- StyleProfile 扩展 source_type/style_rules_json/do_rules/avoid_rules 等字段
+- 创作资产集成风格导入入口
+- 正文草稿生成 Prompt 集成风格约束
+
+### Notes
+- 不保存原文、不复制人物/设定/专有名词
+- 只提取抽象写作风格规则
+
 ## [v2.3.1] — 2026-05-16
 
 ### Fixed

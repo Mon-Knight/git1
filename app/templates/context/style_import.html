@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% set page_class = 'page-form' %}
+{% block title %}导入 TXT 分析写作风格 — {{ world.name }} — AI World Engine{% endblock %}
+{% block page_title %}导入 TXT 分析写作风格{% endblock %}
+{% block head_extra %}
+<style>
+.form-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.form-label{display:block;font-weight:600;font-size:0.85rem;color:var(--color-text);margin-bottom:0.35rem}
+.form-hint{font-size:0.75rem;color:var(--color-text-muted);margin-top:0.2rem}
+.form-input{width:100%;padding:0.55rem 0.7rem;border:1px solid var(--color-border);border-radius:6px;font-size:0.85rem;background:var(--color-bg);color:var(--color-text)}
+.file-input{border:2px dashed var(--color-border);border-radius:8px;padding:2rem;text-align:center;cursor:pointer;transition:border-color 0.2s}
+.file-input:hover{border-color:var(--color-primary)}
+.file-input input[type="file"]{display:none}
+.field-error{color:#e74c3c;font-size:0.78rem;margin-top:0.2rem}
+.alert-info{background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.25);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.8rem;font-size:0.82rem;color:var(--color-text-muted)}
+.alert-warning{background:rgba(243,156,18,0.1);border:1px solid rgba(243,156,18,0.25);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.8rem;font-size:0.82rem;color:#e67e22}
+.alert-danger{background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:#c0392b}
+</style>
+{% endblock %}
+{% block content %}
+<div class="dashboard" style="max-width:800px">
+<h1>📄 导入 TXT 分析写作风格</h1>
+<p style="color:var(--color-text-muted);margin-bottom:1rem">当前世界：<strong>{{ world.name }}</strong></p>
+
+<div class="alert-warning">⚠️ <strong>重要说明：</strong>系统将分析 TXT 文件的抽象写作风格特征（如叙事节奏、段落结构、描写密度等），<strong>不会</strong>保存原文、不会复制人物或设定、不会模仿具体桥段。生成的是写作风格画像，可用于后续正文生成时作为写作约束参考。</div>
+
+<div class="alert-info">📋 <strong>分析维度：</strong>叙事人称、句式风格、段落长度、对话比例、描写密度、冲突推进方式、信息释放方式、章末钩子习惯等。</div>
+
+{% if errors.submit %}<div class="alert-danger">{{ errors.submit }}</div>{% endif %}
+
+<form method="post" enctype="multipart/form-data" action="/worlds/{{ world.id }}/context/styles/import">
+<div class="form-card">
+<label class="file-input" id="file-label">
+<input type="file" name="file" accept=".txt" onchange="document.getElementById('file-label').querySelector('span').textContent=this.files[0]?this.files[0].name:'点击选择 TXT 文件...'">
+<span style="color:var(--color-text-muted)">点击选择 TXT 文件...</span>
+</label>
+{% if errors.file %}<div class="field-error">{{ errors.file }}</div>{% endif %}
+<div class="form-hint">支持 UTF-8、UTF-8-SIG、GBK 编码的 .txt 文件，最大 10MB。</div>
+</div>
+
+<div class="form-card">
+<label class="form-label" for="profile_name">风格画像名称（可选）</label>
+<input type="text" id="profile_name" name="profile_name" class="form-input" value="{{ form_data.get('profile_name', '') }}" placeholder="留空则自动生成名称">
+</div>
+
+<div style="display:flex;gap:0.5rem;margin-top:1rem">
+<button type="submit" class="btn-primary">🤖 开始分析</button>
+<a href="/worlds/{{ world.id }}/context/styles" class="btn-outline">返回风格列表</a>
+<a href="/worlds/{{ world.id }}/context" class="btn-outline">返回创作资产</a>
+</div>
+</form>
+</div>
+{% endblock %}

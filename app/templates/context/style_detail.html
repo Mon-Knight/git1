@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% set page_class = 'page-dashboard' %}
+{% block title %}{{ profile.name }} — AI World Engine{% endblock %}
+{% block page_title %}{{ profile.name }}{% endblock %}
+{% block head_extra %}
+<style>
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.5rem;margin-bottom:1rem}
+.info-item{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:0.6rem 0.8rem}
+.info-label{font-size:0.72rem;color:var(--color-text-muted)}
+.info-value{font-size:0.82rem;font-weight:600;margin-top:0.15rem}
+.section-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.8rem}
+.section-title{font-weight:700;font-size:0.85rem;color:var(--color-text);margin-bottom:0.5rem}
+.rule-item{padding:0.25rem 0;font-size:0.82rem;color:var(--color-text-muted)}
+.rule-item.check::before{content:'✅ '}
+.rule-item.cross::before{content:'❌ '}
+.action-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--color-border)}
+.source-badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:8px;font-size:0.7rem;font-weight:600}
+.source-badge.txt_analysis{background:rgba(52,152,219,0.15);color:#3498db}
+.source-badge.manual{background:rgba(149,165,166,0.15);color:#95a5a6}
+</style>
+{% endblock %}
+{% block content %}
+<div class="app-main-inner" style="max-width:1000px">
+<h1>{{ profile.name or '(无标题)' }}</h1>
+<div style="margin-bottom:0.5rem">
+<span class="source-badge {{ profile.source_type or 'manual' }}">{{ source_label }}</span>
+{% if profile.is_active %}<span style="color:var(--color-accent);font-weight:600;font-size:0.75rem;margin-left:0.4rem">★ 默认风格</span>{% endif %}
+</div>
+
+{% if profile.description %}
+<div class="section-card"><div class="section-title">📝 整体描述</div><div style="font-size:0.85rem;color:var(--color-text-muted);line-height:1.6">{{ profile.description }}</div></div>
+{% endif %}
+
+<div class="info-grid">
+{% if profile.narrative_pov %}<div class="info-item"><div class="info-label">叙事视角</div><div class="info-value">{{ profile.narrative_pov }}</div></div>{% endif %}
+{% if profile.pacing %}<div class="info-item"><div class="info-label">节奏</div><div class="info-value">{{ profile.pacing }}</div></div>{% endif %}
+{% if profile.sentence_style %}<div class="info-item"><div class="info-label">句式风格</div><div class="info-value">{{ profile.sentence_style }}</div></div>{% endif %}
+{% if profile.paragraph_style %}<div class="info-item"><div class="info-label">段落风格</div><div class="info-value">{{ profile.paragraph_style }}</div></div>{% endif %}
+{% if profile.dialogue_style %}<div class="info-item"><div class="info-label">对话</div><div class="info-value">{{ profile.dialogue_style }}</div></div>{% endif %}
+{% if profile.description_ratio %}<div class="info-item"><div class="info-label">描写比例</div><div class="info-value">{{ profile.description_ratio }}</div></div>{% endif %}
+{% if profile.conflict_style %}<div class="info-item"><div class="info-label">冲突推进</div><div class="info-value">{{ profile.conflict_style }}</div></div>{% endif %}
+{% if profile.character_style %}<div class="info-item"><div class="info-label">人物塑造</div><div class="info-value">{{ profile.character_style }}</div></div>{% endif %}
+{% if profile.scene_style %}<div class="info-item"><div class="info-label">场景</div><div class="info-value">{{ profile.scene_style }}</div></div>{% endif %}
+{% if profile.emotion_style %}<div class="info-item"><div class="info-label">情绪</div><div class="info-value">{{ profile.emotion_style }}</div></div>{% endif %}
+{% if profile.info_release_style %}<div class="info-item"><div class="info-label">信息释放</div><div class="info-value">{{ profile.info_release_style }}</div></div>{% endif %}
+{% if profile.opening_style %}<div class="info-item"><div class="info-label">章节开头</div><div class="info-value">{{ profile.opening_style }}</div></div>{% endif %}
+{% if profile.ending_hook_style %}<div class="info-item"><div class="info-label">章末钩子</div><div class="info-value">{{ profile.ending_hook_style }}</div></div>{% endif %}
+</div>
+
+{% if do_rules %}
+<div class="section-card"><div class="section-title">✅ 应遵守的规则</div>{% for r in do_rules %}{% if r.strip() %}<div class="rule-item check">{{ r.strip() }}</div>{% endif %}{% endfor %}</div>
+{% endif %}
+
+{% if avoid_rules %}
+<div class="section-card"><div class="section-title">❌ 禁止事项</div>{% for r in avoid_rules %}{% if r.strip() %}<div class="rule-item cross">{{ r.strip() }}</div>{% endif %}{% endfor %}</div>
+{% endif %}
+
+{% if style_rules %}
+<div class="section-card"><div class="section-title">📋 风格规则</div>{% for r in style_rules %}<div class="rule-item">• {{ r }}</div>{% endfor %}</div>
+{% endif %}
+
+{% if profile.generation_prompt_snippet %}
+<div class="section-card"><div class="section-title">📄 生成约束文本</div><div style="font-size:0.82rem;color:var(--color-text-muted);white-space:pre-wrap">{{ profile.generation_prompt_snippet }}</div></div>
+{% endif %}
+
+{% if profile.forbidden_patterns %}
+<div class="section-card"><div class="section-title">🚫 禁用模式</div><div style="font-size:0.82rem;color:#e67e22">{{ profile.forbidden_patterns }}</div></div>
+{% endif %}
+
+{% if profile.extra_instructions %}
+<div class="section-card"><div class="section-title">📝 补充说明</div><div style="font-size:0.82rem;color:var(--color-text-muted)">{{ profile.extra_instructions }}</div></div>
+{% endif %}
+
+<div class="action-row">
+<form method="post" action="/worlds/{{ world.id }}/context/styles/{{ profile.id }}/set-active" style="display:inline">{% if not profile.is_active %}<button type="submit" class="btn-primary">⭐ 设为默认风格</button>{% endif %}</form>
+<a href="/worlds/{{ world.id }}/context/styles/{{ profile.id }}/edit" class="btn-outline">✏️ 编辑</a>
+<a href="/worlds/{{ world.id }}/context/styles" class="btn-outline">返回列表</a>
+<a href="/worlds/{{ world.id }}/context" class="btn-outline">创作资产</a>
+</div>
+</div>
+{% endblock %}

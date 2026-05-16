@@ -125,4 +125,4 @@ class TestV201NavigationStructure:
         resp = client.get("/")
         assert resp.status_code == 200
         html = resp.text
-        assert "2.3.1" in html, "页面应包含版本号 2.3.1"
+        assert "2.4.0" in html, "页面应包含版本号 2.3.1"
