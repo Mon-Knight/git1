@@ -209,7 +209,8 @@ class NovelDraftService:
             try:
                 client = ModelRouter.get_client(db, "novel_evolution")
                 full_prompt = NovelDraftService.DRAFT_SYSTEM_PROMPT + "\n\n" + prompt
-                raw_text = client.generate(full_prompt) or ""
+                resp = client.generate(messages=[{"role": "user", "content": full_prompt}])
+                raw_text = resp.get("content", "") if isinstance(resp, dict) else str(resp)
             except Exception as e:
                 raise RuntimeError(f"AI 调用失败: {str(e)}")
 

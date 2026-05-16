@@ -1,5 +1,5 @@
 """
-v2.6.1: Test that novel engineering overview has all completed modules unlocked.
+v2.6.2: Test that novel engineering overview has all completed modules unlocked.
 """
 import re
 

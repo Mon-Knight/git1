@@ -1,5 +1,12 @@
 # Changelog
 
+## [v2.6.2] — 2026-05-17
+
+### Fixed
+- 修复 `get_client` 导入错误（类方法 vs 模块函数）
+- 修复 6 个服务 `generate()` 调用参数类型错误（字符串→list[dict]）
+- 统一 AI 调用为 `ModelRouter.get_client(db).generate(messages=[{"role":"user","content":p}])`
+
 ## [v2.6.1] — 2026-05-17
 
 ### Fixed

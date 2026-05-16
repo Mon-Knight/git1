@@ -246,15 +246,17 @@ class StyleImportService:
             chunk_summaries, final_json = StyleImportService._mock_analyze(chunks, chunk_count)
         else:
             try:
-                from app.services.ai.model_router import get_client as get_ai_client
-                ai_client = get_ai_client(db, task_type="simulation")
+                from app.services.ai.model_router import ModelRouter
+                ai_client = ModelRouter.get_client(db, task_type="simulation")
                 chunk_summaries = []
                 for i, chunk in enumerate(chunks):
                     prompt = StyleImportService.build_chunk_style_prompt(chunk, i, chunk_count)
-                    summary = ai_client.generate(prompt=prompt, max_tokens=2000)
+                    resp = ai_client.generate(messages=[{"role": "user", "content": prompt}])
+                    summary = resp.get("content", "") if isinstance(resp, dict) else str(resp)
                     chunk_summaries.append(summary)
                 final_prompt = StyleImportService.build_final_style_profile_prompt(chunk_summaries)
-                raw_final = ai_client.generate(prompt=final_prompt, max_tokens=4000)
+                resp_final = ai_client.generate(messages=[{"role": "user", "content": final_prompt}])
+                raw_final = resp_final.get("content", "") if isinstance(resp_final, dict) else str(resp_final)
                 final_json = StyleImportService._parse_style_json(raw_final)
             except Exception as e:
                 analysis.analysis_status = "failed"

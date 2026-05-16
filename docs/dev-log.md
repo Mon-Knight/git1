@@ -1,5 +1,23 @@
 # Development Log — AI World Engine
 
+## 2026-05-17 — v2.6.2: 修复 TXT 风格导入 AI 调用接口二次错误
+
+### 问题定位
+- v2.6.0: `ModelRouter.generate()` 不存在 → 第一次修复
+- v2.6.1: 改用 `get_client(db)` 但这是**类方法**不是模块函数 → `cannot import name 'get_client'`
+- v2.6.2: 正解 `ModelRouter.get_client(db).generate(messages=[{...}])`
+- **额外发现**: 所有 6 个服务调用 `generate()` 时都传错了参数类型（字符串而非 list[dict]）
+- `generate(messages, options)` 签名: `messages: List[Dict[str,str]]`, 返回 `{"success","content",...}`
+
+### 修复
+- 6个服务全部修正为 `client.generate(messages=[{"role":"user","content":prompt}])`
+- 返回值统一处理 `resp.get("content","")`
+
+### 测试
+1862 passed, 15 xfailed
+
+---
+
 ## 2026-05-17 — v2.6.1: 修复 TXT 风格导入 AI 调用接口错误
 
 ### 问题定位

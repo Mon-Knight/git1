@@ -339,11 +339,12 @@ class NovelContinuityService:
     ) -> Dict[str, Any]:
         """Generate continuity report using AI or Mock."""
         try:
-            from app.services.ai.model_router import get_client as get_ai_client
+            from app.services.ai.model_router import ModelRouter
 
             prompt = NovelContinuityService.build_continuity_prompt(db, world_id, request_data)
-            client = get_ai_client(db, task_type="simulation")
-            ai_response = client.generate(prompt=prompt, max_tokens=4000)
+            client = ModelRouter.get_client(db, task_type="simulation")
+            resp = client.generate(messages=[{"role": "user", "content": prompt}])
+            ai_response = resp.get("content", "") if isinstance(resp, dict) else str(resp)
 
             return {
                 "ok": True,

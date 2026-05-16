@@ -189,10 +189,11 @@ class NovelRevisionService:
         if is_mock:
             content, raw_text, revision_summary = NovelRevisionService._mock_generate(draft)
         else:
-            from app.services.ai.model_router import get_client as get_ai_client
+            from app.services.ai.model_router import ModelRouter
             try:
-                ai_client = get_ai_client(db, task_type="simulation")
-                raw_text = ai_client.generate(prompt=prompt, max_tokens=4000)
+                ai_client = ModelRouter.get_client(db, task_type="simulation")
+                resp = ai_client.generate(messages=[{"role": "user", "content": prompt}])
+                raw_text = resp.get("content", "") if isinstance(resp, dict) else str(resp)
                 content = NovelRevisionService.extract_revision_content(raw_text)
                 revision_summary = NovelRevisionService._extract_summary(raw_text)
             except Exception as e:

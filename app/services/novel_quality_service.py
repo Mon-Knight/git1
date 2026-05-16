@@ -334,10 +334,11 @@ class NovelQualityService:
         if is_mock:
             result_json, raw_text = NovelQualityService._mock_generate()
         else:
-            from app.services.ai.model_router import get_client as get_ai_client
+            from app.services.ai.model_router import ModelRouter
             try:
-                ai_client = get_ai_client(db, task_type="simulation")
-                raw_text = ai_client.generate(prompt=prompt, max_tokens=4000)
+                ai_client = ModelRouter.get_client(db, task_type="simulation")
+                resp = ai_client.generate(messages=[{"role": "user", "content": prompt}])
+                raw_text = resp.get("content", "") if isinstance(resp, dict) else str(resp)
                 result_json = NovelQualityService.parse_quality_report_response(raw_text)
             except Exception as e:
                 raise RuntimeError(f"AI 生成质量报告失败: {str(e)}")
