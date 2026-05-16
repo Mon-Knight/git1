@@ -297,3 +297,19 @@ class SettingSuggestionService:
             ],
         }
         return mock_data.get(suggestion_type, mock_data["character"])
+
+    @staticmethod
+    def delete_discarded_suggestion(db: Session, world_id: int, suggestion_id: int) -> Dict[str, Any]:
+        """Delete a discarded setting suggestion. Only discarded ones can be deleted."""
+        suggestion = (
+            db.query(SettingSuggestion)
+            .filter(SettingSuggestion.id == suggestion_id, SettingSuggestion.world_id == world_id)
+            .first()
+        )
+        if not suggestion:
+            return {"ok": False, "error": "候选不存在"}
+        if suggestion.status != "discarded":
+            return {"ok": False, "error": "只有已废弃的候选才能删除。请先废弃该候选。", "status": suggestion.status}
+        db.delete(suggestion)
+        db.commit()
+        return {"ok": True}

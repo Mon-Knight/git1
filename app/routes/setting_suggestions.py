@@ -272,3 +272,34 @@ async def discard_suggestion(
         url=f"/worlds/{world_id}/setting-suggestions/{suggestion_id}",
         status_code=303,
     )
+# v2.4.4: Delete discarded setting suggestion
+@router.post("/{suggestion_id}/delete")
+async def delete_setting_suggestion(
+    request: Request,
+    world_id: int, suggestion_id: int,
+    db: Session = Depends(get_db),
+):
+    world = _get_world_or_404(db, world_id)
+    if not world:
+        return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+
+    result = SettingSuggestionService.delete_discarded_suggestion(db, world_id, suggestion_id)
+    if not result["ok"]:
+        if result.get("error") == "候选不存在":
+            return templates.TemplateResponse(request, "worlds/404.html", {"world_id": world_id}, status_code=404)
+        suggestion = SettingSuggestionService.get_setting_suggestion(db, world_id, suggestion_id)
+        try:
+            result_data = json.loads(suggestion.result_json) if suggestion and suggestion.result_json else {}
+        except json.JSONDecodeError:
+            result_data = {}
+        return templates.TemplateResponse(request, "setting_suggestions/detail.html", {
+            "world": world, "suggestion": suggestion, "result_data": result_data,
+            "current_world": world, "active_nav": "worlds",
+            "app_version": settings.VERSION,
+            "error": result["error"],
+        })
+
+    return RedirectResponse(
+        url=f"/worlds/{world_id}/setting-suggestions",
+        status_code=303,
+    )

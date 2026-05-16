@@ -42,7 +42,7 @@ class Settings:
     APP_DEBUG: bool = os.getenv("APP_DEBUG", "false").lower() == "true"
 
     # Version
-    VERSION: str = "2.4.3"
+    VERSION: str = "2.4.4"
 
     @property
     def is_mock_ai(self) -> bool:

@@ -25,6 +25,7 @@
         </div>
     </div>
     <a href="/worlds/{{ world.id }}/setting-suggestions/{{ s.id }}" class="btn-sm">查看</a>
+    {% if s.status == 'discarded' %}<form action="/worlds/{{ world.id }}/setting-suggestions/{{ s.id }}/delete" method="post" onsubmit="return confirm('确定要彻底删除这条已废弃候选吗？\\n\\n删除后无法恢复。')" style="display:inline"><button type="submit" class="btn-sm btn-danger">删除</button></form>{% endif %}
 </div>
 {% endfor %}
 </div>

@@ -1,5 +1,23 @@
 # Development Log — AI World Engine
 
+## 2026-05-16 — v2.4.4: 正文质量检查/TXT风格导入/废弃删除修复
+
+### 问题定位
+1. 正文质量检查被锁定：world_dashboard_service 缺 quality-reports 链接
+2. TXT 风格导入缺失：styles.html 无"导入 TXT"按钮
+3. 旧风格方案消失：list_available_style_profiles_for_world 过滤了 is_active=False/NULL
+4. 废弃候选无法删除：缺 delete 路由和服务
+5. 版本显示旧版本：config.py 未更新
+
+### 修复
+- world_dashboard_service: 新增 quality-reports + revisions + final-drafts 链接
+- context/styles.html: 新增"导入 TXT 分析写作风格"按钮
+- style_profile_service: 移除 is_active==True 过滤
+- setting_suggestions: 新增 POST delete 路由 + delete_discarded_suggestion 服务
+- 模板: 废弃候选显示"删除"按钮（列表+详情）
+
+---
+
 ## 2026-05-16 — v2.4.3: 全局入口健康巡检与旧模块兼容收口
 
 ### 为什么不是新功能版本

@@ -128,21 +128,22 @@ class TestModuleGroups:
         assert "演化方案列表" in labels
 
     def test_novel_engineering_future_items_are_disabled(self, db):
-        """小说工程中 future items (正文润色/整卷生成/整书导出) should be disabled; 分卷/章节大纲/正文草稿 are enabled."""
+        """小说工程中 future items (整卷生成/整书导出) should be disabled; 正文质量检查/润色/版本管理/正文草稿 are enabled."""
         w_id = _create_world(db)
         groups = WorldDashboardService.get_world_module_groups(db, w_id)
         group = next(g for g in groups if g["key"] == "novel_engineering")
         future_links = [link for link in group["links"] if link["disabled"]]
         future_labels = {link["label"] for link in future_links}
-        # v2.0.0: 正文草稿已启用, 正文润色/整卷生成/整书导出仍为后续版本
-        assert "正文润色" in future_labels
+        # v2.4.4: 正文润色已启用; 整卷生成/整书导出仍为后续版本
         assert "整卷生成" in future_labels
         assert "整书导出" in future_labels
-        # 正文草稿/分卷/章节大纲 should NOT be disabled
+        # v2.4.4: 正文质量检查/润色/版本管理 enabled
         enabled_links = [link for link in group["links"] if not link["disabled"]]
         enabled_labels = {link["label"] for link in enabled_links}
         assert "✍️ 正文草稿" in enabled_labels
         assert "🪄 生成正文草稿" in enabled_labels
+        assert "🔍 正文质量检查" in enabled_labels
+        assert "✨ 正文润色" in enabled_labels
         assert "分卷大纲" in enabled_labels or "📚 分卷大纲" in enabled_labels
         assert "章节大纲" in enabled_labels or "📝 章节大纲" in enabled_labels
         for link in future_links:

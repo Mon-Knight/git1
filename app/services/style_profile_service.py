@@ -94,7 +94,6 @@ class StyleProfileService:
             .filter(
                 (StyleProfile.world_id == world_id) | (StyleProfile.world_id.is_(None))
             )
-            .filter(StyleProfile.is_active == True)
             .order_by(StyleProfile.updated_at.desc())
             .all()
         )
