@@ -124,6 +124,7 @@ def init_db():
         NovelDraftRevision,
         NovelFinalDraft,
         NovelContinuityReport,
+        NovelVolumeExport,
     )
     Base.metadata.create_all(bind=engine)
     _migrate_schema()

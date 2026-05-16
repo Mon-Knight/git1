@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% set page_class = 'page-dashboard' %}{% block title %}卷内预览 — {{ ctx.volume.title }} — {{ world.name }}{% endblock %}{% block page_title %}卷内正文预览{% endblock %}
+{% block content %}
+<h1>📄 {{ ctx.volume.title }} — 正文预览</h1>
+<div style="margin-bottom:1rem;display:flex;gap:0.5rem;flex-wrap:wrap">
+    <a href="/worlds/{{ world.id }}/novel/volume-manuscripts/{{ volume_id }}" class="btn-sm">← 返回详情</a>
+    <span style="font-size:0.85rem;color:var(--color-text-muted)">{{ ctx.summary.chapter_count }}章 · {{ ctx.summary.word_count }}字</span>
+</div>
+
+{% for ch in ctx.chapters %}
+<div style="margin-bottom:1.5rem;padding:1rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius)">
+    <h3 style="margin-top:0">{{ ch.chapter_title }}</h3>
+    <span style="font-size:0.75rem;color:var(--color-text-muted)">
+        {% if ch.source_type == 'final_draft' %}✅ 最终采用稿{% elif ch.source_type == 'revision_accepted' %}⭐ 采用润色稿{% elif ch.source_type == 'draft_accepted' %}📝 采用草稿{% elif ch.source_type == 'draft_only' %}📄 原始草稿{% else %}❌ 缺失正文{% endif %}
+         · {{ ch.word_count }}字
+    </span>
+    <div style="margin-top:0.75rem;white-space:pre-wrap;line-height:1.8;max-height:600px;overflow:auto;font-size:0.9rem">
+        {% if ch.text %}{{ ch.text[:3000] }}{% if ch.text|length > 3000 %}...{% endif %}{% else %}
+        <div style="padding:1rem;background:rgba(231,76,60,0.05);border:1px dashed rgba(231,76,60,0.3);border-radius:4px;color:#e74c3c">【本章暂无正文内容】</div>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

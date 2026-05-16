@@ -34,6 +34,7 @@ from app.routes.data import router as data_router
 from app.routes.context import router as context_router
 from app.routes.setting_suggestions import router as setting_suggestions_router
 from app.routes.novel_continuity import router as novel_continuity_router
+from app.routes.novel_volume_exports import router as novel_volume_exports_router
 
 
 @asynccontextmanager
@@ -89,6 +90,7 @@ app.include_router(data_router)
 app.include_router(context_router)
 app.include_router(setting_suggestions_router)
 app.include_router(novel_continuity_router)
+app.include_router(novel_volume_exports_router)
 
 
 @app.get("/health")

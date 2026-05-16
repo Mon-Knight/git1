@@ -1,0 +1,24 @@
+{% extends "base.html" %}{% set page_class = 'page-list' %}{% block title %}导出记录 — {{ world.name }} — AI World Engine{% endblock %}{% block page_title %}导出记录{% endblock %}
+{% block content %}
+<h1>📋 导出记录 — {{ world.name }}</h1>
+<a href="/worlds/{{ world.id }}/novel/volume-manuscripts" class="btn-sm" style="margin-bottom:1rem">← 卷内正文管理</a>
+
+{% if records %}
+<div class="item-list">
+{% for r in records %}{% set fl = {'txt':'📝 TXT','markdown':'📑 Markdown','json':'📊 JSON'} %}
+<div class="item-row" style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;padding:0.6rem 1rem;margin-bottom:0.4rem">
+    <div class="item-info" style="flex:1">
+        <div class="item-title" style="font-weight:500">{{ fl.get(r.export_format,'') }} {{ r.title }}
+            <span style="font-size:0.8rem;color:var(--color-text-muted)">{{ r.chapter_count }}章 · {{ r.word_count }}字</span>
+        </div>
+        <div class="item-meta" style="font-size:0.75rem;color:var(--color-text-muted)">{{ r.file_name }} · {{ r.created_at.strftime('%m-%d %H:%M') }}</div>
+    </div>
+    <a href="/worlds/{{ world.id }}/novel/exports/{{ r.id }}" class="btn-sm">详情</a>
+    <a href="/worlds/{{ world.id }}/novel/exports/{{ r.id }}/download" class="btn-sm">⬇ 下载</a>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div style="text-align:center;padding:3rem;background:var(--color-surface);border:1px dashed var(--color-border);border-radius:var(--radius);color:var(--color-text-muted)">暂无导出记录</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}{% set page_class = 'page-dashboard' %}{% block title %}{{ ctx.volume.title }} — 卷内正文 — {{ world.name }}{% endblock %}{% block page_title %}卷内正文管理{% endblock %}
+{% block content %}
+<h1>📖 {{ ctx.volume.title }}</h1>
+<div style="display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0;font-size:0.85rem;color:var(--color-text-muted)">
+    <span>总章节: <strong>{{ ctx.summary.chapter_count }}</strong></span>
+    <span>最终稿: <strong style="color:var(--color-accent)">{{ ctx.summary.final_draft_count }}</strong></span>
+    <span>Fallback: <strong style="color:#f39c12">{{ ctx.summary.fallback_count }}</strong></span>
+    <span>缺失: <strong style="color:#e74c3c">{{ ctx.summary.missing_count }}</strong></span>
+    <span>总字数: <strong>{{ ctx.summary.word_count }}</strong></span>
+</div>
+{% if error %}<div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem;border-radius:var(--radius);margin-bottom:1rem">{{ error }}</div>{% endif %}
+
+<div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap">
+    <a href="/worlds/{{ world.id }}/novel/volume-manuscripts/{{ volume_id }}/preview" class="btn-primary">📄 预览卷内正文</a>
+    <a href="/worlds/{{ world.id }}/novel/exports" class="btn-sm">📋 导出记录</a>
+</div>
+
+<div style="margin-bottom:1.5rem">
+    <h3>📊 导出</h3>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+        <form action="/worlds/{{ world.id }}/novel/volume-manuscripts/{{ volume_id }}/export" method="post" style="display:inline">
+            <input type="hidden" name="export_format" value="txt">
+            <input type="hidden" name="include_missing_placeholders" value="1">
+            <button type="submit" class="btn-sm">📝 导出 TXT</button>
+        </form>
+        <form action="/worlds/{{ world.id }}/novel/volume-manuscripts/{{ volume_id }}/export" method="post" style="display:inline">
+            <input type="hidden" name="export_format" value="markdown">
+            <input type="hidden" name="include_missing_placeholders" value="1">
+            <button type="submit" class="btn-sm">📑 导出 Markdown</button>
+        </form>
+        <form action="/worlds/{{ world.id }}/novel/volume-manuscripts/{{ volume_id }}/export" method="post" style="display:inline">
+            <input type="hidden" name="export_format" value="json">
+            <input type="hidden" name="include_missing_placeholders" value="1">
+            <button type="submit" class="btn-sm">📊 导出 JSON</button>
+        </form>
+    </div>
+</div>
+
+{% if ctx.summary.missing_count > 0 %}
+<div style="padding:0.75rem;background:rgba(231,76,60,0.05);border:1px solid rgba(231,76,60,0.2);border-radius:var(--radius);margin-bottom:1rem">
+    ⚠️ 该卷有 <strong>{{ ctx.summary.missing_count }}</strong> 章缺失正文，导出时将显示占位提示。
+</div>
+{% endif %}
+
+<h3>章节状态表</h3>
+<div class="item-list">
+{% for ch in ctx.chapters %}{% set sl = {'final_draft':'✅ 最终稿','revision_accepted':'⭐ 润色稿','draft_accepted':'📝 采用草稿','draft_only':'📄 草稿','none':'❌ 缺失'} %}
+{% set sc = {'final_draft':'status-adopted','revision_accepted':'status-adopted','draft_accepted':'status-pending','draft_only':'status-pending','none':'status-discarded'} %}
+<div style="padding:0.5rem 0.75rem;margin-bottom:0.3rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem">
+    <div>
+        <strong>{{ ch.chapter_title }}</strong>
+        <span class="item-status {{ sc.get(ch.source_type,'') }}" style="display:inline-block;padding:0.1rem 0.4rem;border-radius:10px;font-size:0.7rem;margin-left:0.5rem">{{ sl.get(ch.source_type,ch.source_type) }}</span>
+        <span style="font-size:0.75rem;color:var(--color-text-muted);margin-left:0.5rem">{{ ch.word_count }}字</span>
+        {% if ch.has_quality %}<span style="font-size:0.7rem;color:var(--color-accent)">🔍</span>{% endif %}
+    </div>
+    <div style="display:flex;gap:0.3rem;flex-wrap:wrap">
+        <a href="/worlds/{{ world.id }}/novel/chapter-outlines/{{ ch.chapter_id }}" class="btn-sm" style="font-size:0.7rem">大纲</a>
+        {% if ch.has_text %}<a href="/worlds/{{ world.id }}/novel/drafts?chapter={{ ch.chapter_id }}" class="btn-sm" style="font-size:0.7rem">草稿</a>{% endif %}
+    </div>
+</div>{% endfor %}
+</div>
+{% endblock %}

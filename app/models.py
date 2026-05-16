@@ -621,3 +621,33 @@ class NovelContinuityReport(Base):
 
     def __repr__(self):
         return f"<NovelContinuityReport id={self.id} status='{self.status}'>"
+
+
+class NovelVolumeExport(Base):
+    """Export record for volume-level manuscript exports. v2.6.0"""
+    __tablename__ = "novel_volume_exports"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    world_id = Column(Integer, ForeignKey("worlds.id"), nullable=False)
+    volume_outline_id = Column(Integer, ForeignKey("novel_volume_outlines.id"), nullable=True)
+    volume_index = Column(Integer, default=0)
+    title = Column(String(300), default="")
+    export_format = Column(String(20), default="txt")  # txt / markdown / json
+    file_name = Column(String(300), default="")
+    file_path = Column(String(500), default="")
+    chapter_count = Column(Integer, default=0)
+    final_draft_count = Column(Integer, default=0)
+    fallback_count = Column(Integer, default=0)
+    missing_count = Column(Integer, default=0)
+    word_count = Column(Integer, default=0)
+    source_summary_json = Column(Text, default="[]")
+    export_options_json = Column(Text, default="{}")
+    status = Column(String(20), default="completed")  # completed / failed / deleted
+    error_message = Column(Text, default="")
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+    world = relationship("World", foreign_keys=[world_id])
+
+    def __repr__(self):
+        return f"<NovelVolumeExport id={self.id} format='{self.export_format}'>"

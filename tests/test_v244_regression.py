@@ -1,5 +1,5 @@
 """
-AI World Engine - v2.5.0 Regression Tests
+AI World Engine - v2.6.0 Regression Tests
 Tests for: quality check availability, TXT style import, style visibility,
 discarded suggestion deletion, version display.
 """
@@ -16,7 +16,7 @@ def _create_world(client) -> int:
 
 
 class TestQualityReportsAvailable:
-    """v2.5.0: Quality reports must not be locked."""
+    """v2.6.0: Quality reports must not be locked."""
 
     def test_quality_reports_page_200(self, client):
         w_id = _create_world(client)
@@ -50,7 +50,7 @@ class TestQualityReportsAvailable:
 
 
 class TestStyleImportAvailable:
-    """v2.5.0: TXT import entry must be visible."""
+    """v2.6.0: TXT import entry must be visible."""
 
     def test_styles_page_200(self, client):
         w_id = _create_world(client)
@@ -74,7 +74,7 @@ class TestStyleImportAvailable:
 
 
 class TestOldStyleProfilesVisible:
-    """v2.5.0: Old style profiles must be visible."""
+    """v2.6.0: Old style profiles must be visible."""
 
     def test_styles_list_includes_manual(self, client):
         w_id = _create_world(client)
@@ -103,7 +103,7 @@ class TestOldStyleProfilesVisible:
 
 
 class TestDiscardedSuggestionDelete:
-    """v2.5.0: Discarded suggestions can be deleted."""
+    """v2.6.0: Discarded suggestions can be deleted."""
 
     def _create_discarded(self, client, w_id):
         resp = client.post(f"/worlds/{w_id}/setting-suggestions", data={
@@ -155,15 +155,15 @@ class TestDiscardedSuggestionDelete:
 
 
 class TestVersionDisplay:
-    """v2.5.0: Version must show 2.5.0."""
+    """v2.6.0: Version must show 2.6.0."""
 
     def test_config_version_is_244(self):
         from app.config import settings
-        assert settings.VERSION == "2.5.0"
+        assert settings.VERSION == "2.6.0"
 
     def test_home_shows_version(self, client):
         r = client.get("/")
-        assert "2.5.0" in r.text
+        assert "2.6.0" in r.text
 
     def test_base_no_old_version(self, client):
         r = client.get("/")

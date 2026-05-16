@@ -153,6 +153,14 @@ AI_MODULES = [
     "app/templates/novel_continuity/index.html",
     "app/templates/novel_continuity/new.html",
     "app/templates/novel_continuity/detail.html",
+    # v2.6.0 Volume Exports
+    "app/services/novel_volume_export_service.py",
+    "app/routes/novel_volume_exports.py",
+    "app/templates/novel_volume_exports/index.html",
+    "app/templates/novel_volume_exports/detail.html",
+    "app/templates/novel_volume_exports/preview.html",
+    "app/templates/novel_volume_exports/exports.html",
+    "app/templates/novel_volume_exports/export_detail.html",
     # v2.4.0 Style Import
     "app/services/style_import_service.py",
     # v2.4.2 Model Formatters

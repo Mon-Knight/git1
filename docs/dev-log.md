@@ -1,5 +1,25 @@
 # Development Log — AI World Engine
 
+## 2026-05-16 — v2.6.0: 卷内正文管理与基础导出
+
+### 为什么做 v2.6.0
+章节内容已可生成/检查/润色/定稿/连续性检查，但缺少按卷汇总和导出能力。
+用户需要查看某卷完整状态并导出为可读文件。
+
+### 核心设计
+- **最终采用稿优先**: 导出时优先 NovelFinalDraft.content_snapshot
+- **Fallback**: 润色稿→正文草稿→原始草稿
+- **3种导出格式**: TXT / Markdown / JSON
+- **导出目录**: 源码模式 `exports/`, EXE 模式 `%LOCALAPPDATA%/AIWorldEngine/exports/`
+
+### 新增文件
+model / service / routes / 5 templates / 1 test file (19 tests)
+
+### 测试
+1821 passed, 15 xfailed
+
+---
+
 ## 2026-05-16 — v2.5.0: 章节连续性与前后文一致性检查
 
 ### 为什么做 v2.5.0

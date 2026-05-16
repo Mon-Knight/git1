@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% set page_class = 'page-dashboard' %}{% block title %}导出详情 — {{ world.name }}{% endblock %}{% block page_title %}导出详情{% endblock %}
+{% block content %}{% set fl = {'txt':'📝 TXT','markdown':'📑 Markdown','json':'📊 JSON'} %}
+<h1>{{ fl.get(record.export_format,'') }} 导出详情</h1>
+<div style="margin:1rem 0">
+    <a href="/worlds/{{ world.id }}/novel/exports" class="btn-sm">← 导出记录列表</a>
+    <a href="/worlds/{{ world.id }}/novel/exports/{{ record.id }}/download" class="btn-primary">⬇ 下载文件</a>
+</div>
+<div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem">
+    <table style="width:100%;font-size:0.9rem">
+        <tr><td style="color:var(--color-text-muted);width:120px">文件名</td><td>{{ record.file_name }}</td></tr>
+        <tr><td style="color:var(--color-text-muted)">格式</td><td>{{ fl.get(record.export_format,record.export_format) }}</td></tr>
+        <tr><td style="color:var(--color-text-muted)">卷名</td><td>{{ record.title }}</td></tr>
+        <tr><td style="color:var(--color-text-muted)">章节数</td><td>{{ record.chapter_count }}</td></tr>
+        <tr><td style="color:var(--color-text-muted)">最终稿</td><td><span style="color:var(--color-accent)">{{ record.final_draft_count }}</span></td></tr>
+        <tr><td style="color:var(--color-text-muted)">Fallback</td><td><span style="color:#f39c12">{{ record.fallback_count }}</span></td></tr>
+        <tr><td style="color:var(--color-text-muted)">缺失</td><td><span style="color:#e74c3c">{{ record.missing_count }}</span></td></tr>
+        <tr><td style="color:var(--color-text-muted)">总字数</td><td>{{ record.word_count }}</td></tr>
+        <tr><td style="color:var(--color-text-muted)">状态</td><td>{{ record.status }}</td></tr>
+        <tr><td style="color:var(--color-text-muted)">创建时间</td><td>{{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>
+    </table>
+</div>
+{% endblock %}

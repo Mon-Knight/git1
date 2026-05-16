@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% set page_class = 'page-list' %}{% block title %}卷内正文管理 — {{ world.name }} — AI World Engine{% endblock %}{% block page_title %}卷内正文管理{% endblock %}
+{% block content %}
+<h1>📚 卷内正文管理 — {{ world.name }}</h1>
+<p style="color:var(--color-text-muted);margin-bottom:1.5rem">查看各卷正文状态，按章节顺序汇总最终采用稿，支持导出 TXT / Markdown / JSON。</p>
+
+{% if volume_summaries %}
+<div class="item-list">
+{% for vs in volume_summaries %}
+{% set v = vs.volume %}{% set s = vs.summary %}
+<div class="item-row" style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;padding:0.6rem 1rem;margin-bottom:0.4rem">
+    <div class="item-info" style="flex:1">
+        <div class="item-title" style="font-weight:500">📖 {{ v.title or '第'~v.id~'卷' }}
+            <span style="font-size:0.8rem;color:var(--color-text-muted)">{{ s.chapter_count }}章</span>
+            <span style="font-size:0.8rem;color:var(--color-accent)">{{ s.final_draft_count }}篇最终稿</span>
+            {% if s.missing_count %}<span style="font-size:0.8rem;color:#e74c3c">{{ s.missing_count }}章缺失</span>{% endif %}
+        </div>
+        <div class="item-meta" style="font-size:0.75rem;color:var(--color-text-muted)">总字数: {{ s.word_count }} · fallback: {{ s.fallback_count }}</div>
+    </div>
+    <a href="/worlds/{{ world.id }}/novel/volume-manuscripts/{{ v.id }}" class="btn-sm">查看</a>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div style="text-align:center;padding:3rem;background:var(--color-surface);border:1px dashed var(--color-border);border-radius:var(--radius);color:var(--color-text-muted)">
+    <p>暂无分卷大纲。请先生成并确认分卷大纲。</p>
+    <a href="/worlds/{{ world.id }}/novel/volume-outlines" class="btn-sm">📚 分卷大纲</a>
+</div>
+{% endif %}
+{% endblock %}

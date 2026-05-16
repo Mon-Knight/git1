@@ -1,5 +1,19 @@
 # Changelog
 
+## [v2.6.0] — 2026-05-16
+
+### Added
+- 卷内正文管理：按卷汇总章节状态、最终采用稿统计、缺失检测
+- TXT / Markdown / JSON 三种导出格式
+- NovelVolumeExport 模型 + novel_volume_export_service
+- 导出记录列表、详情、下载
+- 小说工程新增「卷内正文管理」入口
+- 19 个新增测试
+
+### Notes
+- 不生成新正文，不修改最终采用稿
+- 后续 v2.7.0 → 整卷草稿生成或 DOCX 导出
+
 ## [v2.5.0] — 2026-05-16
 
 ### Added
